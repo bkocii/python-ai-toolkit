@@ -22,3 +22,4 @@ class AIResult(BaseModel, Generic[T]):
     model: str
     raw_response: str
     duration_ms: float | None = None
+    retries_used: int = 0

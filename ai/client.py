@@ -68,6 +68,7 @@ The JSON must match this schema:
         start = perf_counter()
         raw_response = self.provider.ask_text(final_prompt)
         duration_ms = (perf_counter() - start) * 1000
+        retries_used = 0
 
         if response_type is None:
             return AIResult(
@@ -75,11 +76,13 @@ The JSON must match this schema:
                 model=self.model,
                 raw_response=raw_response,
                 duration_ms=duration_ms,
+                retries_used=retries_used,
             )
 
         try:
             parsed = parse_json_response(raw_response, response_type)
         except (AIJSONParseError, AISchemaValidationError):
+            retries_used = 1
             repair_prompt = f"""
         The previous response did not match the required JSON schema.
 
@@ -99,6 +102,7 @@ The JSON must match this schema:
             model=self.model,
             raw_response=raw_response,
             duration_ms=duration_ms,
+            retries_used=retries_used,
         )
 
     def ask_text(self, prompt: str) -> str:
