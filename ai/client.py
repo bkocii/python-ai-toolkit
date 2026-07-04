@@ -1,7 +1,7 @@
 from typing import TypeVar, overload
 from time import perf_counter
 from pydantic import BaseModel
-
+from ai.exceptions import AIJSONParseError, AISchemaValidationError
 from ai.config import get_ai_config
 from ai.parser import parse_json_response
 from ai.providers.openai_provider import OpenAIProvider
@@ -77,7 +77,22 @@ The JSON must match this schema:
                 duration_ms=duration_ms,
             )
 
-        parsed = parse_json_response(raw_response, response_type)
+        try:
+            parsed = parse_json_response(raw_response, response_type)
+        except (AIJSONParseError, AISchemaValidationError):
+            repair_prompt = f"""
+        The previous response did not match the required JSON schema.
+
+        Original prompt:
+        {final_prompt}
+
+        Invalid response:
+        {raw_response}
+
+        Return ONLY corrected valid JSON matching the schema.
+        """
+            raw_response = self.provider.ask_text(repair_prompt)
+            parsed = parse_json_response(raw_response, response_type)
 
         return AIResult(
             data=parsed,
