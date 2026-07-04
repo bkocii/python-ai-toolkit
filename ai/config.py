@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass
 from dotenv import load_dotenv
+from ai.exceptions import AIConfigurationError
 
 load_dotenv()
 
@@ -16,7 +17,9 @@ def get_ai_config() -> AIConfig:
     api_key = os.getenv("OPENAI_API_KEY")
 
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is missing. Add it to your .env file.")
+        raise AIConfigurationError(
+            "OPENAI_API_KEY is missing. Add it to your .env file."
+        )
 
     return AIConfig(
         api_key=api_key,

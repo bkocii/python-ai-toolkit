@@ -27,7 +27,7 @@ MENU = [
     },
     {
         "name": "Vodka Sour",
-        "price": 4.5,
+        "price": 7.5,
         "alcoholic": True,
         "taste": ["kiwi", "fresh", "fruity", "refreshing"],
         "available": True,
