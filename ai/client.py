@@ -1,36 +1,25 @@
-from openai import OpenAI
-
 from ai.config import get_ai_config
+from ai.providers.openai_provider import OpenAIProvider
 
 
 class AIClient:
     """
-    Reusable wrapper around the OpenAI client.
+    Main public client used by applications.
 
-    Goal:
-    - One place for model configuration.
-    - One place for future logging, retries, caching, and cost tracking.
+    AIClient does not know provider-specific API details.
+    It delegates actual model calls to a provider class.
     """
 
-    def __init__(self, model: str | None = None):
+    def __init__(self):
         config = get_ai_config()
 
-        self.model = model or config.model
-        self.client = OpenAI(api_key=config.api_key)
+        if config.provider == "openai":
+            self.provider = OpenAIProvider(
+                api_key=config.api_key,
+                model=config.model,
+            )
+        else:
+            raise ValueError(f"Unsupported AI provider: {config.provider}")
 
     def ask_text(self, prompt: str) -> str:
-        """
-        Send a plain text prompt to the model and return plain text.
-
-        Later we will add:
-        - ask_json()
-        - ask_schema()
-        - tool calling
-        - retries
-        """
-        response = self.client.responses.create(
-            model=self.model,
-            input=prompt,
-        )
-
-        return response.output_text
+        return self.provider.ask_text(prompt)

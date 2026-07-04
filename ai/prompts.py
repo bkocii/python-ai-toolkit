@@ -13,6 +13,4 @@ class PromptBuilder:
         return self
 
     def build(self) -> str:
-        return "\n\n".join(
-            f"{title}:\n{content}" for title, content in self.sections
-        )
+        return "\n\n".join(f"{title}:\n{content}" for title, content in self.sections)

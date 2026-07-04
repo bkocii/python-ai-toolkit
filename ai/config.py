@@ -7,24 +7,12 @@ load_dotenv()
 
 @dataclass(frozen=True)
 class AIConfig:
-    """
-    Central place for AI configuration.
-
-    We keep configuration here so the rest of the code does not read
-    environment variables directly.
-    """
-
     api_key: str
     model: str = "gpt-5.4-mini"
+    provider: str = "openai"
 
 
 def get_ai_config() -> AIConfig:
-    """
-    Load AI configuration from environment variables.
-
-    Raises:
-        RuntimeError: If OPENAI_API_KEY is missing.
-    """
     api_key = os.getenv("OPENAI_API_KEY")
 
     if not api_key:
@@ -33,4 +21,5 @@ def get_ai_config() -> AIConfig:
     return AIConfig(
         api_key=api_key,
         model=os.getenv("OPENAI_MODEL", "gpt-5.4-mini"),
+        provider=os.getenv("AI_PROVIDER", "openai"),
     )
