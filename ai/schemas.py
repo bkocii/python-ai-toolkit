@@ -21,3 +21,4 @@ class AIResult(BaseModel, Generic[T]):
     data: T
     model: str
     raw_response: str
+    duration_ms: float | None = None

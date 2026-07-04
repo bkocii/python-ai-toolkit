@@ -1,5 +1,5 @@
 from typing import TypeVar, overload
-
+from time import perf_counter
 from pydantic import BaseModel
 
 from ai.config import get_ai_config
@@ -65,13 +65,16 @@ The JSON must match this schema:
 {schema_json}
 """
 
+        start = perf_counter()
         raw_response = self.provider.ask_text(final_prompt)
+        duration_ms = (perf_counter() - start) * 1000
 
         if response_type is None:
             return AIResult(
                 data=raw_response,
                 model=self.model,
                 raw_response=raw_response,
+                duration_ms=duration_ms,
             )
 
         parsed = parse_json_response(raw_response, response_type)
@@ -80,6 +83,7 @@ The JSON must match this schema:
             data=parsed,
             model=self.model,
             raw_response=raw_response,
+            duration_ms=duration_ms,
         )
 
     def ask_text(self, prompt: str) -> str:
