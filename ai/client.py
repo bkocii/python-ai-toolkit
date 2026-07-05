@@ -67,6 +67,7 @@ The JSON must match this schema:
 
         start = perf_counter()
         raw_response = self.provider.ask_text(final_prompt)
+        original_raw_response = raw_response
         duration_ms = (perf_counter() - start) * 1000
         retries_used = 0
 
@@ -77,6 +78,7 @@ The JSON must match this schema:
                 raw_response=raw_response,
                 duration_ms=duration_ms,
                 retries_used=retries_used,
+                original_raw_response=original_raw_response,
             )
 
         try:
@@ -103,6 +105,7 @@ The JSON must match this schema:
             raw_response=raw_response,
             duration_ms=duration_ms,
             retries_used=retries_used,
+            original_raw_response=original_raw_response,
         )
 
     def ask_text(self, prompt: str) -> str:
