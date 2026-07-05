@@ -1,5 +1,6 @@
 from typing import TypeVar, overload
 from time import perf_counter
+from uuid import uuid4
 from pydantic import BaseModel
 from ai.exceptions import AIJSONParseError, AISchemaValidationError, AIError
 from ai.config import get_ai_config
@@ -55,6 +56,7 @@ class AIClient:
         If response_type is provided, the model is instructed to return JSON,
         and the result is validated against that Pydantic schema.
         """
+        request_id = str(uuid4())
         final_prompt = prompt
 
         if response_type is not None:
@@ -81,7 +83,8 @@ The JSON must match this schema:
                 estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
 
                 self.logger.info(
-                    "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
+                    "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s",
+                    request_id,
                     self.model,
                     duration_ms,
                     retries_used,
@@ -96,6 +99,7 @@ The JSON must match this schema:
                     original_raw_response=original_raw_response,
                     token_usage=token_usage,
                     estimated_cost_usd=estimated_cost_usd,
+                    request_id=request_id,
                 )
 
             try:
@@ -126,7 +130,8 @@ The JSON must match this schema:
             estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
 
             self.logger.info(
-                "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
+                "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s",
+                request_id,
                 self.model,
                 duration_ms,
                 retries_used,
@@ -141,9 +146,14 @@ The JSON must match this schema:
                 original_raw_response=original_raw_response,
                 token_usage=token_usage,
                 estimated_cost_usd=estimated_cost_usd,
+                request_id=request_id,
             )
         except AIError:
-            self.logger.exception("AI request failed | model=%s", self.model)
+            self.logger.exception(
+                "AI request failed | request_id=%s | model=%s",
+                request_id,
+                self.model,
+            )
             raise
 
     def ask_text(self, prompt: str) -> str:

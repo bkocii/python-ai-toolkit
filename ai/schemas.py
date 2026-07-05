@@ -48,3 +48,4 @@ class AIResult(BaseModel, Generic[T]):
     retries_used: int = 0
     token_usage: TokenUsage | None = None
     estimated_cost_usd: Decimal | None = None
+    request_id: str
