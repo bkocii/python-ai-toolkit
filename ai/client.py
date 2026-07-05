@@ -1,7 +1,7 @@
 from typing import TypeVar, overload
 from time import perf_counter
 from pydantic import BaseModel
-from ai.exceptions import AIJSONParseError, AISchemaValidationError
+from ai.exceptions import AIJSONParseError, AISchemaValidationError, AIError
 from ai.config import get_ai_config
 from ai.parser import parse_json_response
 from ai.providers.openai_provider import OpenAIProvider
@@ -67,62 +67,69 @@ The JSON must match this schema:
 {schema_json}
 """
 
-        start = perf_counter()
-        raw_response = self.provider.ask_text(final_prompt)
-        original_raw_response = raw_response
-        duration_ms = (perf_counter() - start) * 1000
-        retries_used = 0
+        try:
+            start = perf_counter()
+            raw_response = self.provider.ask_text(final_prompt)
+            original_raw_response = raw_response
+            retries_used = 0
 
-        self.logger.info(
-            "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
-            self.model,
-            duration_ms,
-            retries_used,
-        )
+            if response_type is None:
+                duration_ms = (perf_counter() - start) * 1000
 
-        if response_type is None:
+                self.logger.info(
+                    "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
+                    self.model,
+                    duration_ms,
+                    retries_used,
+                )
+
+                return AIResult(
+                    data=raw_response,
+                    model=self.model,
+                    raw_response=raw_response,
+                    duration_ms=duration_ms,
+                    retries_used=retries_used,
+                    original_raw_response=original_raw_response,
+                )
+
+            try:
+                parsed = parse_json_response(raw_response, response_type)
+            except (AIJSONParseError, AISchemaValidationError):
+                retries_used = 1
+                repair_prompt = f"""
+            The previous response did not match the required JSON schema.
+    
+            Original prompt:
+            {final_prompt}
+    
+            Invalid response:
+            {raw_response}
+    
+            Return ONLY corrected valid JSON matching the schema.
+            """
+                raw_response = self.provider.ask_text(repair_prompt)
+                parsed = parse_json_response(raw_response, response_type)
+
+            duration_ms = (perf_counter() - start) * 1000
+
+            self.logger.info(
+                "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
+                self.model,
+                duration_ms,
+                retries_used,
+            )
+
             return AIResult(
-                data=raw_response,
+                data=parsed,
                 model=self.model,
                 raw_response=raw_response,
                 duration_ms=duration_ms,
                 retries_used=retries_used,
                 original_raw_response=original_raw_response,
             )
-
-        try:
-            parsed = parse_json_response(raw_response, response_type)
-        except (AIJSONParseError, AISchemaValidationError):
-            retries_used = 1
-            repair_prompt = f"""
-        The previous response did not match the required JSON schema.
-
-        Original prompt:
-        {final_prompt}
-
-        Invalid response:
-        {raw_response}
-
-        Return ONLY corrected valid JSON matching the schema.
-        """
-            raw_response = self.provider.ask_text(repair_prompt)
-            parsed = parse_json_response(raw_response, response_type)
-
-        self.logger.info(
-            "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
-            self.model,
-            duration_ms,
-            retries_used,
-        )
-
-        return AIResult(
-            data=parsed,
-            model=self.model,
-            raw_response=raw_response,
-            duration_ms=duration_ms,
-            retries_used=retries_used,
-            original_raw_response=original_raw_response,
-        )
+        except AIError:
+            self.logger.exception("AI request failed | model=%s", self.model)
+            raise
 
     def ask_text(self, prompt: str) -> str:
         """
