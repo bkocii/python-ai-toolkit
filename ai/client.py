@@ -6,6 +6,7 @@ from ai.config import get_ai_config
 from ai.parser import parse_json_response
 from ai.providers.openai_provider import OpenAIProvider
 from ai.schemas import AIResult
+from ai.logger import get_ai_logger
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -26,6 +27,7 @@ class AIClient:
     def __init__(self):
         config = get_ai_config()
         self.model = config.model
+        self.logger = get_ai_logger()
 
         if config.provider == "openai":
             self.provider = OpenAIProvider(
@@ -71,6 +73,13 @@ The JSON must match this schema:
         duration_ms = (perf_counter() - start) * 1000
         retries_used = 0
 
+        self.logger.info(
+            "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
+            self.model,
+            duration_ms,
+            retries_used,
+        )
+
         if response_type is None:
             return AIResult(
                 data=raw_response,
@@ -98,6 +107,13 @@ The JSON must match this schema:
         """
             raw_response = self.provider.ask_text(repair_prompt)
             parsed = parse_json_response(raw_response, response_type)
+
+        self.logger.info(
+            "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
+            self.model,
+            duration_ms,
+            retries_used,
+        )
 
         return AIResult(
             data=parsed,
