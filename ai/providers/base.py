@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from ai.schemas import ProviderResponse
 
 
 class BaseAIProvider(ABC):
@@ -11,6 +12,6 @@ class BaseAIProvider(ABC):
     """
 
     @abstractmethod
-    def ask_text(self, prompt: str) -> str:
+    def ask_text(self, prompt: str) -> ProviderResponse:
         """Send a prompt and return a text response."""
         raise NotImplementedError

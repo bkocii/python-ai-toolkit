@@ -69,8 +69,10 @@ The JSON must match this schema:
 
         try:
             start = perf_counter()
-            raw_response = self.provider.ask_text(final_prompt)
+            provider_response = self.provider.ask_text(final_prompt)
+            raw_response = provider_response.text
             original_raw_response = raw_response
+            token_usage = provider_response.token_usage
             retries_used = 0
 
             if response_type is None:
@@ -90,6 +92,7 @@ The JSON must match this schema:
                     duration_ms=duration_ms,
                     retries_used=retries_used,
                     original_raw_response=original_raw_response,
+                    token_usage=token_usage,
                 )
 
             try:
@@ -107,7 +110,9 @@ The JSON must match this schema:
     
             Return ONLY corrected valid JSON matching the schema.
             """
-                raw_response = self.provider.ask_text(repair_prompt)
+                provider_response = self.provider.ask_text(repair_prompt)
+                raw_response = provider_response.text
+                token_usage = provider_response.token_usage
                 parsed = parse_json_response(raw_response, response_type)
 
             duration_ms = (perf_counter() - start) * 1000
@@ -126,6 +131,7 @@ The JSON must match this schema:
                 duration_ms=duration_ms,
                 retries_used=retries_used,
                 original_raw_response=original_raw_response,
+                token_usage=token_usage,
             )
         except AIError:
             self.logger.exception("AI request failed | model=%s", self.model)
