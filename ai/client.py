@@ -112,7 +112,11 @@ The JSON must match this schema:
             """
                 provider_response = self.provider.ask_text(repair_prompt)
                 raw_response = provider_response.text
-                token_usage = provider_response.token_usage
+                token_usage = (
+                    token_usage.add(provider_response.token_usage)
+                    if token_usage is not None
+                    else provider_response.token_usage
+                )
                 parsed = parse_json_response(raw_response, response_type)
 
             duration_ms = (perf_counter() - start) * 1000

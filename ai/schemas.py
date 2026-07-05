@@ -9,6 +9,16 @@ class TokenUsage(BaseModel):
     output_tokens: int | None = None
     total_tokens: int | None = None
 
+    def add(self, other: "TokenUsage | None") -> "TokenUsage":
+        if other is None:
+            return self
+
+        return TokenUsage(
+            input_tokens=(self.input_tokens or 0) + (other.input_tokens or 0),
+            output_tokens=(self.output_tokens or 0) + (other.output_tokens or 0),
+            total_tokens=(self.total_tokens or 0) + (other.total_tokens or 0),
+        )
+
 
 class ProviderResponse(BaseModel):
     text: str
