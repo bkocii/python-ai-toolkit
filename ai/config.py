@@ -11,6 +11,8 @@ class AIConfig:
     api_key: str
     model: str = "gpt-5.4-mini"
     provider: str = "openai"
+    input_cost_per_1m_tokens: str | None = None
+    output_cost_per_1m_tokens: str | None = None
 
 
 def get_ai_config() -> AIConfig:
@@ -25,4 +27,6 @@ def get_ai_config() -> AIConfig:
         api_key=api_key,
         model=os.getenv("OPENAI_MODEL", "gpt-5.4-mini"),
         provider=os.getenv("AI_PROVIDER", "openai"),
+        input_cost_per_1m_tokens=os.getenv("AI_INPUT_COST_PER_1M_TOKENS"),
+        output_cost_per_1m_tokens=os.getenv("AI_OUTPUT_COST_PER_1M_TOKENS"),
     )

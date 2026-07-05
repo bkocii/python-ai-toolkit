@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from ai.config import get_ai_config
 from ai.schemas import TokenUsage
 
 # Prices are per 1M tokens.
@@ -23,7 +23,15 @@ def estimate_cost_usd(model: str, token_usage: TokenUsage | None) -> Decimal | N
     if token_usage is None:
         return None
 
-    prices = MODEL_PRICES_USD.get(model)
+    config = get_ai_config()
+
+    if config.input_cost_per_1m_tokens and config.output_cost_per_1m_tokens:
+        prices = {
+            "input": Decimal(config.input_cost_per_1m_tokens),
+            "output": Decimal(config.output_cost_per_1m_tokens),
+        }
+    else:
+        prices = MODEL_PRICES_USD.get(model)
 
     if prices is None:
         return None
