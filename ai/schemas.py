@@ -1,4 +1,5 @@
 from typing import Generic, TypeVar
+from decimal import Decimal
 from pydantic import BaseModel
 
 T = TypeVar("T")
@@ -46,3 +47,4 @@ class AIResult(BaseModel, Generic[T]):
     duration_ms: float | None = None
     retries_used: int = 0
     token_usage: TokenUsage | None = None
+    estimated_cost_usd: Decimal | None = None

@@ -7,6 +7,7 @@ from ai.parser import parse_json_response
 from ai.providers.openai_provider import OpenAIProvider
 from ai.schemas import AIResult
 from ai.logger import get_ai_logger
+from ai.cost import estimate_cost_usd
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -77,6 +78,7 @@ The JSON must match this schema:
 
             if response_type is None:
                 duration_ms = (perf_counter() - start) * 1000
+                estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
 
                 self.logger.info(
                     "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
@@ -93,6 +95,7 @@ The JSON must match this schema:
                     retries_used=retries_used,
                     original_raw_response=original_raw_response,
                     token_usage=token_usage,
+                    estimated_cost_usd=estimated_cost_usd,
                 )
 
             try:
@@ -120,6 +123,7 @@ The JSON must match this schema:
                 parsed = parse_json_response(raw_response, response_type)
 
             duration_ms = (perf_counter() - start) * 1000
+            estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
 
             self.logger.info(
                 "AI request succeeded | model=%s | duration_ms=%.2f | retries_used=%s",
@@ -136,6 +140,7 @@ The JSON must match this schema:
                 retries_used=retries_used,
                 original_raw_response=original_raw_response,
                 token_usage=token_usage,
+                estimated_cost_usd=estimated_cost_usd,
             )
         except AIError:
             self.logger.exception("AI request failed | model=%s", self.model)
