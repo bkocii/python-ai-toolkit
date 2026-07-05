@@ -83,11 +83,13 @@ The JSON must match this schema:
                 estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
 
                 self.logger.info(
-                    "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s",
+                    "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s | tokens=%s | estimated_cost_usd=%s",
                     request_id,
                     self.model,
                     duration_ms,
                     retries_used,
+                    token_usage.model_dump() if token_usage else None,
+                    estimated_cost_usd,
                 )
 
                 return AIResult(
@@ -130,11 +132,13 @@ The JSON must match this schema:
             estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
 
             self.logger.info(
-                "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s",
+                "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s | tokens=%s | estimated_cost_usd=%s",
                 request_id,
                 self.model,
                 duration_ms,
                 retries_used,
+                token_usage.model_dump() if token_usage else None,
+                estimated_cost_usd,
             )
 
             return AIResult(
