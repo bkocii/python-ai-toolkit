@@ -1,14 +1,11 @@
 from typing import TypeVar, overload
-from time import perf_counter
-from uuid import uuid4
+
 from pydantic import BaseModel
-from ai.exceptions import AIJSONParseError, AISchemaValidationError, AIError
+
 from ai.config import get_ai_config
-from ai.parser import parse_json_response
+from ai.executor import RequestExecutor
 from ai.providers.openai_provider import OpenAIProvider
 from ai.schemas import AIResult
-from ai.logger import get_ai_logger
-from ai.cost import estimate_cost_usd
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -17,19 +14,20 @@ class AIClient:
     """
     Main public client used by applications.
 
-    AIClient decides how to handle a request based on response_type:
+    AIClient is intentionally small.
 
-    - response_type is None:
-        Return plain text.
+    Responsibilities:
+    - Load configuration
+    - Select provider
+    - Expose public ask() and ask_text() methods
 
-    - response_type is a Pydantic model:
-        Request structured JSON and validate it.
+    Request execution, retry, parsing, logging, timing, and cost tracking
+    are handled by RequestExecutor.
     """
 
     def __init__(self):
         config = get_ai_config()
         self.model = config.model
-        self.logger = get_ai_logger()
 
         if config.provider == "openai":
             self.provider = OpenAIProvider(
@@ -38,6 +36,11 @@ class AIClient:
             )
         else:
             raise ValueError(f"Unsupported AI provider: {config.provider}")
+
+        self.executor = RequestExecutor(
+            provider=self.provider,
+            model=self.model,
+        )
 
     @overload
     def ask(self, prompt: str) -> AIResult[str]: ...
@@ -53,112 +56,13 @@ class AIClient:
         """
         Send a prompt to the configured provider.
 
-        If response_type is provided, the model is instructed to return JSON,
-        and the result is validated against that Pydantic schema.
+        If response_type is provided, RequestExecutor handles structured JSON
+        parsing and Pydantic validation.
         """
-        request_id = str(uuid4())
-        final_prompt = prompt
-
-        if response_type is not None:
-            schema_json = response_type.model_json_schema()
-
-            final_prompt = f"""
-{prompt}
-
-Return valid JSON only.
-The JSON must match this schema:
-{schema_json}
-"""
-
-        try:
-            start = perf_counter()
-            provider_response = self.provider.ask_text(final_prompt)
-            raw_response = provider_response.text
-            original_raw_response = raw_response
-            token_usage = provider_response.token_usage
-            retries_used = 0
-
-            if response_type is None:
-                duration_ms = (perf_counter() - start) * 1000
-                estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
-
-                self.logger.info(
-                    "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s | tokens=%s | estimated_cost_usd=%s",
-                    request_id,
-                    self.model,
-                    duration_ms,
-                    retries_used,
-                    token_usage.model_dump() if token_usage else None,
-                    estimated_cost_usd,
-                )
-
-                return AIResult(
-                    data=raw_response,
-                    model=self.model,
-                    raw_response=raw_response,
-                    duration_ms=duration_ms,
-                    retries_used=retries_used,
-                    original_raw_response=original_raw_response,
-                    token_usage=token_usage,
-                    estimated_cost_usd=estimated_cost_usd,
-                    request_id=request_id,
-                )
-
-            try:
-                parsed = parse_json_response(raw_response, response_type)
-            except (AIJSONParseError, AISchemaValidationError):
-                retries_used = 1
-                repair_prompt = f"""
-            The previous response did not match the required JSON schema.
-    
-            Original prompt:
-            {final_prompt}
-    
-            Invalid response:
-            {raw_response}
-    
-            Return ONLY corrected valid JSON matching the schema.
-            """
-                provider_response = self.provider.ask_text(repair_prompt)
-                raw_response = provider_response.text
-                token_usage = (
-                    token_usage.add(provider_response.token_usage)
-                    if token_usage is not None
-                    else provider_response.token_usage
-                )
-                parsed = parse_json_response(raw_response, response_type)
-
-            duration_ms = (perf_counter() - start) * 1000
-            estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
-
-            self.logger.info(
-                "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s | tokens=%s | estimated_cost_usd=%s",
-                request_id,
-                self.model,
-                duration_ms,
-                retries_used,
-                token_usage.model_dump() if token_usage else None,
-                estimated_cost_usd,
-            )
-
-            return AIResult(
-                data=parsed,
-                model=self.model,
-                raw_response=raw_response,
-                duration_ms=duration_ms,
-                retries_used=retries_used,
-                original_raw_response=original_raw_response,
-                token_usage=token_usage,
-                estimated_cost_usd=estimated_cost_usd,
-                request_id=request_id,
-            )
-        except AIError:
-            self.logger.exception(
-                "AI request failed | request_id=%s | model=%s",
-                request_id,
-                self.model,
-            )
-            raise
+        return self.executor.execute(
+            prompt=prompt,
+            response_type=response_type,
+        )
 
     def ask_text(self, prompt: str) -> str:
         """
