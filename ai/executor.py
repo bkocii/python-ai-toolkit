@@ -7,6 +7,7 @@ from ai.logger import get_ai_logger
 from ai.parser import parse_json_response
 from ai.schemas import AIResult
 from typing import Any
+from ai.retry import build_json_repair_prompt
 
 
 class RequestExecutor:
@@ -129,17 +130,10 @@ The JSON must match this schema:
             except (AIJSONParseError, AISchemaValidationError):
                 retries_used = 1
 
-                repair_prompt = f"""
-The previous response did not match the required JSON schema.
-
-Original prompt:
-{final_prompt}
-
-Invalid response:
-{raw_response}
-
-Return ONLY corrected valid JSON matching the schema.
-"""
+                repair_prompt = build_json_repair_prompt(
+                    original_prompt=final_prompt,
+                    invalid_response=raw_response,
+                )
                 retry_response = self.provider.ask_text(repair_prompt)
                 raw_response = retry_response.text
 

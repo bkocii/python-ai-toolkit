@@ -43,11 +43,11 @@ Refine the existing architecture without introducing new user-facing features.
 
 - [x] CORE-001 Create architecture documentation
 - [x] CORE-002 Create Architecture Decision Records (ADRs)
+- [x] CORE-003 Create project roadmap
+- [x] CORE-004 Remove duplicate success logging
 
 ### Remaining
 
-- [ ] CORE-003 Create project roadmap
-- [ ] CORE-004 Remove duplicate success logging
 - [ ] CORE-005 Extract retry prompt helper
 - [ ] CORE-006 Configurable retry count
 
