@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-
+import pytest
+from ai.exceptions import AIJSONParseError
 from ai.executor import RequestExecutor
 from ai.schemas import ProviderResponse, TokenUsage
 
@@ -91,3 +92,25 @@ def test_executor_retries_once_for_invalid_structured_response():
     assert result.original_raw_response == "not json"
     assert result.raw_response == '{"name": "Genius Green"}'
     assert result.token_usage.total_tokens == 30
+
+
+def test_executor_respects_max_retries():
+    provider = SequentialFakeProvider(
+        responses=[
+            "not json",
+            "still not json",
+        ]
+    )
+    executor = RequestExecutor(
+        provider=provider,
+        model="test-model",
+        max_retries=1,
+    )
+
+    with pytest.raises(AIJSONParseError):
+        executor.execute(
+            prompt="Return product",
+            response_type=SampleResponse,
+        )
+
+    assert provider.calls == 2

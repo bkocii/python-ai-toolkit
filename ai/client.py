@@ -40,6 +40,7 @@ class AIClient:
         self.executor = RequestExecutor(
             provider=self.provider,
             model=self.model,
+            max_retries=config.max_retries,
         )
 
     @overload

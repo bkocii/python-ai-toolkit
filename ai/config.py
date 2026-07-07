@@ -13,6 +13,7 @@ class AIConfig:
     provider: str = "openai"
     input_cost_per_1m_tokens: str | None = None
     output_cost_per_1m_tokens: str | None = None
+    max_retries: int = 1
 
 
 def get_ai_config() -> AIConfig:
@@ -29,4 +30,5 @@ def get_ai_config() -> AIConfig:
         provider=os.getenv("AI_PROVIDER", "openai"),
         input_cost_per_1m_tokens=os.getenv("AI_INPUT_COST_PER_1M_TOKENS"),
         output_cost_per_1m_tokens=os.getenv("AI_OUTPUT_COST_PER_1M_TOKENS"),
+        max_retries=int(os.getenv("AI_MAX_RETRIES", "1")),
     )

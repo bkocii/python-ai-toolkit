@@ -25,10 +25,11 @@ class RequestExecutor:
     This keeps AIClient small and focused on public API.
     """
 
-    def __init__(self, provider, model: str):
+    def __init__(self, provider, model: str, max_retries: int = 1):
         self.provider = provider
         self.model = model
         self.logger = get_ai_logger()
+        self.max_retries = max_retries
 
     def _log_success(
         self,
@@ -125,25 +126,33 @@ The JSON must match this schema:
                     estimated_cost_usd=estimated_cost_usd,
                 )
 
-            try:
-                parsed = parse_json_response(raw_response, response_type)
-            except (AIJSONParseError, AISchemaValidationError):
-                retries_used = 1
+            retries_used = 0
 
-                repair_prompt = build_json_repair_prompt(
-                    original_prompt=final_prompt,
-                    invalid_response=raw_response,
-                )
-                retry_response = self.provider.ask_text(repair_prompt)
-                raw_response = retry_response.text
+            while True:
+                try:
+                    parsed = parse_json_response(raw_response, response_type)
+                    break
+                except (AIJSONParseError, AISchemaValidationError):
+                    if retries_used >= self.max_retries:
+                        raise
 
-                token_usage = (
-                    token_usage.add(retry_response.token_usage)
-                    if token_usage is not None
-                    else retry_response.token_usage
-                )
+                    retries_used += 1
 
-                parsed = parse_json_response(raw_response, response_type)
+                    repair_prompt = build_json_repair_prompt(
+                        original_prompt=final_prompt,
+                        invalid_response=raw_response,
+                    )
+
+                    retry_response = self.provider.ask_text(repair_prompt)
+                    raw_response = retry_response.text
+
+                    token_usage = (
+                        token_usage.add(retry_response.token_usage)
+                        if token_usage is not None
+                        else retry_response.token_usage
+                    )
+
+                    parsed = parse_json_response(raw_response, response_type)
 
             duration_ms = (perf_counter() - start) * 1000
             estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
