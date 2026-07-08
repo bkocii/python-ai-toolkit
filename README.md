@@ -205,11 +205,15 @@ Create a `.env`
 AI_PROVIDER=openai
 
 OPENAI_API_KEY=your_api_key
-
 OPENAI_MODEL=gpt-5.4-mini
 
-AI_INPUT_COST_PER_1M_TOKENS=
+# Optional generic fallback for custom providers
+AI_API_KEY=
+AI_MODEL=
 
+AI_MAX_RETRIES=1
+
+AI_INPUT_COST_PER_1M_TOKENS=
 AI_OUTPUT_COST_PER_1M_TOKENS=
 ```
 

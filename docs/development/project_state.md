@@ -10,7 +10,7 @@ Python AI Toolkit
 
 ## Current Milestone
 
-Sprint 2 completed — Core Infrastructure Refinement
+Sprint 3 completed — Provider Infrastructure
 
 ## Current Goal
 

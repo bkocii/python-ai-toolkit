@@ -70,11 +70,11 @@ Tasks
 - [x] PROVIDER-001 ProviderFactory
 - [x] PROVIDER-002 Provider registry
 - [x] PROVIDER-003 Provider Registration API
-- [ ] PROVIDER-004 Provider configuration cleanup
+- [x] PROVIDER-004 Provider configuration cleanup
 
 Exit Criteria
 
-- Adding a new provider requires no changes to AIClient.
+- [x] Adding a new provider requires no changes to AIClient.
 
 ---
 
