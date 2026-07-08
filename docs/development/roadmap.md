@@ -46,17 +46,16 @@ Refine the existing architecture without introducing new user-facing features.
 - [x] CORE-003 Create project roadmap
 - [x] CORE-004 Remove duplicate success logging
 - [x] CORE-005 Extract retry prompt helper
+- [x] CORE-006 Configurable retry count
 
 ### Remaining
 
-- [ ] CORE-006 Configurable retry count
-
 Exit Criteria
 
-- Core architecture documented
-- RequestExecutor cleaned up
-- Retry configurable
-- Sprint documentation complete
+- [x] Core architecture documented
+- [x] RequestExecutor cleaned up
+- [x] Retry configurable
+- [x] Sprint documentation complete
 
 ---
 

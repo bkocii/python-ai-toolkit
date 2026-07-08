@@ -13,5 +13,10 @@ class BaseAIProvider(ABC):
 
     @abstractmethod
     def ask_text(self, prompt: str) -> ProviderResponse:
-        """Send a prompt and return a text response."""
+        """
+        Send a prompt to the provider and return a ProviderResponse.
+
+        Concrete implementations are responsible for translating
+        toolkit requests into provider-specific SDK calls.
+        """
         raise NotImplementedError

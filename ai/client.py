@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from ai.config import get_ai_config
 from ai.executor import RequestExecutor
-from ai.providers.openai_provider import OpenAIProvider
+from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
 
 T = TypeVar("T", bound=BaseModel)
@@ -29,13 +29,7 @@ class AIClient:
         config = get_ai_config()
         self.model = config.model
 
-        if config.provider == "openai":
-            self.provider = OpenAIProvider(
-                api_key=config.api_key,
-                model=config.model,
-            )
-        else:
-            raise ValueError(f"Unsupported AI provider: {config.provider}")
+        self.provider = ProviderFactory.create(config)
 
         self.executor = RequestExecutor(
             provider=self.provider,
