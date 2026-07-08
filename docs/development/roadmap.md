@@ -69,7 +69,7 @@ Tasks
 
 - [x] PROVIDER-001 ProviderFactory
 - [x] PROVIDER-002 Provider registry
-- [ ] PROVIDER-003 Automatic provider discovery
+- [x] PROVIDER-003 Provider Registration API
 - [ ] PROVIDER-004 Provider configuration cleanup
 
 Exit Criteria
@@ -215,6 +215,7 @@ Ideas
 - AI evaluation framework
 - MCP support
 - Additional providers
+- Automatic provider discovery
 
 Future backlog items may become roadmap tasks after the completion of a sprint.
 

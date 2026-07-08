@@ -15,12 +15,16 @@ class ProviderFactory:
     keeping provider selection logic out of the client.
     """
 
-    @staticmethod
-    def create(config: AIConfig) -> BaseAIProvider:
+    _registry = {
+        "openai": OpenAIProvider,
+    }
+
+    @classmethod
+    def create(cls, config: AIConfig) -> BaseAIProvider:
         """
         Create a provider instance from the supplied configuration.
         """
-        provider_class = PROVIDER_REGISTRY.get(config.provider)
+        provider_class = cls._registry.get(config.provider)
 
         if provider_class is None:
             raise ValueError(f"Unsupported AI provider: {config.provider}")
@@ -29,3 +33,24 @@ class ProviderFactory:
             api_key=config.api_key,
             model=config.model,
         )
+
+    @classmethod
+    def register(
+        cls,
+        name: str,
+        provider_class: type[BaseAIProvider],
+    ) -> None:
+        """
+        Register a provider implementation.
+        """
+        if name in cls._registry:
+            raise ValueError(f"Provider '{name}' is already registered.")
+
+        cls._registry[name] = provider_class
+
+    @classmethod
+    def available_providers(cls) -> tuple[str, ...]:
+        """
+        Return registered provider names.
+        """
+        return tuple(sorted(cls._registry.keys()))
