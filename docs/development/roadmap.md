@@ -67,8 +67,8 @@ Support multiple AI providers without changing application code.
 
 Tasks
 
-- [ ] PROVIDER-001 ProviderFactory
-- [ ] PROVIDER-002 Provider registry
+- [x] PROVIDER-001 ProviderFactory
+- [x] PROVIDER-002 Provider registry
 - [ ] PROVIDER-003 Automatic provider discovery
 - [ ] PROVIDER-004 Provider configuration cleanup
 

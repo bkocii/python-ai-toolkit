@@ -2,6 +2,10 @@ from ai.config import AIConfig
 from ai.providers.base import BaseAIProvider
 from ai.providers.openai_provider import OpenAIProvider
 
+PROVIDER_REGISTRY = {
+    "openai": OpenAIProvider,
+}
+
 
 class ProviderFactory:
     """
@@ -16,10 +20,12 @@ class ProviderFactory:
         """
         Create a provider instance from the supplied configuration.
         """
-        if config.provider == "openai":
-            return OpenAIProvider(
-                api_key=config.api_key,
-                model=config.model,
-            )
+        provider_class = PROVIDER_REGISTRY.get(config.provider)
 
-        raise ValueError(f"Unsupported AI provider: {config.provider}")
+        if provider_class is None:
+            raise ValueError(f"Unsupported AI provider: {config.provider}")
+
+        return provider_class(
+            api_key=config.api_key,
+            model=config.model,
+        )
