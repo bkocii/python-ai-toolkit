@@ -20,14 +20,14 @@ class AIRequestBuilder(Generic[T]):
     def __init__(self, executor: RequestExecutor):
         self._executor = executor
         self._prompt: str | None = None
-        self._response_model: type[T] | None = None
+        self._response_type: type[T] | None = None
 
     def prompt(self, text: str) -> "AIRequestBuilder[T]":
         self._prompt = text
         return self
 
-    def response_model(self, model: type[T]) -> "AIRequestBuilder[T]":
-        self._response_model = model
+    def response_type(self, response_type: type[T]) -> "AIRequestBuilder[T]":
+        self._response_type = response_type
         return self
 
     def execute(self) -> AIResult[str] | AIResult[T]:
@@ -36,5 +36,5 @@ class AIRequestBuilder(Generic[T]):
 
         return self._executor.execute(
             prompt=self._prompt,
-            response_type=self._response_model,
+            response_type=self._response_type,
         )

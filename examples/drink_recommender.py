@@ -50,9 +50,7 @@ Candidate products:
 Recommend exactly one product from the candidate list.
 Do not invent products.
 """
-
     result = ai.ask(prompt, response_type=DrinkRecommendation)
-
     print(result.data.model_dump_json(indent=2))
     print(result.token_usage)
 

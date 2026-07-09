@@ -14,7 +14,7 @@ The LLM is only one part of an AI application.
 
 Business logic should remain in Python.
 
-```
+```text
 Application
         │
         ▼
@@ -46,10 +46,13 @@ Applications remain responsible for business logic.
 Single entry point for all AI requests.
 
 ```python
+from ai.client import AIClient
+
 ai = AIClient()
 
 response = ai.ask(...)
 ```
+
 ---
 
 ## Fluent Request Builder
@@ -57,13 +60,18 @@ response = ai.ask(...)
 For simple requests, use `AIClient.ask()`:
 
 ```python
+from ai.client import AIClient
+
 ai = AIClient()
 
 result = ai.ask("Explain dependency injection in one paragraph.")
 ```
+
 For advanced requests, use the fluent request builder:
-ai = AIClient()
+
 ```python
+from ai.client import AIClient
+
 ai = AIClient()
 
 result = (
@@ -73,13 +81,14 @@ result = (
 )
 
 print(result.data)
-
 ```
-Structured responses also work through the builder:
-```python
+
 Structured responses also work through the builder:
 
+```python
 from pydantic import BaseModel
+
+from ai.client import AIClient
 
 
 class Recommendation(BaseModel):
@@ -87,19 +96,51 @@ class Recommendation(BaseModel):
     reason: str
 
 
+ai = AIClient()
+
 result = (
     ai.request()
     .prompt("Recommend one beginner Python project.")
-    .response_model(Recommendation)
+    .response_type(Recommendation)
     .execute()
 )
 
 print(result.data.title)
-
-
 ```
-The builder is intentionally mutable. Each method updates the current builder and returns self, which allows method chaining.
-Request execution is still handled by RequestExecutor.
+
+The builder is intentionally mutable. Each method updates the current builder and returns `self`, which allows method chaining.
+
+Request execution is still handled by `RequestExecutor`.
+
+---
+
+## Prompt Templates
+
+Prompt templates provide a reusable way to build prompts by substituting named variables into a template.
+
+```python
+from ai.client import AIClient
+from ai.prompts import PromptTemplate
+
+template = PromptTemplate(
+    "Summarize this article in {language}: {article}"
+)
+
+prompt = template.render(
+    language="English",
+    article="Python is popular.",
+)
+
+ai = AIClient()
+
+result = ai.ask(prompt)
+
+print(result.data)
+```
+
+Prompt templates are ideal for reusable prompts that differ only by input values.
+
+For prompts assembled dynamically from multiple sections, use `PromptBuilder`.
 
 ---
 
@@ -126,7 +167,7 @@ Supports returning validated Pydantic models instead of raw text.
 ```python
 recommendation = ai.ask(
     prompt=prompt,
-    response_type=DrinkRecommendation
+    response_type=DrinkRecommendation,
 )
 
 print(recommendation.data.recommended_item)
@@ -144,7 +185,7 @@ Invalid JSON and schema mismatches raise custom exceptions.
 
 ## Retry
 
-Structured responses are automatically retried once if validation fails.
+Structured responses are automatically retried using the configured retry count if validation fails.
 
 ---
 
@@ -158,6 +199,8 @@ Each request is logged with:
 - retry count
 - token usage
 - estimated cost
+
+Prompts and model responses are not logged by default.
 
 ---
 
@@ -179,30 +222,37 @@ Includes dedicated exception hierarchy.
 
 Examples:
 
-- AIConfigurationError
-- AIProviderError
-- AIJSONParseError
-- AISchemaValidationError
+- `AIConfigurationError`
+- `AIProviderError`
+- `AIJSONParseError`
+- `AISchemaValidationError`
 
 ---
 
 # Current Project Structure
 
-```
+```text
 python-ai-toolkit/
 
 ├── ai/
 │   ├── client.py
 │   ├── config.py
-│   ├── parser.py
-│   ├── prompts.py
-│   ├── schemas.py
-│   ├── logger.py
 │   ├── cost.py
 │   ├── exceptions.py
+│   ├── executor.py
+│   ├── logger.py
+│   ├── parser.py
+│   ├── prompts.py
+│   ├── request_builder.py
+│   ├── schemas.py
 │   └── providers/
 │       ├── base.py
+│       ├── factory.py
 │       └── openai_provider.py
+│
+├── docs/
+│   ├── architecture/
+│   └── development/
 │
 ├── examples/
 │
@@ -217,39 +267,39 @@ python-ai-toolkit/
 
 # Installation
 
-Clone the repository
+Clone the repository.
 
 ```bash
 git clone https://github.com/<your-username>/python-ai-toolkit.git
 ```
 
-Create a virtual environment
+Create a virtual environment.
 
 ```bash
 python -m venv .venv
 ```
 
-Activate
+Activate it.
 
-Windows
+Windows:
 
 ```bash
 .venv\Scripts\activate
 ```
 
-Linux / macOS
+Linux / macOS:
 
 ```bash
 source .venv/bin/activate
 ```
 
-Install dependencies
+Install dependencies.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create a `.env`
+Create a `.env`.
 
 ```env
 AI_PROVIDER=openai
@@ -271,19 +321,19 @@ AI_OUTPUT_COST_PER_1M_TOKENS=
 
 # Development
 
-Run tests
+Run tests.
 
 ```bash
 python -m pytest
 ```
 
-Format
+Format code.
 
 ```bash
 python -m black .
 ```
 
-Lint
+Lint code.
 
 ```bash
 python -m ruff check .
@@ -297,9 +347,15 @@ python -m ruff check .
 
 - [x] Configuration management
 - [x] Provider abstraction
+- [x] Provider factory
+- [x] Provider registry
+- [x] Provider registration API
+- [x] Provider configuration cleanup
 - [x] OpenAI provider
 - [x] AI client
+- [x] Fluent request builder
 - [x] Prompt builder
+- [x] Prompt templates
 - [x] Structured responses
 - [x] Schema validation
 - [x] Retry
@@ -312,11 +368,13 @@ python -m ruff check .
 
 ## Planned
 
-- [ ] Prompt Builder v2
-- [ ] Better parser architecture
+- [ ] Example gallery
+- [ ] Configuration validation improvements
+- [ ] Better error messages
 - [ ] Streaming responses
 - [ ] Async client
 - [ ] Tool calling
+- [ ] Image inputs
 - [ ] Conversation memory
 - [ ] Embeddings
 - [ ] Vector store abstraction

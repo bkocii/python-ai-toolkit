@@ -52,7 +52,7 @@ def test_request_builder_executes_structured_request():
     result = (
         AIRequestBuilder(executor)
         .prompt("Return JSON")
-        .response_model(DummyResponse)
+        .response_type(DummyResponse)
         .execute()
     )
 
@@ -73,5 +73,5 @@ def test_request_builder_methods_are_fluent():
     builder = AIRequestBuilder(executor)
 
     assert builder.prompt("Hello") is builder
-    assert builder.response_model(DummyResponse) is builder
+    assert builder.response_type(DummyResponse) is builder
 

@@ -14,3 +14,25 @@ class PromptBuilder:
 
     def build(self) -> str:
         return "\n\n".join(f"{title}:\n{content}" for title, content in self.sections)
+
+
+class PromptTemplate:
+    """
+    Reusable prompt template based on Python format strings.
+    """
+
+    def __init__(self, template: str):
+        if not template.strip():
+            raise ValueError("Prompt template cannot be empty.")
+
+        self.template = template
+
+    def render(self, **values: object) -> str:
+        try:
+            return self.template.format(**values)
+        except KeyError as exc:
+            missing_key = exc.args[0]
+            raise ValueError(
+                f"Missing value for prompt template variable: {missing_key}"
+            ) from exc
+
