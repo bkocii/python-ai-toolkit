@@ -1,7 +1,7 @@
 from typing import TypeVar, overload
 
 from pydantic import BaseModel
-
+from ai.request_builder import AIRequestBuilder
 from ai.config import get_ai_config
 from ai.executor import RequestExecutor
 from ai.providers.factory import ProviderFactory
@@ -64,3 +64,9 @@ class AIClient:
         Backward-compatible shortcut for plain text responses.
         """
         return self.ask(prompt).data
+
+    def request(self) -> AIRequestBuilder:
+        """
+        Create a fluent request builder for advanced AI requests.
+        """
+        return AIRequestBuilder(self.executor)

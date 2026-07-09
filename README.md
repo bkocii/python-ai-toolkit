@@ -50,6 +50,56 @@ ai = AIClient()
 
 response = ai.ask(...)
 ```
+---
+
+## Fluent Request Builder
+
+For simple requests, use `AIClient.ask()`:
+
+```python
+ai = AIClient()
+
+result = ai.ask("Explain dependency injection in one paragraph.")
+```
+For advanced requests, use the fluent request builder:
+ai = AIClient()
+```python
+ai = AIClient()
+
+result = (
+    ai.request()
+    .prompt("Explain dependency injection in one paragraph.")
+    .execute()
+)
+
+print(result.data)
+
+```
+Structured responses also work through the builder:
+```python
+Structured responses also work through the builder:
+
+from pydantic import BaseModel
+
+
+class Recommendation(BaseModel):
+    title: str
+    reason: str
+
+
+result = (
+    ai.request()
+    .prompt("Recommend one beginner Python project.")
+    .response_model(Recommendation)
+    .execute()
+)
+
+print(result.data.title)
+
+
+```
+The builder is intentionally mutable. Each method updates the current builder and returns self, which allows method chaining.
+Request execution is still handled by RequestExecutor.
 
 ---
 

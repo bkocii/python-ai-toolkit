@@ -58,17 +58,38 @@ Status: Completed
 
 ---
 
-# Next Sprint
-
 ## Sprint 3 – Provider Infrastructure
+
+Status: Completed
 
 ### Goal
 
 Support multiple AI providers without changing application code.
 
+### Completed Tasks
+
+- PROVIDER-001 ProviderFactory
+- PROVIDER-002 Provider registry
+- PROVIDER-003 Provider Registration API
+- PROVIDER-004 Provider configuration cleanup
+
+### Exit Criteria
+
+- Adding a new provider requires no changes to AIClient.
+
+---
+
+# Next Sprint
+
+## Sprint 4 – Developer Experience
+
+### Goal
+
+Improve usability for developers.
+
 ### Next Task
 
-PROVIDER-001 ProviderFactory
+DX-001 Fluent Request Builder
 
 ---
 
@@ -78,6 +99,10 @@ PROVIDER-001 ProviderFactory
 - OpenAI provider
 - `AIClient`
 - `RequestExecutor`
+- `ProviderFactory`
+- Provider registry
+- Provider Registration API
+- Provider-aware configuration loading
 - Prompt builder
 - Pydantic schema-based responses
 - `AIResult`
@@ -99,6 +124,8 @@ PROVIDER-001 ProviderFactory
 - Prompt builder tests
 - Request executor tests
 - Retry behavior test
+- Provider factory tests
+- Provider configuration tests
 
 ---
 
@@ -110,6 +137,8 @@ Application
 AIClient
     ↓
 RequestExecutor
+    ↓
+ProviderFactory
     ↓
 Provider
     ↓
@@ -131,6 +160,10 @@ Application
 - Applications should use `AIClient`, not provider SDKs directly.
 - Provider-specific SDK code lives inside provider classes.
 - `AIClient` is intentionally small and acts as the public API.
+- `AIClient` delegates provider creation to `ProviderFactory`.
+- Provider lookup is handled through a provider registry.
+- Additional providers can be registered through the Provider Registration API.
+- Provider configuration is loaded in a provider-aware way.
 - `RequestExecutor` owns the request lifecycle.
 - Structured responses use Pydantic models.
 - `AIResult` returns both validated data and metadata.
@@ -153,6 +186,9 @@ docs/
             0002-provider-abstraction.md
             0003-request-executor.md
             0004-schema-validation.md
+            0005-provider-factory.md
+            0006-provider-registry.md
+            0007-provider-registration-api.md
 
     development/
         roadmap.md
@@ -165,11 +201,9 @@ docs/
 
 - Retry behavior is implemented but can be improved with a dedicated retry strategy object.
 - Cost table is still a scaffold and should eventually use verified provider pricing.
-- Provider selection currently supports only OpenAI.
+- Provider selection currently supports only OpenAI as a built-in provider.
 - Error handling around non-toolkit exceptions can be improved.
 - Logging currently writes only to a file.
-- ProviderFactory is not yet implemented.
-- Provider registry is not yet implemented.
 - Streaming and async support are not yet implemented.
 
 ---
@@ -214,11 +248,11 @@ A task is not complete until all relevant steps are done.
 
 # Next Recommended Steps
 
-1. Commit Sprint 2 documentation updates.
-2. Start Sprint 3.
-3. Implement `PROVIDER-001 ProviderFactory`.
-4. Add tests for provider creation.
-5. Update roadmap after completing PROVIDER-001.
+1. Commit Sprint 3 provider infrastructure updates.
+2. Start Sprint 4.
+3. Implement `DX-001 Fluent Request Builder`.
+4. Add tests for the fluent request builder.
+5. Update roadmap after completing DX-001.
 
 ---
 
@@ -231,11 +265,11 @@ Paste this file or upload it and say:
 The next task should be:
 
 ```text
-PROVIDER-001 ProviderFactory
+DX-001 Fluent Request Builder
 ```
 
 ---
 
 # Last Updated
 
-2026-07-07
+2026-07-08

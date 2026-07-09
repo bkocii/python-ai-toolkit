@@ -86,7 +86,7 @@ Improve usability for developers.
 
 Tasks
 
-- [ ] DX-001 Fluent Request Builder
+- [x] DX-001 Fluent Request Builder
 - [ ] DX-002 Prompt templates
 - [ ] DX-003 Example gallery
 - [ ] DX-004 Configuration validation improvements
@@ -216,6 +216,7 @@ Ideas
 - MCP support
 - Additional providers
 - Automatic provider discovery
+- Immutable / reusable request builders
 
 Future backlog items may become roadmap tasks after the completion of a sprint.
 
