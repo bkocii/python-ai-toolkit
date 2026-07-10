@@ -88,7 +88,7 @@ Tasks
 
 - [x] DX-001 Fluent Request Builder
 - [x] DX-002 Prompt templates
-- [ ] DX-003 Example gallery
+- [x] DX-003 Example gallery
 - [ ] DX-004 Configuration validation improvements
 - [ ] DX-005 Better error messages
 
