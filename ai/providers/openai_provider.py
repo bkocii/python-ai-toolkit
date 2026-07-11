@@ -2,6 +2,7 @@ from openai import OpenAI, OpenAIError
 from ai.schemas import ProviderResponse, TokenUsage
 from ai.exceptions import AIProviderError
 from ai.providers.base import BaseAIProvider
+from typing import Iterator
 
 
 class OpenAIProvider(BaseAIProvider):
@@ -36,3 +37,30 @@ class OpenAIProvider(BaseAIProvider):
             text=response.output_text,
             token_usage=token_usage,
         )
+
+    def stream_text(self, prompt: str) -> Iterator[str]:
+        """
+        Stream plain text chunks from OpenAI.
+        """
+        try:
+            stream = self.client.responses.create(
+                model=self.model,
+                input=prompt,
+                stream=True,
+            )
+
+            for event in stream:
+                event_type = getattr(event, "type", None)
+
+                if event_type == "response.output_text.delta":
+                    delta = getattr(event, "delta", "")
+
+                    if delta:
+                        yield delta
+
+                elif event_type == "error":
+                    message = getattr(event, "message", "Unknown streaming error")
+                    raise AIProviderError(f"OpenAI streaming request failed: {message}")
+
+        except OpenAIError as exc:
+            raise AIProviderError(f"OpenAI streaming request failed: {exc}") from exc

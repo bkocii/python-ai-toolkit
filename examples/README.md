@@ -21,6 +21,16 @@ This directory contains small, self-contained examples demonstrating how to use 
 - reusable prompts
 - variable substitution
 
+---
+
+## 05 – Streaming Response
+
+Demonstrates:
+
+- streaming plain text responses
+- consuming response chunks
+- printing streamed output immediately
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -31,3 +41,4 @@ python -m examples.01_summarize_text
 2. Extract Structured Data
 3. Builder Usage
 4. Prompt Templates
+5. Streaming Response

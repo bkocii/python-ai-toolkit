@@ -6,7 +6,7 @@ from ai.exceptions import AIError, AIJSONParseError, AISchemaValidationError
 from ai.logger import get_ai_logger
 from ai.parser import parse_json_response
 from ai.schemas import AIResult
-from typing import Any
+from typing import Any, Iterator
 from ai.retry import build_json_repair_prompt
 
 
@@ -179,6 +179,40 @@ The JSON must match this schema:
         except AIError:
             self.logger.exception(
                 "AI request failed | request_id=%s | model=%s",
+                request_id,
+                self.model,
+            )
+            raise
+
+    def stream(self, prompt: str) -> Iterator[str]:
+        """
+        Stream a plain text response from the configured provider.
+
+        Streaming returns chunks immediately instead of waiting for a full AIResult.
+        """
+        request_id = str(uuid4())
+        chunks: list[str] = []
+
+        try:
+            start = perf_counter()
+
+            for chunk in self.provider.stream_text(prompt):
+                chunks.append(chunk)
+                yield chunk
+
+            duration_ms = (perf_counter() - start) * 1000
+
+            self._log_success(
+                request_id=request_id,
+                duration_ms=duration_ms,
+                retries_used=0,
+                token_usage=None,
+                estimated_cost_usd=None,
+            )
+
+        except AIError:
+            self.logger.exception(
+                "AI streaming request failed | request_id=%s | model=%s",
                 request_id,
                 self.model,
             )

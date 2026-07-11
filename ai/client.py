@@ -1,4 +1,4 @@
-from typing import TypeVar, overload
+from typing import Iterator, TypeVar, overload
 
 from pydantic import BaseModel
 from ai.request_builder import AIRequestBuilder
@@ -70,3 +70,9 @@ class AIClient:
         Create a fluent request builder for advanced AI requests.
         """
         return AIRequestBuilder(self.executor)
+
+    def stream(self, prompt: str) -> Iterator[str]:
+        """
+        Stream a plain text response from the configured provider.
+        """
+        return self.executor.stream(prompt)

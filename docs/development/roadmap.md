@@ -106,7 +106,7 @@ Support advanced LLM capabilities.
 
 Tasks
 
-- [ ] REQUEST-001 Streaming responses
+- [x] REQUEST-001 Streaming responses
 - [ ] REQUEST-002 Async AIClient
 - [ ] REQUEST-003 Tool Calling
 - [ ] REQUEST-004 Image inputs

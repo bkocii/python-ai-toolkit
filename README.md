@@ -144,6 +144,46 @@ For prompts assembled dynamically from multiple sections, use `PromptBuilder`.
 
 ---
 
+---
+
+## Streaming Responses
+
+For plain text responses, you can stream chunks as they arrive.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+for chunk in ai.stream("Explain dependency injection in one short paragraph."):
+    print(chunk, end="", flush=True)
+
+print()
+```
+
+Streaming is useful when you want to show output immediately instead of waiting for the full response.
+
+Current streaming support:
+
+* plain text responses
+* synchronous iteration
+* provider-level streaming through `stream_text()`
+
+Not yet supported:
+
+* structured streaming
+* async streaming
+* token usage metadata during streaming
+
+Structured responses should still use:
+
+```python
+ai.ask(..., response_type=...)
+```
+
+`ai.stream(...)` returns streamed text chunks as an iterator, not a full `AIResult`.
+
+
 ## Provider Architecture
 
 Current:
