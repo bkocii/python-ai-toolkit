@@ -11,7 +11,7 @@ def main() -> None:
 
     prompt = template.render(
         language="Albanian",
-        tone="simple",
+        tone="complicated",
         text=(
             "Dependency injection is a software design technique where an object "
             "receives the dependencies it needs from the outside instead of "

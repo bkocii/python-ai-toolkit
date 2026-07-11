@@ -23,7 +23,7 @@ This directory contains small, self-contained examples demonstrating how to use 
 
 ## Running
 ```bash
-python examples/01_summarize_text.py
+python -m examples.01_summarize_text
 ```
 
 ## Learning Path

@@ -14,9 +14,7 @@ def main() -> None:
 
     result = (
         ai.request()
-        .prompt(
-            "Recommend one beginner-friendly Python automation project."
-        )
+        .prompt("Recommend one beginner-friendly Python automation project.")
         .response_type(ProjectIdea)
         .execute()
     )

@@ -35,4 +35,3 @@ class PromptTemplate:
             raise ValueError(
                 f"Missing value for prompt template variable: {missing_key}"
             ) from exc
-

@@ -4,9 +4,7 @@ from ai.client import AIClient
 def main() -> None:
     ai = AIClient()
 
-    result = ai.ask(
-        "Explain what dependency injection is in one short paragraph."
-    )
+    result = ai.ask("Explain what dependency injection is in one short paragraph.")
 
     print(result.data)
     print()
