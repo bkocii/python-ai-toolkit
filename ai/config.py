@@ -34,7 +34,8 @@ def _get_api_key(provider: str) -> str:
 
     if not api_key:
         raise AIConfigurationError(
-            f"{provider_key_name} or AI_API_KEY is missing. Add one to your .env file."
+            f"Missing API key for provider '{provider}'. "
+            f"Set {provider_key_name}=your_api_key or AI_API_KEY=your_api_key in your .env file."
         )
 
     return api_key
@@ -51,10 +52,16 @@ def _get_max_retries() -> int:
     try:
         max_retries = int(raw_value)
     except ValueError as exc:
-        raise AIConfigurationError("AI_MAX_RETRIES must be an integer.") from exc
+        raise AIConfigurationError(
+            f"Invalid AI_MAX_RETRIES value '{raw_value}'. "
+            "Set AI_MAX_RETRIES to a whole number, for example AI_MAX_RETRIES=1."
+        ) from exc
 
     if max_retries < 0:
-        raise AIConfigurationError("AI_MAX_RETRIES must be zero or greater.")
+        raise AIConfigurationError(
+            f"Invalid AI_MAX_RETRIES value '{max_retries}'. "
+            "Set AI_MAX_RETRIES to zero or greater, for example AI_MAX_RETRIES=1."
+        )
 
     return max_retries
 

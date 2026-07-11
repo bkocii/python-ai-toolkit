@@ -59,6 +59,6 @@ def test_config_validator_rejects_negative_retry_count():
 
     with pytest.raises(
         AIConfigurationError,
-        match="AI_MAX_RETRIES must be zero or greater",
+        match="Invalid AI_MAX_RETRIES value '-1'",
     ):
         ConfigValidator.validate(config)

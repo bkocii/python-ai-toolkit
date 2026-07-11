@@ -1,10 +1,7 @@
 from ai.config import AIConfig
+from ai.exceptions import AIConfigurationError
 from ai.providers.base import BaseAIProvider
 from ai.providers.openai_provider import OpenAIProvider
-
-PROVIDER_REGISTRY = {
-    "openai": OpenAIProvider,
-}
 
 
 class ProviderFactory:
@@ -27,7 +24,14 @@ class ProviderFactory:
         provider_class = cls._registry.get(config.provider)
 
         if provider_class is None:
-            raise ValueError(f"Unsupported AI provider: {config.provider}")
+            available = ", ".join(cls.available_providers())
+
+            raise AIConfigurationError(
+                f"Unsupported AI provider '{config.provider}'. "
+                f"Available providers: {available}. "
+                "Set AI_PROVIDER to a registered provider or register "
+                "a custom provider before creating AIClient."
+            )
 
         return provider_class(
             api_key=config.api_key,
@@ -44,7 +48,10 @@ class ProviderFactory:
         Register a provider implementation.
         """
         if name in cls._registry:
-            raise ValueError(f"Provider '{name}' is already registered.")
+            raise AIConfigurationError(
+                f"Provider '{name}' is already registered. "
+                "Choose a different provider name or remove the existing registration."
+            )
 
         cls._registry[name] = provider_class
 

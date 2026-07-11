@@ -90,11 +90,11 @@ Tasks
 - [x] DX-002 Prompt templates
 - [x] DX-003 Example gallery
 - [x] DX-004 Configuration validation improvements
-- [ ] DX-005 Better error messages
+- [x] DX-005 Better error messages
 
 Exit Criteria
 
-- Building prompts should require minimal boilerplate.
+- [x] Building prompts should require minimal boilerplate.
 
 ---
 

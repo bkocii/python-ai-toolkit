@@ -2,6 +2,7 @@ import pytest
 from ai.config import AIConfig
 from ai.providers.factory import ProviderFactory
 from ai.providers.openai_provider import OpenAIProvider
+from ai.exceptions import AIConfigurationError
 
 
 def test_provider_factory_creates_openai_provider():
@@ -18,14 +19,17 @@ def test_provider_factory_creates_openai_provider():
 
 
 def test_provider_factory_rejects_unsupported_provider():
-    config = AIConfig(
+    AIConfig(
         api_key="test-key",
         model="test-model",
         provider="unsupported",
     )
 
-    with pytest.raises(ValueError, match="Unsupported AI provider"):
-        ProviderFactory.create(config)
+    with pytest.raises(
+        AIConfigurationError,
+        match="Provider 'openai' is already registered",
+    ):
+        ProviderFactory.register("openai", OpenAIProvider)
 
 
 def test_register_provider():
@@ -38,7 +42,10 @@ def test_register_provider():
 
 
 def test_duplicate_provider_registration_raises_error():
-    with pytest.raises(ValueError, match="already registered"):
+    with pytest.raises(
+        AIConfigurationError,
+        match="Provider 'openai' is already registered",
+    ):
         ProviderFactory.register("openai", OpenAIProvider)
 
 

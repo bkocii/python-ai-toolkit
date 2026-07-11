@@ -68,7 +68,7 @@ def test_get_ai_config_raises_error_when_api_key_missing(monkeypatch):
 
     with pytest.raises(
         AIConfigurationError,
-        match="ANTHROPIC_API_KEY or AI_API_KEY is missing",
+        match="Missing API key for provider 'anthropic'",
     ):
         get_ai_config()
 
@@ -79,7 +79,10 @@ def test_get_ai_config_rejects_invalid_retry_count(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
     monkeypatch.setenv("AI_MAX_RETRIES", "not-a-number")
 
-    with pytest.raises(AIConfigurationError, match="AI_MAX_RETRIES must be an integer"):
+    with pytest.raises(
+        AIConfigurationError,
+        match="Invalid AI_MAX_RETRIES value 'not-a-number'",
+    ):
         get_ai_config()
 
 
@@ -90,7 +93,8 @@ def test_get_ai_config_rejects_negative_retry_count(monkeypatch):
     monkeypatch.setenv("AI_MAX_RETRIES", "-1")
 
     with pytest.raises(
-        AIConfigurationError, match="AI_MAX_RETRIES must be zero or greater"
+        AIConfigurationError,
+        match="Invalid AI_MAX_RETRIES value '-1'",
     ):
         get_ai_config()
 

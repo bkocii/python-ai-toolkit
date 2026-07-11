@@ -35,11 +35,7 @@ class FakeExecutor:
 def test_request_builder_executes_plain_text_request():
     executor = FakeExecutor()
 
-    result = (
-        AIRequestBuilder(executor)
-        .prompt("Hello")
-        .execute()
-    )
+    result = AIRequestBuilder(executor).prompt("Hello").execute()
 
     assert result.data == "ok"
     assert executor.received_prompt == "Hello"
@@ -74,4 +70,3 @@ def test_request_builder_methods_are_fluent():
 
     assert builder.prompt("Hello") is builder
     assert builder.response_type(DummyResponse) is builder
-

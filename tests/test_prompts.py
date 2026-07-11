@@ -4,9 +4,7 @@ from ai.prompts import PromptTemplate
 
 
 def test_prompt_template_renders_values():
-    template = PromptTemplate(
-        "Summarize this article in {language}: {article}"
-    )
+    template = PromptTemplate("Summarize this article in {language}: {article}")
 
     result = template.render(
         language="English",
