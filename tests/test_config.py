@@ -89,5 +89,20 @@ def test_get_ai_config_rejects_negative_retry_count(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
     monkeypatch.setenv("AI_MAX_RETRIES", "-1")
 
-    with pytest.raises(AIConfigurationError, match="AI_MAX_RETRIES must be zero or greater"):
+    with pytest.raises(
+        AIConfigurationError, match="AI_MAX_RETRIES must be zero or greater"
+    ):
+        get_ai_config()
+
+
+def test_get_ai_config_validates_loaded_model(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("OPENAI_MODEL", "   ")
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="AI model cannot be empty",
+    ):
         get_ai_config()

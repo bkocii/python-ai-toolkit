@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-
 from dotenv import load_dotenv
 
 from ai.exceptions import AIConfigurationError
@@ -61,9 +60,11 @@ def _get_max_retries() -> int:
 
 
 def get_ai_config() -> AIConfig:
+    from ai.config_validator import ConfigValidator
+
     provider = _normalize_provider(os.getenv("AI_PROVIDER"))
 
-    return AIConfig(
+    config = AIConfig(
         api_key=_get_api_key(provider),
         model=_get_model(provider),
         provider=provider,
@@ -71,3 +72,7 @@ def get_ai_config() -> AIConfig:
         output_cost_per_1m_tokens=os.getenv("AI_OUTPUT_COST_PER_1M_TOKENS"),
         max_retries=_get_max_retries(),
     )
+
+    ConfigValidator.validate(config)
+
+    return config

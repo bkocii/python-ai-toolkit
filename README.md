@@ -263,6 +263,56 @@ python-ai-toolkit/
 └── README.md
 ```
 
+## Configuration Validation
+
+Configuration is validated when `AIClient` loads the toolkit settings.
+
+The toolkit fails early with `AIConfigurationError` when configuration is invalid.
+
+Currently validated:
+
+- provider is not empty
+- API key is not empty
+- model is not empty
+- retry count is zero or greater
+
+Example:
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-5.4-mini
+AI_MAX_RETRIES=1
+```
+
+Invalid configuration raises an error before an AI request is sent.
+
+```python
+from ai.client import AIClient
+from ai.exceptions import AIConfigurationError
+
+try:
+    ai = AIClient()
+except AIConfigurationError as exc:
+    print(f"Invalid AI configuration: {exc}")
+```
+
+
+## Why this documentation matters
+
+Configuration validation affects application startup behavior. Developers need to know that:
+
+```python
+AIClient()
+```
+may raise:
+```python
+AIConfigurationError
+```
+before any request is made.
+
+That is intentional fail-fast behavior.
+
 ---
 
 # Installation
