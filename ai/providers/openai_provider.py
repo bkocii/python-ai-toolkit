@@ -2,7 +2,9 @@ from openai import OpenAI, OpenAIError, AsyncOpenAI
 from ai.schemas import ProviderResponse, TokenUsage
 from ai.exceptions import AIProviderError
 from ai.providers.base import BaseAIProvider
-from typing import Iterator
+from ai.tools import ToolCall, ToolDefinition, ToolResponse
+from typing import Iterator, Any
+import json
 
 
 class OpenAIProvider(BaseAIProvider):
@@ -91,4 +93,65 @@ class OpenAIProvider(BaseAIProvider):
         return ProviderResponse(
             text=response.output_text,
             token_usage=token_usage,
+        )
+
+    def _to_openai_tool(self, tool: ToolDefinition) -> dict[str, Any]:
+        """
+        Convert provider-independent tool definition to OpenAI tool format.
+        """
+        return {
+            "type": "function",
+            "name": tool.name,
+            "description": tool.description,
+            "parameters": tool.parameters,
+        }
+
+    def _parse_tool_arguments(self, raw_arguments: str) -> dict[str, Any]:
+        """
+        Parse tool call arguments returned by OpenAI.
+        """
+        try:
+            return json.loads(raw_arguments or "{}")
+        except json.JSONDecodeError as exc:
+            raise AIProviderError(
+                f"OpenAI returned invalid tool arguments: {raw_arguments}. "
+                "Tool call arguments must be valid JSON."
+            ) from exc
+
+    def ask_with_tools(
+        self,
+        prompt: str,
+        tools: list[ToolDefinition],
+    ) -> ToolResponse:
+        """
+        Send a prompt to OpenAI with available tool definitions.
+        """
+        try:
+            response = self.client.responses.create(
+                model=self.model,
+                input=prompt,
+                tools=[self._to_openai_tool(tool) for tool in tools],
+            )
+        except OpenAIError as exc:
+            raise AIProviderError(f"OpenAI tool request failed: {exc}") from exc
+
+        tool_calls: list[ToolCall] = []
+
+        for item in getattr(response, "output", []):
+            if getattr(item, "type", None) != "function_call":
+                continue
+
+            tool_calls.append(
+                ToolCall(
+                    name=getattr(item, "name"),
+                    arguments=self._parse_tool_arguments(
+                        getattr(item, "arguments", "{}")
+                    ),
+                    call_id=getattr(item, "call_id", None),
+                )
+            )
+
+        return ToolResponse(
+            text=getattr(response, "output_text", None),
+            tool_calls=tool_calls,
         )

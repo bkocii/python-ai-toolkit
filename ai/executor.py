@@ -5,7 +5,8 @@ from ai.cost import estimate_cost_usd
 from ai.exceptions import AIError, AIJSONParseError, AISchemaValidationError
 from ai.logger import get_ai_logger
 from ai.parser import parse_json_response
-from ai.schemas import AIResult
+from ai.schemas import AIResult, TokenUsage
+from ai.tools import ToolDefinition, ToolResponse
 from typing import Any, Iterator
 from ai.retry import build_json_repair_prompt
 
@@ -36,7 +37,7 @@ class RequestExecutor:
         request_id: str,
         duration_ms: float,
         retries_used: int,
-        token_usage,
+        token_usage: TokenUsage | None,
         estimated_cost_usd,
     ) -> None:
         """
@@ -213,6 +214,47 @@ The JSON must match this schema:
         except AIError:
             self.logger.exception(
                 "AI streaming request failed | request_id=%s | model=%s",
+                request_id,
+                self.model,
+            )
+            raise
+
+    def execute_with_tools(
+        self,
+        prompt: str,
+        tools: list[ToolDefinition],
+    ) -> ToolResponse:
+        """
+        Execute a tool-aware AI request.
+
+        The model may return plain text, tool calls, or both.
+        Tool execution is intentionally left to the application.
+        """
+        request_id = str(uuid4())
+
+        try:
+            start = perf_counter()
+
+            response = self.provider.ask_with_tools(
+                prompt=prompt,
+                tools=tools,
+            )
+
+            duration_ms = (perf_counter() - start) * 1000
+
+            self._log_success(
+                request_id=request_id,
+                duration_ms=duration_ms,
+                retries_used=0,
+                token_usage=None,
+                estimated_cost_usd=None,
+            )
+
+            return response
+
+        except AIError:
+            self.logger.exception(
+                "AI tool request failed | request_id=%s | model=%s",
                 request_id,
                 self.model,
             )

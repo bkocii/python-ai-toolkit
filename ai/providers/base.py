@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import AsyncIterator, Iterator
-
+from ai.tools import ToolDefinition, ToolResponse
 from ai.exceptions import AIProviderError
 from ai.schemas import ProviderResponse
 
@@ -55,4 +55,19 @@ class BaseAIProvider(ABC):
         raise AIProviderError(
             f"Provider '{self.__class__.__name__}' does not support async streaming. "
             "Implement stream_text_async() on the provider before using async streaming."
+        )
+
+    def ask_with_tools(
+        self,
+        prompt: str,
+        tools: list[ToolDefinition],
+    ) -> ToolResponse:
+        """
+        Send a prompt with available tool definitions.
+
+        Providers that support tool calling should override this method.
+        """
+        raise AIProviderError(
+            f"Provider '{self.__class__.__name__}' does not support tool calling. "
+            "Implement ask_with_tools() on the provider before using tools."
         )

@@ -257,6 +257,77 @@ Not yet supported:
 * async fluent request builder
 * async tool calling
 
+---
+
+## Tool Calling
+
+Tool calling allows the model to request external capabilities, such as searching documents, checking weather, querying a database, or calling an application service.
+
+The toolkit defines tools in a provider-independent way.
+
+```python
+from ai.client import AIClient
+from ai.tools import ToolDefinition
+
+ai = AIClient()
+
+weather_tool = ToolDefinition(
+    name="get_weather",
+    description="Get the current weather for a city.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "location": {
+                "type": "string",
+                "description": "City name, for example Paris or London.",
+            }
+        },
+        "required": ["location"],
+        "additionalProperties": False,
+    },
+)
+
+response = ai.ask_with_tools(
+    prompt="What is the weather in Paris?",
+    tools=[weather_tool],
+)
+
+for tool_call in response.tool_calls:
+    print(tool_call.name)
+    print(tool_call.arguments)
+```
+
+Tool calling currently returns requested tool calls to the application.
+
+The toolkit does **not** automatically execute tools.
+
+That means application code remains responsible for deciding whether and how to run a requested tool.
+
+```python
+for tool_call in response.tool_calls:
+    if tool_call.name == "get_weather":
+        location = tool_call.arguments["location"]
+        # Application decides what to do next.
+```
+
+Current tool-calling support:
+
+* provider-independent `ToolDefinition`
+* provider-independent `ToolCall`
+* provider-independent `ToolResponse`
+* OpenAI tool-call adapter
+* requested tool calls returned to the application
+
+Not yet supported:
+
+* automatic tool execution
+* submitting tool results back to the model
+* multi-step agent loops
+* parallel tool execution
+* async tool calling
+
+Automatic tool execution belongs later in the Agents and Workflows roadmap.
+
 
 ## Provider Architecture
 

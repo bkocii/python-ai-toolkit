@@ -108,7 +108,7 @@ Tasks
 
 - [x] REQUEST-001 Streaming responses
 - [x] REQUEST-002 Async AIClient
-- [ ] REQUEST-003 Tool Calling
+- [x] REQUEST-003 Tool Calling
 - [ ] REQUEST-004 Image inputs
 - [ ] REQUEST-005 Structured output improvements
 

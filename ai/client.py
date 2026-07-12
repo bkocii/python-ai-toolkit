@@ -1,11 +1,11 @@
 from typing import Iterator, TypeVar, overload
-
 from pydantic import BaseModel
 from ai.request_builder import AIRequestBuilder
 from ai.config import get_ai_config
 from ai.executor import RequestExecutor
 from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
+from ai.tools import ToolDefinition, ToolResponse
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -76,3 +76,19 @@ class AIClient:
         Stream a plain text response from the configured provider.
         """
         return self.executor.stream(prompt)
+
+    def ask_with_tools(
+        self,
+        prompt: str,
+        tools: list[ToolDefinition],
+    ) -> ToolResponse:
+        """
+        Send a prompt with available tool definitions.
+
+        The model may return plain text, tool calls, or both.
+        Tool execution is intentionally left to the application.
+        """
+        return self.executor.execute_with_tools(
+            prompt=prompt,
+            tools=tools,
+        )

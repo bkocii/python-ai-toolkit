@@ -41,6 +41,23 @@ Demonstrates:
 - awaiting async AI requests
 - running async examples with asyncio.run()
 
+---
+
+## 07 – Tool Calling
+
+**File**
+
+```text
+07_tool_calling.py
+```
+
+Demonstrates:
+
+- defining provider-independent tools
+- passing tools to AIClient
+- receiving requested tool calls
+- keeping tool execution inside the application
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -53,3 +70,4 @@ python -m examples.01_summarize_text
 4. Prompt Templates
 5. Streaming Response
 6. Async Client
+7. Tool Calling
