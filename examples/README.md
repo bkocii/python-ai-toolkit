@@ -31,6 +31,16 @@ Demonstrates:
 - consuming response chunks
 - printing streamed output immediately
 
+---
+
+## 06 – Async Client
+
+Demonstrates:
+
+- using AsyncAIClient
+- awaiting async AI requests
+- running async examples with asyncio.run()
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -42,3 +52,4 @@ python -m examples.01_summarize_text
 3. Builder Usage
 4. Prompt Templates
 5. Streaming Response
+6. Async Client

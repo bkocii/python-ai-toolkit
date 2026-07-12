@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterator
+from typing import AsyncIterator, Iterator
 
 from ai.exceptions import AIProviderError
 from ai.schemas import ProviderResponse
@@ -24,6 +24,17 @@ class BaseAIProvider(ABC):
         """
         raise NotImplementedError
 
+    async def ask_text_async(self, prompt: str) -> ProviderResponse:
+        """
+        Send a prompt asynchronously.
+
+        Providers that support async requests should override this method.
+        """
+        raise AIProviderError(
+            f"Provider '{self.__class__.__name__}' does not support async requests. "
+            "Implement ask_text_async() on the provider before using AsyncAIClient."
+        )
+
     def stream_text(self, prompt: str) -> Iterator[str]:
         """
         Stream text chunks from the provider.
@@ -33,4 +44,15 @@ class BaseAIProvider(ABC):
         raise AIProviderError(
             f"Provider '{self.__class__.__name__}' does not support streaming. "
             "Implement stream_text() on the provider before using AIClient.stream()."
+        )
+
+    async def stream_text_async(self, prompt: str) -> AsyncIterator[str]:
+        """
+        Stream text chunks asynchronously.
+
+        Providers that support async streaming should override this method.
+        """
+        raise AIProviderError(
+            f"Provider '{self.__class__.__name__}' does not support async streaming. "
+            "Implement stream_text_async() on the provider before using async streaming."
         )

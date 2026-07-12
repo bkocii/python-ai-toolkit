@@ -183,6 +183,80 @@ ai.ask(..., response_type=...)
 
 `ai.stream(...)` returns streamed text chunks as an iterator, not a full `AIResult`.
 
+---
+
+## Async AI Client
+
+For async Python applications, use `AsyncAIClient`.
+
+```python
+import asyncio
+
+from ai.async_client import AsyncAIClient
+
+
+async def main() -> None:
+    ai = AsyncAIClient()
+
+    result = await ai.ask(
+        "Explain dependency injection in one short paragraph."
+    )
+
+    print(result.data)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Structured responses also work with the async client.
+
+```python
+import asyncio
+
+from pydantic import BaseModel
+
+from ai.async_client import AsyncAIClient
+
+
+class Summary(BaseModel):
+    title: str
+    key_point: str
+
+
+async def main() -> None:
+    ai = AsyncAIClient()
+
+    result = await ai.ask(
+        prompt="Summarize dependency injection.",
+        response_type=Summary,
+    )
+
+    print(result.data.title)
+    print(result.data.key_point)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Use `AIClient` for synchronous applications.
+
+Use `AsyncAIClient` for asynchronous applications, such as FastAPI apps, async workers, or other event-loop based systems.
+
+Current async support:
+
+* plain text requests
+* structured responses
+* retry for structured responses
+* full `AIResult` return values
+
+Not yet supported:
+
+* async streaming
+* async fluent request builder
+* async tool calling
+
 
 ## Provider Architecture
 
