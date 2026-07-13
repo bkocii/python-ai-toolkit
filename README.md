@@ -146,6 +146,111 @@ For prompts assembled dynamically from multiple sections, use `PromptBuilder`.
 
 ---
 
+## Structured Outputs
+
+Structured outputs allow the toolkit to return validated Pydantic models instead of plain text.
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+
+
+class Answer(BaseModel):
+    summary: str
+    confidence: float
+
+
+ai = AIClient()
+
+result = ai.ask(
+    prompt="Summarize dependency injection in one sentence.",
+    response_type=Answer,
+)
+
+print(result.data.summary)
+print(result.data.confidence)
+```
+
+When `response_type` is provided, the toolkit:
+
+- builds a schema-aware prompt
+- asks the model to return valid JSON
+- parses the raw response
+- validates the response with Pydantic
+- retries once when JSON parsing or schema validation fails, depending on `AI_MAX_RETRIES`
+
+The structured-output logic is centralized in:
+
+```text
+ai/structured.py
+```
+
+This keeps structured prompt construction and structured response parsing separate from request execution.
+
+The same structured-output behavior is used by:
+
+- `AIClient.ask(...)`
+- `AsyncAIClient.ask(...)`
+- `AIClient.ask_with_images(...)`
+
+Example with image input:
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+from ai.images import ImageInput
+
+
+class ImageDescription(BaseModel):
+    subject: str
+    colors: list[str]
+    visible_text: str | None = None
+
+
+ai = AIClient()
+
+result = ai.ask_with_images(
+    prompt="Extract structured information from this image.",
+    images=[
+        ImageInput(
+            source=(
+                "https://api.nga.gov/iiif/"
+                "a2e6da57-3cd1-4235-b20e-95dcaefed6c8/"
+                "full/!800,800/0/default.jpg"
+            ),
+        )
+    ],
+    response_type=ImageDescription,
+)
+
+print(result.data.subject)
+print(result.data.colors)
+```
+
+Current structured-output support:
+
+- Pydantic response models
+- schema-aware prompt generation
+- JSON parsing
+- Pydantic validation
+- repair retry for invalid JSON or schema mismatch
+- sync requests
+- async requests
+- image requests with structured responses
+
+Not yet supported:
+
+- provider-native strict structured output
+- OpenAI `response_format` integration
+- streaming structured output
+- partial structured validation while streaming
+
+Provider-native strict structured output may be added later without changing the public `response_type` API.
+
+---
+
 ## Streaming Responses
 
 For plain text responses, you can stream chunks as they arrive.

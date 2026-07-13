@@ -4,10 +4,10 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
+from ai.structured import build_structured_prompt, parse_structured_response
 from ai.cost import estimate_cost_usd
 from ai.exceptions import AIError, AIJSONParseError, AISchemaValidationError
 from ai.logger import get_ai_logger
-from ai.parser import parse_json_response
 from ai.retry import build_json_repair_prompt
 from ai.schemas import AIResult
 
@@ -83,14 +83,10 @@ class AsyncRequestExecutor:
         final_prompt = prompt
 
         if response_type is not None:
-            schema_json = response_type.model_json_schema()
-            final_prompt = f"""
-{prompt}
-
-Return valid JSON only.
-The JSON must match this schema:
-{schema_json}
-"""
+            final_prompt = build_structured_prompt(
+                prompt=prompt,
+                response_type=response_type,
+            )
 
         try:
             start = perf_counter()
@@ -126,7 +122,7 @@ The JSON must match this schema:
 
             while True:
                 try:
-                    parsed = parse_json_response(raw_response, response_type)
+                    parsed = parse_structured_response(raw_response, response_type)
                     break
                 except (AIJSONParseError, AISchemaValidationError):
                     if retries_used >= self.max_retries:

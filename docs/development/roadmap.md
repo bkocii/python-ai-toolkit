@@ -110,11 +110,11 @@ Tasks
 - [x] REQUEST-002 Async AIClient
 - [x] REQUEST-003 Tool Calling
 - [x] REQUEST-004 Image inputs
-- [ ] REQUEST-005 Structured output improvements
+- [x] REQUEST-005 Structured output improvements
 
 Exit Criteria
 
-- Modern provider capabilities fully supported.
+- [x] Modern provider capabilities fully supported.
 
 ---
 
