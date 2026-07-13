@@ -6,6 +6,7 @@ from ai.executor import RequestExecutor
 from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
 from ai.tools import ToolDefinition, ToolResponse
+from ai.images import ImageInput
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -91,4 +92,36 @@ class AIClient:
         return self.executor.execute_with_tools(
             prompt=prompt,
             tools=tools,
+        )
+
+    @overload
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+    ) -> AIResult[str]: ...
+
+    @overload
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+        response_type: type[T],
+    ) -> AIResult[T]: ...
+
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+        response_type: type[T] | None = None,
+    ) -> AIResult[str] | AIResult[T]:
+        """
+        Send a prompt with image inputs.
+
+        Supports plain text responses and structured Pydantic responses.
+        """
+        return self.executor.execute_with_images(
+            prompt=prompt,
+            images=images,
+            response_type=response_type,
         )

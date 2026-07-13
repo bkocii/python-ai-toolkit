@@ -109,7 +109,7 @@ Tasks
 - [x] REQUEST-001 Streaming responses
 - [x] REQUEST-002 Async AIClient
 - [x] REQUEST-003 Tool Calling
-- [ ] REQUEST-004 Image inputs
+- [x] REQUEST-004 Image inputs
 - [ ] REQUEST-005 Structured output improvements
 
 Exit Criteria

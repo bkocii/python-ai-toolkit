@@ -58,6 +58,33 @@ Demonstrates:
 - receiving requested tool calls
 - keeping tool execution inside the application
 
+---
+
+## 08 – Image Inputs
+
+**File**
+
+```text
+08_image_inputs.py
+```
+Demonstrates:
+
+- sending an image URL to the model
+- combining text and image input
+- receiving a plain text response
+
+## 09 – Structured Image Input
+
+**FIle**
+```text
+09_structured_image_input.py
+```
+Demonstrates:
+
+- sending image input
+- using response_type
+- validating structured image analysis with Pydantic
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -71,3 +98,5 @@ python -m examples.01_summarize_text
 5. Streaming Response
 6. Async Client
 7. Tool Calling
+8. Image Inputs
+9. Structured Image Input

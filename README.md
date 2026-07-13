@@ -329,6 +329,96 @@ Not yet supported:
 Automatic tool execution belongs later in the Agents and Workflows roadmap.
 
 
+---
+
+## Image Inputs
+
+Image inputs allow the toolkit to send one or more images together with a text prompt.
+
+The public API uses provider-independent `ImageInput` objects.
+
+```python
+from ai.client import AIClient
+from ai.images import ImageInput
+
+ai = AIClient()
+
+image = ImageInput(
+    source=(
+        "https://api.nga.gov/iiif/"
+        "a2e6da57-3cd1-4235-b20e-95dcaefed6c8/"
+        "full/!800,800/0/default.jpg"
+    ),
+)
+
+result = ai.ask_with_images(
+    prompt="Describe this image in one short paragraph.",
+    images=[image],
+)
+
+print(result.data)
+```
+
+Structured responses are also supported.
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+from ai.images import ImageInput
+
+
+class ImageDescription(BaseModel):
+    subject: str
+    colors: list[str]
+    visible_text: str | None = None
+
+
+ai = AIClient()
+
+result = ai.ask_with_images(
+    prompt="Extract structured information from this image.",
+    images=[
+        ImageInput(
+            source=(
+                "https://api.nga.gov/iiif/"
+                "a2e6da57-3cd1-4235-b20e-95dcaefed6c8/"
+                "full/!800,800/0/default.jpg"
+            ),
+        )
+    ],
+    response_type=ImageDescription,
+)
+
+print(result.data.subject)
+print(result.data.colors)
+```
+
+Current image-input support:
+
+- image URL input
+- Base64 data URL input
+- multiple images
+- plain text responses
+- structured Pydantic responses
+- OpenAI Responses API adapter
+
+Not yet supported:
+
+- local file helper
+- OpenAI file ID helper
+- async image input
+- streaming image input
+- image generation
+- image editing
+
+### Note about image URLs
+
+When using image URLs, the model provider must be able to download the image.
+
+Some public image hosts block automated downloads, redirects, or hotlinking. If a URL fails with an error like `Error while downloading file`, try another public image URL or use a Base64 data URL instead.
+
+
 ## Provider Architecture
 
 Current:

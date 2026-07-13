@@ -3,6 +3,7 @@ from ai.schemas import ProviderResponse, TokenUsage
 from ai.exceptions import AIProviderError
 from ai.providers.base import BaseAIProvider
 from ai.tools import ToolCall, ToolDefinition, ToolResponse
+from ai.images import ImageInput
 from typing import Iterator, Any
 import json
 
@@ -154,4 +155,60 @@ class OpenAIProvider(BaseAIProvider):
         return ToolResponse(
             text=getattr(response, "output_text", None),
             tool_calls=tool_calls,
+        )
+
+    def _to_openai_image_content(self, image: ImageInput) -> dict:
+        """
+        Convert provider-independent image input to OpenAI image content.
+        """
+        content = {
+            "type": "input_image",
+            "image_url": image.source,
+        }
+
+        if image.detail is not None:
+            content["detail"] = image.detail
+
+        return content
+
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+    ) -> ProviderResponse:
+        """
+        Send a prompt with image inputs to OpenAI.
+        """
+        try:
+            response = self.client.responses.create(
+                model=self.model,
+                input=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": prompt,
+                            },
+                            *[self._to_openai_image_content(image) for image in images],
+                        ],
+                    }
+                ],
+            )
+        except OpenAIError as exc:
+            raise AIProviderError(f"OpenAI image request failed: {exc}") from exc
+
+        usage = getattr(response, "usage", None)
+
+        token_usage = None
+        if usage is not None:
+            token_usage = TokenUsage(
+                input_tokens=getattr(usage, "input_tokens", None),
+                output_tokens=getattr(usage, "output_tokens", None),
+                total_tokens=getattr(usage, "total_tokens", None),
+            )
+
+        return ProviderResponse(
+            text=response.output_text,
+            token_usage=token_usage,
         )

@@ -6,6 +6,7 @@ from ai.exceptions import AIError, AIJSONParseError, AISchemaValidationError
 from ai.logger import get_ai_logger
 from ai.parser import parse_json_response
 from ai.schemas import AIResult, TokenUsage
+from ai.images import ImageInput
 from ai.tools import ToolDefinition, ToolResponse
 from typing import Any, Iterator
 from ai.retry import build_json_repair_prompt
@@ -255,6 +256,119 @@ The JSON must match this schema:
         except AIError:
             self.logger.exception(
                 "AI tool request failed | request_id=%s | model=%s",
+                request_id,
+                self.model,
+            )
+            raise
+
+    def execute_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+        response_type: type[BaseModel] | None = None,
+    ):
+        """
+        Execute an AI request with image inputs.
+
+        Supports plain text responses and structured Pydantic responses.
+        """
+        request_id = str(uuid4())
+        final_prompt = prompt
+
+        if response_type is not None:
+            schema_json = response_type.model_json_schema()
+            final_prompt = f"""
+    {prompt}
+
+    Return valid JSON only.
+    The JSON must match this schema:
+    {schema_json}
+    """
+
+        try:
+            start = perf_counter()
+
+            provider_response = self.provider.ask_with_images(
+                prompt=final_prompt,
+                images=images,
+            )
+            raw_response = provider_response.text
+            original_raw_response = raw_response
+            token_usage = provider_response.token_usage
+            retries_used = 0
+
+            if response_type is None:
+                duration_ms = (perf_counter() - start) * 1000
+                estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
+
+                self._log_success(
+                    request_id=request_id,
+                    duration_ms=duration_ms,
+                    retries_used=retries_used,
+                    token_usage=token_usage,
+                    estimated_cost_usd=estimated_cost_usd,
+                )
+
+                return self._build_result(
+                    data=raw_response,
+                    raw_response=raw_response,
+                    request_id=request_id,
+                    original_raw_response=original_raw_response,
+                    duration_ms=duration_ms,
+                    retries_used=retries_used,
+                    token_usage=token_usage,
+                    estimated_cost_usd=estimated_cost_usd,
+                )
+
+            while True:
+                try:
+                    parsed = parse_json_response(raw_response, response_type)
+                    break
+                except (AIJSONParseError, AISchemaValidationError):
+                    if retries_used >= self.max_retries:
+                        raise
+
+                    retries_used += 1
+
+                    repair_prompt = build_json_repair_prompt(
+                        original_prompt=final_prompt,
+                        invalid_response=raw_response,
+                    )
+
+                    retry_response = self.provider.ask_text(repair_prompt)
+                    raw_response = retry_response.text
+
+                    token_usage = (
+                        token_usage.add(retry_response.token_usage)
+                        if token_usage is not None
+                        else retry_response.token_usage
+                    )
+
+            duration_ms = (perf_counter() - start) * 1000
+            estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
+
+            self._log_success(
+                request_id=request_id,
+                duration_ms=duration_ms,
+                retries_used=retries_used,
+                token_usage=token_usage,
+                estimated_cost_usd=estimated_cost_usd,
+            )
+
+            return self._build_result(
+                data=parsed,
+                raw_response=raw_response,
+                request_id=request_id,
+                original_raw_response=original_raw_response,
+                duration_ms=duration_ms,
+                retries_used=retries_used,
+                token_usage=token_usage,
+                estimated_cost_usd=estimated_cost_usd,
+            )
+
+        except AIError:
+            self.logger.exception(
+                "AI image request failed | request_id=%s | model=%s",
                 request_id,
                 self.model,
             )

@@ -3,6 +3,7 @@ from typing import AsyncIterator, Iterator
 from ai.tools import ToolDefinition, ToolResponse
 from ai.exceptions import AIProviderError
 from ai.schemas import ProviderResponse
+from ai.images import ImageInput
 
 
 class BaseAIProvider(ABC):
@@ -70,4 +71,19 @@ class BaseAIProvider(ABC):
         raise AIProviderError(
             f"Provider '{self.__class__.__name__}' does not support tool calling. "
             "Implement ask_with_tools() on the provider before using tools."
+        )
+
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+    ) -> ProviderResponse:
+        """
+        Send a prompt with image inputs.
+
+        Providers that support image input should override this method.
+        """
+        raise AIProviderError(
+            f"Provider '{self.__class__.__name__}' does not support image inputs. "
+            "Implement ask_with_images() on the provider before using image requests."
         )
