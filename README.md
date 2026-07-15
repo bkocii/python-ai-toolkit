@@ -841,6 +841,141 @@ The in-memory store is best for tests, examples, demos, and small local workflow
 
 Production applications should later use a persistent vector store implementation behind the same `BaseVectorStore` interface.
 
+---
+
+## Retriever
+
+A retriever connects embeddings and a vector store.
+
+It takes a user query, embeds it, searches the vector store, and returns relevant context.
+
+The basic flow is:
+
+```text
+User question
+    ↓
+Query embedding
+    ↓
+Vector store similarity search
+    ↓
+Retrieved context
+```
+
+The toolkit includes `VectorStoreRetriever`.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.retriever import VectorStoreRetriever, format_retrieved_context
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+knowledge = [
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={"topic": "redis"},
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database.",
+        metadata={"topic": "postgres"},
+    ),
+    EmbeddingInput(
+        text="Django is a Python web framework.",
+        metadata={"topic": "django"},
+    ),
+]
+
+embedding_response = ai.embed_texts(knowledge)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+contexts = retriever.retrieve(
+    query="Which technology should I use for caching?",
+    limit=2,
+)
+
+context_text = format_retrieved_context(contexts)
+
+print(context_text)
+```
+
+`RetrievedContext` contains only the information needed by higher-level RAG code.
+
+```python
+context.id
+context.text
+context.score
+context.metadata
+```
+
+The raw vector is not exposed by the retriever result.
+
+Metadata filtering is supported.
+
+```python
+contexts = retriever.retrieve(
+    query="How should I cache data?",
+    limit=5,
+    metadata_filter={
+        "topic": "redis",
+    },
+)
+```
+
+Retrieved context can be inserted into a prompt.
+
+```python
+prompt = f"""
+Answer the question using only the context below.
+
+Context:
+{context_text}
+
+Question:
+Which technology should I use for caching?
+"""
+```
+
+Current retriever support:
+
+- provider-independent `RetrievedContext`
+- `BaseRetriever` interface
+- `VectorStoreRetriever`
+- query embedding through `AIClient`
+- vector store similarity search
+- metadata filtering
+- prompt-ready context formatting
+
+Not yet supported:
+
+- full RAG answer pipeline
+- reranking
+- hybrid keyword and vector search
+- retrieval evaluation
+- document loaders
+- database loaders
+
+The retriever finds relevant context. It does not generate the final answer yet.
+
+Answer generation is added by the RAG pipeline.
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.

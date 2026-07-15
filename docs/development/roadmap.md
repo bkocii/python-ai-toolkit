@@ -128,7 +128,7 @@ Tasks
 
 - [x] RAG-001 Embeddings
 - [x] RAG-002 Vector Store abstraction
-- [ ] RAG-003 Retriever interface
+- [x] RAG-003 Retriever interface
 - [ ] RAG-004 RAG Pipeline
 - [ ] RAG-005 Document loaders
 

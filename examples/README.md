@@ -121,6 +121,25 @@ Demonstrates:
 - running similarity search
 - reading search scores and metadata
 
+---
+
+## 12 – Retriever
+
+**File**
+
+```text
+12_retriever.py
+```
+Demonstrates:
+
+- embedding knowledge text
+- storing vectors in InMemoryVectorStore
+- creating VectorStoreRetriever
+- retrieving relevant context for a query
+- formatting retrieved context for prompts
+
+
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -138,3 +157,4 @@ python -m examples.01_summarize_text
 9. Structured Image Input
 10. Embeddings
 11. Vector Store
+12. Retriever
