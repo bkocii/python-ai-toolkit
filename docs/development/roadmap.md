@@ -127,7 +127,7 @@ Support Retrieval-Augmented Generation (RAG).
 Tasks
 
 - [x] RAG-001 Embeddings
-- [ ] RAG-002 Vector Store abstraction
+- [x] RAG-002 Vector Store abstraction
 - [ ] RAG-003 Retriever interface
 - [ ] RAG-004 RAG Pipeline
 - [ ] RAG-005 Document loaders

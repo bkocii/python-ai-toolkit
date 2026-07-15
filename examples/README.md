@@ -102,6 +102,25 @@ Demonstrates:
 - reading vector length
 - using embeddings as preparation for RAG
 
+
+---
+
+## 11 – Vector Store
+
+**File**
+
+```text
+11_vector_store.py
+```
+Demonstrates:
+
+- embedding multiple texts
+- converting embeddings into vector records
+- storing records in InMemoryVectorStore
+- embedding a search query
+- running similarity search
+- reading search scores and metadata
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -118,3 +137,4 @@ python -m examples.01_summarize_text
 8. Image Inputs
 9. Structured Image Input
 10. Embeddings
+11. Vector Store

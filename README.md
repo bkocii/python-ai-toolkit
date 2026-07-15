@@ -682,6 +682,165 @@ Relevant context
 AI answer
 ```
 
+---
+
+## Vector Store
+
+A vector store saves embedded text records and allows similarity search.
+
+This is the second building block for Retrieval-Augmented Generation.
+
+The basic flow is:
+
+```text
+Text
+    ↓
+Embedding vector
+    ↓
+VectorRecord
+    ↓
+Vector store
+    ↓
+Similarity search
+    ↓
+Relevant results
+```
+
+The toolkit includes a dependency-free in-memory vector store.
+
+```python
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+store = InMemoryVectorStore()
+
+store.add(
+    [
+        VectorRecord(
+            id="doc-1",
+            text="Django is a Python web framework.",
+            vector=[1.0, 0.0, 0.0],
+            metadata={
+                "topic": "django",
+            },
+        ),
+        VectorRecord(
+            id="doc-2",
+            text="Redis is often used as a cache.",
+            vector=[0.0, 1.0, 0.0],
+            metadata={
+                "topic": "redis",
+            },
+        ),
+    ]
+)
+
+results = store.similarity_search(
+    query_vector=[0.0, 0.9, 0.1],
+    limit=1,
+)
+
+for result in results:
+    print(result.text)
+    print(result.score)
+    print(result.metadata)
+```
+
+A more realistic example uses embeddings from `AIClient`.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+texts = [
+    EmbeddingInput(
+        text="Django is a Python web framework.",
+        metadata={"topic": "django"},
+    ),
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={"topic": "redis"},
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database.",
+        metadata={"topic": "postgres"},
+    ),
+]
+
+embedding_response = ai.embed_texts(texts)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+query_response = ai.embed_text(
+    "Which technology should I use for caching?"
+)
+
+query_vector = query_response.embeddings[0].vector
+
+results = store.similarity_search(
+    query_vector=query_vector,
+    limit=2,
+)
+
+for result in results:
+    print(result.text)
+    print(result.score)
+    print(result.metadata)
+```
+
+The in-memory vector store supports metadata filtering.
+
+```python
+results = store.similarity_search(
+    query_vector=query_vector,
+    limit=5,
+    metadata_filter={
+        "topic": "redis",
+    },
+)
+```
+
+Current vector store support:
+
+- provider-independent `VectorRecord`
+- provider-independent `VectorSearchResult`
+- `BaseVectorStore` interface
+- dependency-free `InMemoryVectorStore`
+- cosine similarity search
+- metadata preservation
+- metadata filtering
+- record replacement by ID
+- count and clear operations
+
+Not yet supported:
+
+- persistent storage
+- PostgreSQL / pgvector
+- Chroma
+- Pinecone
+- FAISS
+- Qdrant
+- retriever interface
+- full RAG pipeline
+- document loaders
+
+The in-memory store is best for tests, examples, demos, and small local workflows.
+
+Production applications should later use a persistent vector store implementation behind the same `BaseVectorStore` interface.
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.
