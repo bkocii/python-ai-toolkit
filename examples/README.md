@@ -85,6 +85,23 @@ Demonstrates:
 - using response_type
 - validating structured image analysis with Pydantic
 
+---
+
+## 10 – Embeddings
+
+**File**
+
+```text
+10_embeddings.py
+```
+Demonstrates:
+
+- embedding one text
+- embedding multiple texts
+- preserving metadata
+- reading vector length
+- using embeddings as preparation for RAG
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -100,3 +117,4 @@ python -m examples.01_summarize_text
 7. Tool Calling
 8. Image Inputs
 9. Structured Image Input
+10. Embeddings

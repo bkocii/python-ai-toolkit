@@ -7,6 +7,7 @@ from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
 from ai.tools import ToolDefinition, ToolResponse
 from ai.images import ImageInput
+from ai.embeddings import EmbeddingInput, EmbeddingResponse
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -125,3 +126,43 @@ class AIClient:
             images=images,
             response_type=response_type,
         )
+
+    def embed_text(
+        self,
+        text: str,
+        metadata: dict[str, str] | None = None,
+    ) -> EmbeddingResponse:
+        """
+        Embed one text input.
+
+        Returns an EmbeddingResponse containing one EmbeddingVector.
+        """
+        return self.embed_texts(
+            [
+                EmbeddingInput(
+                    text=text,
+                    metadata=metadata or {},
+                )
+            ]
+        )
+
+    def embed_texts(
+        self,
+        inputs: list[str] | list[EmbeddingInput],
+    ) -> EmbeddingResponse:
+        """
+        Embed multiple text inputs.
+
+        Inputs may be plain strings or EmbeddingInput objects.
+        Use EmbeddingInput when you need to attach metadata.
+        """
+        normalized_inputs = [
+            (
+                input_item
+                if isinstance(input_item, EmbeddingInput)
+                else EmbeddingInput(text=input_item)
+            )
+            for input_item in inputs
+        ]
+
+        return self.provider.embed_texts(normalized_inputs)

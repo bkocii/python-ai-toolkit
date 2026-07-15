@@ -4,6 +4,7 @@ from ai.exceptions import AIProviderError
 from ai.providers.base import BaseAIProvider
 from ai.tools import ToolCall, ToolDefinition, ToolResponse
 from ai.images import ImageInput
+from ai.embeddings import EmbeddingInput, EmbeddingResponse, EmbeddingVector
 from typing import Iterator, Any
 import json
 
@@ -13,8 +14,17 @@ class OpenAIProvider(BaseAIProvider):
     OpenAI implementation of BaseAIProvider.
     """
 
-    def __init__(self, api_key: str, model: str):
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        embedding_model: str = "text-embedding-3-small",
+        embedding_dimensions: int | None = None,
+    ):
         self.model = model
+        self.embedding_model = embedding_model
+        self.embedding_dimensions = embedding_dimensions
+
         self.client = OpenAI(api_key=api_key)
         self.async_client = AsyncOpenAI(api_key=api_key)
 
@@ -210,5 +220,70 @@ class OpenAIProvider(BaseAIProvider):
 
         return ProviderResponse(
             text=response.output_text,
+            token_usage=token_usage,
+        )
+
+    def embed_texts(
+        self,
+        inputs: list[EmbeddingInput],
+    ) -> EmbeddingResponse:
+        """
+        Embed multiple text inputs with OpenAI.
+        """
+        if not inputs:
+            raise AIProviderError("At least one embedding input is required.")
+
+        for input_item in inputs:
+            if not input_item.text.strip():
+                raise AIProviderError("Embedding input text cannot be empty.")
+
+        request_kwargs: dict[str, Any] = {
+            "model": self.embedding_model,
+            "input": [input_item.text for input_item in inputs],
+            "encoding_format": "float",
+        }
+
+        if self.embedding_dimensions is not None:
+            request_kwargs["dimensions"] = self.embedding_dimensions
+
+        try:
+            response = self.client.embeddings.create(**request_kwargs)
+        except OpenAIError as exc:
+            raise AIProviderError(f"OpenAI embedding request failed: {exc}") from exc
+
+        usage = getattr(response, "usage", None)
+
+        token_usage = None
+        if usage is not None:
+            token_usage = TokenUsage(
+                input_tokens=getattr(usage, "prompt_tokens", None),
+                output_tokens=None,
+                total_tokens=getattr(usage, "total_tokens", None),
+            )
+
+        embeddings: list[EmbeddingVector] = []
+
+        for item in response.data:
+            index = getattr(item, "index", None)
+
+            if index is None or index >= len(inputs):
+                raise AIProviderError(
+                    f"OpenAI returned an invalid embedding index: {index}."
+                )
+
+            original_input = inputs[index]
+
+            embeddings.append(
+                EmbeddingVector(
+                    text=original_input.text,
+                    vector=list(getattr(item, "embedding")),
+                    index=index,
+                    metadata=original_input.metadata,
+                )
+            )
+
+        return EmbeddingResponse(
+            embeddings=embeddings,
+            model=getattr(response, "model", self.embedding_model),
             token_usage=token_usage,
         )

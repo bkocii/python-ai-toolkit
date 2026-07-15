@@ -126,7 +126,7 @@ Support Retrieval-Augmented Generation (RAG).
 
 Tasks
 
-- [ ] RAG-001 Embeddings
+- [x] RAG-001 Embeddings
 - [ ] RAG-002 Vector Store abstraction
 - [ ] RAG-003 Retriever interface
 - [ ] RAG-004 RAG Pipeline
@@ -217,6 +217,7 @@ Ideas
 - Additional providers
 - Automatic provider discovery
 - Immutable / reusable request builders
+- - [ ] DX-006 Add local image file helper
 
 Future backlog items may become roadmap tasks after the completion of a sprint.
 

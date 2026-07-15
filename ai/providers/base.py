@@ -4,6 +4,7 @@ from ai.tools import ToolDefinition, ToolResponse
 from ai.exceptions import AIProviderError
 from ai.schemas import ProviderResponse
 from ai.images import ImageInput
+from ai.embeddings import EmbeddingInput, EmbeddingResponse
 
 
 class BaseAIProvider(ABC):
@@ -86,4 +87,38 @@ class BaseAIProvider(ABC):
         raise AIProviderError(
             f"Provider '{self.__class__.__name__}' does not support image inputs. "
             "Implement ask_with_images() on the provider before using image requests."
+        )
+
+    def embed_text(
+        self,
+        text: str,
+        metadata: dict[str, str] | None = None,
+    ) -> EmbeddingResponse:
+        """
+        Embed one text input.
+
+        Providers can override this method, but by default it delegates to
+        embed_texts() so providers only need to implement batch embedding once.
+        """
+        return self.embed_texts(
+            [
+                EmbeddingInput(
+                    text=text,
+                    metadata=metadata or {},
+                )
+            ]
+        )
+
+    def embed_texts(
+        self,
+        inputs: list[EmbeddingInput],
+    ) -> EmbeddingResponse:
+        """
+        Embed multiple text inputs.
+
+        Providers that support embeddings should override this method.
+        """
+        raise AIProviderError(
+            f"Provider '{self.__class__.__name__}' does not support embeddings. "
+            "Implement embed_texts() on the provider before using embedding requests."
         )

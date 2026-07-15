@@ -540,6 +540,148 @@ Planned:
 
 ---
 
+---
+
+## Embeddings
+
+Embeddings convert text into vectors of numbers.
+
+Those vectors can later be stored and searched to build Retrieval-Augmented Generation workflows.
+
+Typical uses include:
+
+- semantic search
+- document search
+- product search
+- support knowledge search
+- FAQ matching
+- RAG pipelines
+
+The toolkit exposes embeddings through `AIClient`.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+response = ai.embed_text(
+    "Django is a Python web framework."
+)
+
+embedding = response.embeddings[0]
+
+print(embedding.text)
+print(len(embedding.vector))
+print(response.model)
+```
+
+Batch embedding is also supported.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+response = ai.embed_texts(
+    [
+        "Django is a Python web framework.",
+        "Redis is often used as a cache.",
+        "PostgreSQL is a relational database.",
+    ]
+)
+
+print(response.texts)
+print(len(response.vectors))
+```
+
+Use `EmbeddingInput` when you need metadata.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+
+ai = AIClient()
+
+response = ai.embed_texts(
+    [
+        EmbeddingInput(
+            text="Django is a Python web framework.",
+            metadata={
+                "source": "notes.md",
+                "topic": "django",
+            },
+        )
+    ]
+)
+
+embedding = response.embeddings[0]
+
+print(embedding.text)
+print(embedding.metadata)
+print(len(embedding.vector))
+```
+
+Embedding configuration uses a separate model setting from normal AI requests.
+
+```env
+AI_PROVIDER=openai
+
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5.4-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+
+# Optional generic fallback
+AI_EMBEDDING_MODEL=
+
+# Optional custom embedding vector size
+AI_EMBEDDING_DIMENSIONS=
+```
+
+The embedding model is separate because normal text requests and embedding requests use different provider capabilities.
+
+```env
+OPENAI_MODEL=gpt-5.4-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+```
+
+Current embedding support:
+
+- embed one text
+- embed multiple texts
+- preserve metadata
+- provider-independent embedding models
+- OpenAI embeddings adapter
+- optional embedding dimensions
+- token usage when reported by the provider
+
+Not yet supported:
+
+- vector store
+- retriever
+- RAG pipeline
+- document loaders
+- database loaders
+- embedding cache
+- async embeddings
+
+Embeddings are the first building block for RAG.
+
+A later RAG flow will look like this:
+
+```text
+Documents / database rows
+    ↓
+Embeddings
+    ↓
+Vector store
+    ↓
+Retriever
+    ↓
+Relevant context
+    ↓
+AI answer
+```
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.

@@ -2,6 +2,7 @@ from ai.config import AIConfig
 from ai.exceptions import AIConfigurationError
 from ai.providers.base import BaseAIProvider
 from ai.providers.openai_provider import OpenAIProvider
+from inspect import Parameter, signature
 
 
 class ProviderFactory:
@@ -15,6 +16,41 @@ class ProviderFactory:
     _registry = {
         "openai": OpenAIProvider,
     }
+
+    @classmethod
+    def _build_provider_kwargs(
+        cls,
+        provider_class: type[BaseAIProvider],
+        config: AIConfig,
+    ) -> dict:
+        """
+        Build constructor kwargs for a provider.
+
+        Required provider arguments are always passed.
+        Optional advanced capability arguments are passed only when the
+        provider constructor accepts them.
+        """
+        kwargs = {
+            "api_key": config.api_key,
+            "model": config.model,
+        }
+
+        parameters = signature(provider_class).parameters
+
+        accepts_kwargs = any(
+            parameter.kind == Parameter.VAR_KEYWORD for parameter in parameters.values()
+        )
+
+        optional_kwargs = {
+            "embedding_model": config.embedding_model,
+            "embedding_dimensions": config.embedding_dimensions,
+        }
+
+        for name, value in optional_kwargs.items():
+            if accepts_kwargs or name in parameters:
+                kwargs[name] = value
+
+        return kwargs
 
     @classmethod
     def create(cls, config: AIConfig) -> BaseAIProvider:
@@ -34,8 +70,10 @@ class ProviderFactory:
             )
 
         return provider_class(
-            api_key=config.api_key,
-            model=config.model,
+            **cls._build_provider_kwargs(
+                provider_class=provider_class,
+                config=config,
+            )
         )
 
     @classmethod

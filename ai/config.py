@@ -8,6 +8,7 @@ load_dotenv()
 
 DEFAULT_PROVIDER = "openai"
 DEFAULT_MODEL = "gpt-5.4-mini"
+DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
 
 
 @dataclass(frozen=True)
@@ -15,6 +16,8 @@ class AIConfig:
     api_key: str
     model: str = DEFAULT_MODEL
     provider: str = DEFAULT_PROVIDER
+    embedding_model: str = DEFAULT_EMBEDDING_MODEL
+    embedding_dimensions: int | None = None
     input_cost_per_1m_tokens: str | None = None
     output_cost_per_1m_tokens: str | None = None
     max_retries: int = 1
@@ -75,6 +78,8 @@ def get_ai_config() -> AIConfig:
         api_key=_get_api_key(provider),
         model=_get_model(provider),
         provider=provider,
+        embedding_model=_get_embedding_model(provider),
+        embedding_dimensions=_get_embedding_dimensions(),
         input_cost_per_1m_tokens=os.getenv("AI_INPUT_COST_PER_1M_TOKENS"),
         output_cost_per_1m_tokens=os.getenv("AI_OUTPUT_COST_PER_1M_TOKENS"),
         max_retries=_get_max_retries(),
@@ -83,3 +88,39 @@ def get_ai_config() -> AIConfig:
     ConfigValidator.validate(config)
 
     return config
+
+
+def _get_embedding_model(provider: str) -> str:
+    provider_embedding_model_name = _provider_env_name(
+        provider,
+        "EMBEDDING_MODEL",
+    )
+
+    return (
+        os.getenv(provider_embedding_model_name)
+        or os.getenv("AI_EMBEDDING_MODEL")
+        or DEFAULT_EMBEDDING_MODEL
+    )
+
+
+def _get_embedding_dimensions() -> int | None:
+    raw_value = os.getenv("AI_EMBEDDING_DIMENSIONS")
+
+    if raw_value is None or not raw_value.strip():
+        return None
+
+    try:
+        dimensions = int(raw_value)
+    except ValueError as exc:
+        raise AIConfigurationError(
+            f"Invalid AI_EMBEDDING_DIMENSIONS value '{raw_value}'. "
+            "Set AI_EMBEDDING_DIMENSIONS to a whole number, for example AI_EMBEDDING_DIMENSIONS=1536."
+        ) from exc
+
+    if dimensions <= 0:
+        raise AIConfigurationError(
+            f"Invalid AI_EMBEDDING_DIMENSIONS value '{dimensions}'. "
+            "Set AI_EMBEDDING_DIMENSIONS to a positive whole number."
+        )
+
+    return dimensions

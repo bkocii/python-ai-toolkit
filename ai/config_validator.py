@@ -37,3 +37,16 @@ class ConfigValidator:
                 f"Invalid AI_MAX_RETRIES value '{config.max_retries}'. "
                 "Set AI_MAX_RETRIES to zero or greater, for example AI_MAX_RETRIES=1."
             )
+
+        if not config.embedding_model.strip():
+            raise AIConfigurationError(
+                "AI embedding model cannot be empty. "
+                "Set a provider-specific embedding model such as OPENAI_EMBEDDING_MODEL, "
+                "or use AI_EMBEDDING_MODEL as a generic fallback."
+            )
+
+        if config.embedding_dimensions is not None and config.embedding_dimensions <= 0:
+            raise AIConfigurationError(
+                f"Invalid AI_EMBEDDING_DIMENSIONS value '{config.embedding_dimensions}'. "
+                "Set AI_EMBEDDING_DIMENSIONS to a positive whole number."
+            )

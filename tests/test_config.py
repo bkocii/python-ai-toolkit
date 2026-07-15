@@ -16,6 +16,9 @@ def clear_ai_env(monkeypatch):
         "ANTHROPIC_MODEL",
         "AI_INPUT_COST_PER_1M_TOKENS",
         "AI_OUTPUT_COST_PER_1M_TOKENS",
+        "OPENAI_EMBEDDING_MODEL",
+        "AI_EMBEDDING_MODEL",
+        "AI_EMBEDDING_DIMENSIONS",
     ]
 
     for key in keys:
@@ -108,5 +111,64 @@ def test_get_ai_config_validates_loaded_model(monkeypatch):
     with pytest.raises(
         AIConfigurationError,
         match="AI model cannot be empty",
+    ):
+        get_ai_config()
+
+
+def test_get_ai_config_loads_provider_specific_embedding_model(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-large")
+
+    config = get_ai_config()
+
+    assert config.embedding_model == "text-embedding-3-large"
+
+
+def test_get_ai_config_supports_generic_embedding_model_fallback(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("AI_EMBEDDING_MODEL", "custom-embedding-model")
+
+    config = get_ai_config()
+
+    assert config.embedding_model == "custom-embedding-model"
+
+
+def test_get_ai_config_loads_embedding_dimensions(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("AI_EMBEDDING_DIMENSIONS", "512")
+
+    config = get_ai_config()
+
+    assert config.embedding_dimensions == 512
+
+
+def test_get_ai_config_rejects_invalid_embedding_dimensions(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("AI_EMBEDDING_DIMENSIONS", "many")
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="Invalid AI_EMBEDDING_DIMENSIONS value 'many'",
+    ):
+        get_ai_config()
+
+
+def test_get_ai_config_rejects_negative_embedding_dimensions(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "openai-key")
+    monkeypatch.setenv("AI_EMBEDDING_DIMENSIONS", "-1")
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="Invalid AI_EMBEDDING_DIMENSIONS value '-1'",
     ):
         get_ai_config()
