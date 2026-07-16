@@ -1426,6 +1426,119 @@ Not yet supported:
 
 Conversation memory is the first building block for agents and workflows.
 
+## Agent
+
+An agent combines an AI client, instructions, and conversation memory.
+
+The basic flow is:
+
+```text
+User message
+    ↓
+Conversation memory
+    ↓
+Agent prompt
+    ↓
+AIClient
+    ↓
+Assistant response
+    ↓
+Conversation memory
+```
+
+The toolkit includes a simple memory-backed `Agent`.
+
+```python
+from ai.agent import Agent
+from ai.client import AIClient
+from ai.memory import InMemoryConversationMemory
+
+ai = AIClient()
+memory = InMemoryConversationMemory()
+
+agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a concise technical assistant. "
+        "Answer clearly and remember the previous conversation."
+    ),
+    memory=memory,
+    memory_limit=6,
+)
+
+response = agent.run("What is Redis?")
+
+print(response.output)
+print(response.model)
+print(response.request_id)
+```
+
+Agents reuse memory across turns.
+
+```python
+agent.run("What is Redis?")
+
+response = agent.run("Can it help with Django apps?")
+
+print(response.output)
+```
+
+`Agent.run(...)` returns an `AgentResponse`.
+
+```python
+response.output
+response.model
+response.request_id
+response.messages
+```
+
+User message metadata can be passed into memory.
+
+```python
+response = agent.run(
+    "What is Redis?",
+    metadata={
+        "user_id": "123",
+        "source": "web_chat",
+    },
+)
+```
+
+The agent stores assistant response metadata automatically.
+
+```python
+assistant_message = response.messages[-1]
+
+print(assistant_message.metadata["request_id"])
+print(assistant_message.metadata["model"])
+```
+
+Current agent support:
+
+- `AgentResponse`
+- `BaseAgent`
+- memory-backed `Agent`
+- system instructions
+- conversation memory integration
+- recent memory limit
+- user metadata preservation
+- assistant request metadata preservation
+- multi-turn conversation support
+
+Not yet supported:
+
+- automatic tool execution
+- RAG-aware agent
+- workflow engine
+- multi-agent orchestration
+- streaming agent responses
+- async agent
+- custom agent prompt templates
+
+The first agent implementation is intentionally simple.
+
+It provides a reusable foundation for workflow and multi-agent features.
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.

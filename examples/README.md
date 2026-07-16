@@ -190,6 +190,23 @@ Demonstrates:
 - retrieving recent messages
 - formatting memory for prompts
 
+---
+
+## 16 – Agent
+
+**File**
+
+```text
+16_agent.py
+```
+Demonstrates:
+
+- creating an Agent
+- using system instructions
+- using conversation memory
+- running multiple turns
+- reading the updated conversation messages
+
 
 ## Running
 ```bash
@@ -212,3 +229,4 @@ python -m examples.01_summarize_text
 13. RAG Pipeline
 14. Document Loader RAG
 15. Conversation Memory
+16. Agent

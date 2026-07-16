@@ -147,7 +147,7 @@ Build reusable autonomous AI workflows.
 Tasks
 
 - [x] AGENT-001 Conversation memory
-- [ ] AGENT-002 Agent abstraction
+- [x] AGENT-002 Agent abstraction
 - [ ] AGENT-003 Workflow engine
 - [ ] AGENT-004 Multi-agent orchestration
 
@@ -239,6 +239,11 @@ Ideas
 - Token-aware memory trimming
 - Conversation summarization memory
 - Vector-based long-term memory
+- Streaming agent responses
+- Async agent
+- RAG-aware agent
+- Tool-using agent
+- Agent prompt template customization
 
 
 
