@@ -1,0 +1,3 @@
+PostgreSQL is a relational database used for structured data.
+
+It is useful when an application needs durable storage, relational queries, transactions, and strong consistency.

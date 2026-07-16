@@ -155,6 +155,23 @@ Demonstrates:
 - generating an answer with RAGPipeline
 - returning both answer and sources
 
+---
+
+## 14 – Document Loader RAG
+
+**File**
+
+```text
+14_document_loader_rag.py
+```
+Demonstrates:
+
+- loading .txt and .md files from a directory
+- converting documents to embedding inputs
+- embedding loaded documents
+- storing document vectors
+- retrieving relevant context
+- answering with RAGPipeline
 
 
 ## Running
@@ -176,3 +193,4 @@ python -m examples.01_summarize_text
 11. Vector Store
 12. Retriever
 13. RAG Pipeline
+14. Document Loader RAG

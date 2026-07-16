@@ -130,11 +130,11 @@ Tasks
 - [x] RAG-002 Vector Store abstraction
 - [x] RAG-003 Retriever interface
 - [x] RAG-004 RAG Pipeline
-- [ ] RAG-005 Document loaders
+- [x] RAG-005 Document loaders
 
 Exit Criteria
 
-- Toolkit supports end-to-end RAG workflows.
+- [x] Toolkit supports end-to-end RAG workflows.
 
 ---
 
@@ -225,6 +225,17 @@ Ideas
 - RAG reranking
 - RAG evaluation framework
 - Hybrid keyword + vector retrieval
+- PDF document loader
+- DOCX document loader
+- HTML document loader
+- Database document loader
+- Automatic document chunking
+- File watching and re-indexing
+- Markdown section-aware loader
+- Configurable document loader registry by file extension
+- High-level document indexing helper
+
+
 Future backlog items may become roadmap tasks after the completion of a sprint.
 
 ---

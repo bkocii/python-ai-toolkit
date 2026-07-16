@@ -1145,6 +1145,180 @@ At this stage, knowledge must still be added manually or through application cod
 
 Document loading is added later in the Sprint 6 roadmap.
 
+## Document Loaders
+
+Document loaders turn files into `Document` objects that can be embedded, stored, retrieved, and used in RAG workflows.
+
+The basic flow is:
+
+```text
+File / directory
+    ↓
+Document loader
+    ↓
+Document
+    ↓
+EmbeddingInput
+    ↓
+Embeddings
+    ↓
+Vector store
+    ↓
+Retriever
+    ↓
+RAG pipeline
+```
+
+The toolkit includes simple dependency-free loaders for text and Markdown files.
+
+```python
+from ai.documents import TextFileLoader, MarkdownFileLoader
+
+text_documents = TextFileLoader("notes.txt").load()
+markdown_documents = MarkdownFileLoader("guide.md").load()
+```
+
+Each loader returns a list of `Document` objects.
+
+```python
+document.text
+document.metadata
+```
+
+Example metadata:
+
+```python
+{
+    "source": "examples/sample_docs/redis.md",
+    "filename": "redis.md",
+    "extension": ".md",
+    "loader": "MarkdownFileLoader",
+}
+```
+
+A directory can be loaded with `DirectoryLoader`.
+
+```python
+from ai.documents import DirectoryLoader
+
+documents = DirectoryLoader(
+    path="examples/sample_docs",
+    recursive=True,
+).load()
+
+for document in documents:
+    print(document.metadata["filename"])
+    print(document.text[:100])
+```
+
+Loaded documents can be converted into embedding inputs.
+
+```python
+from ai.documents import DirectoryLoader, documents_to_embedding_inputs
+
+documents = DirectoryLoader(
+    path="examples/sample_docs",
+    recursive=True,
+).load()
+
+embedding_inputs = documents_to_embedding_inputs(documents)
+```
+
+A full document-based RAG flow looks like this:
+
+```python
+from ai.client import AIClient
+from ai.documents import DirectoryLoader, documents_to_embedding_inputs
+from ai.rag import RAGPipeline
+from ai.retriever import VectorStoreRetriever
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+documents = DirectoryLoader(
+    path="examples/sample_docs",
+    recursive=True,
+).load()
+
+embedding_inputs = documents_to_embedding_inputs(documents)
+
+embedding_response = ai.embed_texts(embedding_inputs)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+rag = RAGPipeline(
+    ai_client=ai,
+    retriever=retriever,
+)
+
+response = rag.ask(
+    question="Which technology should I use for caching?",
+    limit=2,
+)
+
+print(response.answer)
+
+for context in response.contexts:
+    print(context.metadata.get("filename"))
+    print(context.score)
+    print(context.text)
+```
+
+Current document-loader support:
+
+- provider-independent `Document`
+- `BaseDocumentLoader`
+- `TextFileLoader`
+- `MarkdownFileLoader`
+- `DirectoryLoader`
+- recursive directory loading
+- configurable file extensions
+- source metadata preservation
+- conversion from documents to embedding inputs
+
+Not yet supported:
+
+- PDF loader
+- DOCX loader
+- HTML loader
+- database loader
+- automatic chunking
+- Markdown section-aware loading
+- file watching and re-indexing
+- high-level document indexing helper
+
+Document loaders complete the first end-to-end RAG workflow:
+
+```text
+Documents
+    ↓
+Embeddings
+    ↓
+Vector store
+    ↓
+Retriever
+    ↓
+RAG pipeline
+    ↓
+Answer with sources
+```
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.
