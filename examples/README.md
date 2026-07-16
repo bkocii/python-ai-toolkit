@@ -173,6 +173,23 @@ Demonstrates:
 - retrieving relevant context
 - answering with RAGPipeline
 
+---
+
+## 15 – Conversation Memory
+
+**File**
+
+```text
+15_conversation_memory.py
+```
+Demonstrates:
+
+- creating in-memory conversation memory
+- adding system, user, and assistant messages
+- retrieving all messages
+- retrieving recent messages
+- formatting memory for prompts
+
 
 ## Running
 ```bash
@@ -194,3 +211,4 @@ python -m examples.01_summarize_text
 12. Retriever
 13. RAG Pipeline
 14. Document Loader RAG
+15. Conversation Memory

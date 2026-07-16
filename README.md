@@ -1319,6 +1319,113 @@ RAG pipeline
 Answer with sources
 ```
 
+## Conversation Memory
+
+Conversation memory stores messages across turns.
+
+Agents and workflows need memory because they often operate over multiple user and assistant messages, not one isolated prompt.
+
+The basic flow is:
+
+```text
+User message
+    ↓
+Memory
+    ↓
+Assistant response
+    ↓
+Memory
+    ↓
+Next user message with previous context
+```
+
+The toolkit includes provider-independent memory models.
+
+```python
+from ai.memory import (
+    InMemoryConversationMemory,
+    format_conversation_messages,
+)
+
+memory = InMemoryConversationMemory()
+
+memory.add_system_message("You are a helpful AI assistant.")
+memory.add_user_message("What is Redis?")
+memory.add_assistant_message(
+    "Redis is often used as a cache and message broker."
+)
+
+conversation_text = format_conversation_messages(
+    memory.messages()
+)
+
+print(conversation_text)
+```
+
+Output shape:
+
+```text
+SYSTEM:
+You are a helpful AI assistant.
+
+USER:
+What is Redis?
+
+ASSISTANT:
+Redis is often used as a cache and message broker.
+```
+
+Memory supports system, user, assistant, and tool messages.
+
+```python
+memory.add_system_message("You are a concise assistant.")
+memory.add_user_message("What is the weather?")
+memory.add_assistant_message("I need to call a weather tool.")
+memory.add_tool_message(
+    '{"temperature": "18C"}',
+    metadata={"tool_name": "get_weather"},
+)
+```
+
+Recent messages can be retrieved for prompt context.
+
+```python
+recent = memory.recent_messages(limit=5)
+
+conversation_text = format_conversation_messages(recent)
+```
+
+Memory can be cleared.
+
+```python
+memory.clear()
+```
+
+Current conversation memory support:
+
+- provider-independent `ConversationMessage`
+- `MessageRole`
+- `BaseConversationMemory`
+- `InMemoryConversationMemory`
+- system messages
+- user messages
+- assistant messages
+- tool messages
+- metadata preservation
+- recent message retrieval
+- memory clearing
+- prompt-ready conversation formatting
+
+Not yet supported:
+
+- persistent conversation memory
+- database-backed conversation memory
+- token-aware memory trimming
+- conversation summarization memory
+- vector-based long-term memory
+
+Conversation memory is the first building block for agents and workflows.
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.

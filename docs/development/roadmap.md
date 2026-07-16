@@ -146,7 +146,7 @@ Build reusable autonomous AI workflows.
 
 Tasks
 
-- [ ] AGENT-001 Conversation memory
+- [x] AGENT-001 Conversation memory
 - [ ] AGENT-002 Agent abstraction
 - [ ] AGENT-003 Workflow engine
 - [ ] AGENT-004 Multi-agent orchestration
@@ -234,6 +234,12 @@ Ideas
 - Markdown section-aware loader
 - Configurable document loader registry by file extension
 - High-level document indexing helper
+- Persistent conversation memory
+- Database-backed conversation memory
+- Token-aware memory trimming
+- Conversation summarization memory
+- Vector-based long-term memory
+
 
 
 Future backlog items may become roadmap tasks after the completion of a sprint.
@@ -250,3 +256,7 @@ Future backlog items may become roadmap tasks after the completion of a sprint.
 6. Every public API change updates the README.
 7. Every released feature updates the CHANGELOG.
 8. PROJECT_STATE.md is updated only when the project state meaningfully changes.
+
+## Future Backlog Policy
+
+Future backlog items are recorded when discovered, but they should not interrupt the active roadmap unless they block the current sprint, fix a design issue, or are required by the next roadmap task.
