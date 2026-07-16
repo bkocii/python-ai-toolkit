@@ -841,8 +841,6 @@ The in-memory store is best for tests, examples, demos, and small local workflow
 
 Production applications should later use a persistent vector store implementation behind the same `BaseVectorStore` interface.
 
----
-
 ## Retriever
 
 A retriever connects embeddings and a vector store.
@@ -975,6 +973,177 @@ Not yet supported:
 The retriever finds relevant context. It does not generate the final answer yet.
 
 Answer generation is added by the RAG pipeline.
+
+## RAG Pipeline
+
+The RAG pipeline combines retrieval and answer generation.
+
+RAG means Retrieval-Augmented Generation.
+
+Instead of asking the model to answer only from general knowledge, the application first retrieves relevant context from its own stored knowledge, then sends that context to the model.
+
+The basic flow is:
+
+```text
+User question
+    ↓
+Retriever
+    ↓
+Relevant context
+    ↓
+Grounded prompt
+    ↓
+AI answer
+    ↓
+Answer + sources
+```
+
+The toolkit includes `RAGPipeline`.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.rag import RAGPipeline
+from ai.retriever import VectorStoreRetriever
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+knowledge = [
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={
+            "topic": "redis",
+            "source": "technical_notes",
+        },
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database used for structured data.",
+        metadata={
+            "topic": "postgres",
+            "source": "technical_notes",
+        },
+    ),
+    EmbeddingInput(
+        text="Django is a Python web framework for building web applications.",
+        metadata={
+            "topic": "django",
+            "source": "technical_notes",
+        },
+    ),
+]
+
+embedding_response = ai.embed_texts(knowledge)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+rag = RAGPipeline(
+    ai_client=ai,
+    retriever=retriever,
+)
+
+response = rag.ask(
+    question="Which technology should I use for caching?",
+    limit=2,
+    instructions="Answer in one short paragraph.",
+)
+
+print(response.answer)
+
+for context in response.contexts:
+    print(context.id)
+    print(context.score)
+    print(context.metadata)
+    print(context.text)
+```
+
+`RAGPipeline.ask(...)` returns a `RAGResponse`.
+
+```python
+response.answer
+response.contexts
+response.model
+response.request_id
+response.raw_response
+```
+
+The answer is generated from retrieved context.
+
+The contexts are returned so the application can show sources, debug retrieval quality, or inspect which records were used.
+
+Example source display:
+
+```python
+for context in response.contexts:
+    print(f"Source: {context.metadata}")
+    print(f"Score: {context.score:.4f}")
+    print(context.text)
+```
+
+Additional instructions can be passed to the RAG prompt.
+
+```python
+response = rag.ask(
+    question="Which technology should I use for caching?",
+    instructions="Answer briefly and mention only technologies found in the context.",
+)
+```
+
+Metadata filtering is also supported.
+
+```python
+response = rag.ask(
+    question="How should I cache data?",
+    metadata_filter={
+        "topic": "redis",
+    },
+)
+```
+
+Current RAG pipeline support:
+
+- `RAGResponse`
+- grounded RAG prompt builder
+- `RAGPipeline`
+- retrieval through `BaseRetriever`
+- answer generation through `AIClient`
+- returned answer and retrieved contexts
+- metadata filtering
+- additional prompt instructions
+
+Not yet supported:
+
+- streaming RAG responses
+- async RAG pipeline
+- structured RAG responses
+- citation formatting
+- reranking
+- retrieval evaluation
+- hybrid keyword and vector search
+- document loaders
+- database loaders
+
+The RAG pipeline is the first complete end-to-end Retrieval-Augmented Generation workflow in the toolkit.
+
+At this stage, knowledge must still be added manually or through application code.
+
+Document loading is added later in the Sprint 6 roadmap.
 
 ## Structured Responses
 

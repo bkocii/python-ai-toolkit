@@ -129,7 +129,7 @@ Tasks
 - [x] RAG-001 Embeddings
 - [x] RAG-002 Vector Store abstraction
 - [x] RAG-003 Retriever interface
-- [ ] RAG-004 RAG Pipeline
+- [x] RAG-004 RAG Pipeline
 - [ ] RAG-005 Document loaders
 
 Exit Criteria
@@ -217,8 +217,14 @@ Ideas
 - Additional providers
 - Automatic provider discovery
 - Immutable / reusable request builders
-- - [ ] DX-006 Add local image file helper
-
+- DX-006 Add local image file helper
+- RAG streaming responses
+- Async RAG pipeline
+- Structured RAG responses
+- RAG citations formatter
+- RAG reranking
+- RAG evaluation framework
+- Hybrid keyword + vector retrieval
 Future backlog items may become roadmap tasks after the completion of a sprint.
 
 ---

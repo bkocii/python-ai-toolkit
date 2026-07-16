@@ -138,6 +138,23 @@ Demonstrates:
 - retrieving relevant context for a query
 - formatting retrieved context for prompts
 
+---
+
+## 13 – RAG Pipeline
+
+**File**
+
+```text
+13_rag_pipeline.py
+```
+Demonstrates:
+
+- embedding knowledge text
+- storing embeddings in InMemoryVectorStore
+- retrieving relevant context
+- generating an answer with RAGPipeline
+- returning both answer and sources
+
 
 
 ## Running
@@ -158,3 +175,4 @@ python -m examples.01_summarize_text
 10. Embeddings
 11. Vector Store
 12. Retriever
+13. RAG Pipeline
