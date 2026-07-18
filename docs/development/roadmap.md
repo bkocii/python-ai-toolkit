@@ -148,7 +148,7 @@ Tasks
 
 - [x] AGENT-001 Conversation memory
 - [x] AGENT-002 Agent abstraction
-- [ ] AGENT-003 Workflow engine
+- [x] AGENT-003 Workflow engine
 - [ ] AGENT-004 Multi-agent orchestration
 
 Exit Criteria
@@ -244,6 +244,12 @@ Ideas
 - RAG-aware agent
 - Tool-using agent
 - Agent prompt template customization
+- Branching workflow engine
+- Parallel workflow execution
+- Workflow step retries
+- Async workflow engine
+- Durable workflow persistence
+- Visual workflow builder
 
 
 

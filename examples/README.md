@@ -207,6 +207,23 @@ Demonstrates:
 - running multiple turns
 - reading the updated conversation messages
 
+---
+
+## 17 – Workflow Engine
+
+**File**
+
+```text
+17_workflow_engine.py
+```
+Demonstrates:
+
+- creating workflow steps
+- passing shared workflow state
+- composing retrieve and answer steps
+- running a sequential workflow
+- inspecting final output and workflow state
+
 
 ## Running
 ```bash
@@ -230,3 +247,4 @@ python -m examples.01_summarize_text
 14. Document Loader RAG
 15. Conversation Memory
 16. Agent
+17. Workflow Engine

@@ -1539,6 +1539,276 @@ The first agent implementation is intentionally simple.
 
 It provides a reusable foundation for workflow and multi-agent features.
 
+## Workflow Engine
+
+The workflow engine lets applications compose multiple AI or non-AI steps into a reusable sequence.
+
+An agent handles a conversational turn.
+
+A workflow handles a process.
+
+The basic flow is:
+
+```text
+Input
+    ↓
+Step 1
+    ↓
+Step 2
+    ↓
+Step 3
+    ↓
+Final result
+```
+
+The toolkit includes a sequential `WorkflowEngine`.
+
+```python
+from ai.workflow import (
+    FunctionWorkflowStep,
+    WorkflowContext,
+    WorkflowEngine,
+    WorkflowStepResult,
+)
+
+
+def first_step(context: WorkflowContext) -> WorkflowStepResult:
+    return WorkflowStepResult(
+        step_name="first",
+        output="first output",
+        state_updates={
+            "first_result": "first output",
+        },
+    )
+
+
+def second_step(context: WorkflowContext) -> WorkflowStepResult:
+    return WorkflowStepResult(
+        step_name="second",
+        output=f"Second step used: {context.state['first_result']}",
+    )
+
+
+workflow = WorkflowEngine(
+    steps=[
+        FunctionWorkflowStep("first", first_step),
+        FunctionWorkflowStep("second", second_step),
+    ]
+)
+
+result = workflow.run(
+    input_data={
+        "question": "Which technology should I use for caching?",
+    },
+    metadata={
+        "workflow": "example",
+    },
+)
+
+print(result.success)
+print(result.final_output)
+print(result.context.state)
+```
+
+Workflow steps receive a shared `WorkflowContext`.
+
+```python
+context.input
+context.state
+context.metadata
+```
+
+`context.input` contains the original workflow input.
+
+```python
+{
+    "question": "Which technology should I use for caching?"
+}
+```
+
+`context.state` stores data produced by previous steps.
+
+```python
+{
+    "retrieved_context": "...",
+    "answer": "Redis is a good choice."
+}
+```
+
+`context.metadata` stores application-level tracking information.
+
+```python
+{
+    "user_id": "123",
+    "workflow": "support_answer",
+}
+```
+
+Each workflow step returns a `WorkflowStepResult`.
+
+```python
+WorkflowStepResult(
+    step_name="retrieve",
+    output="retrieved context",
+    state_updates={
+        "context_text": "retrieved context",
+    },
+)
+```
+
+The workflow engine applies `state_updates` after each step.
+
+A workflow can compose retrieval and answering.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.retriever import VectorStoreRetriever, format_retrieved_context
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+from ai.workflow import FunctionWorkflowStep, WorkflowContext, WorkflowEngine, WorkflowStepResult
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+knowledge = [
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={"topic": "redis"},
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database.",
+        metadata={"topic": "postgres"},
+    ),
+]
+
+embedding_response = ai.embed_texts(knowledge)
+
+store.add(
+    [
+        VectorRecord(
+            id=f"doc-{embedding.index}",
+            text=embedding.text,
+            vector=embedding.vector,
+            metadata=embedding.metadata,
+        )
+        for embedding in embedding_response.embeddings
+    ]
+)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+
+def retrieve_step(context: WorkflowContext) -> WorkflowStepResult:
+    question = context.input["question"]
+
+    contexts = retriever.retrieve(
+        query=question,
+        limit=2,
+    )
+
+    context_text = format_retrieved_context(contexts)
+
+    return WorkflowStepResult(
+        step_name="retrieve",
+        output=context_text,
+        state_updates={
+            "question": question,
+            "context_text": context_text,
+        },
+    )
+
+
+def answer_step(context: WorkflowContext) -> WorkflowStepResult:
+    prompt = f"""
+Answer the question using only the context below.
+
+Context:
+{context.state["context_text"]}
+
+Question:
+{context.state["question"]}
+"""
+
+    result = ai.ask(prompt)
+
+    return WorkflowStepResult(
+        step_name="answer",
+        output=result.data,
+        state_updates={
+            "answer": result.data,
+            "request_id": result.request_id,
+            "model": result.model,
+        },
+    )
+
+
+workflow = WorkflowEngine(
+    steps=[
+        FunctionWorkflowStep("retrieve", retrieve_step),
+        FunctionWorkflowStep("answer", answer_step),
+    ]
+)
+
+result = workflow.run(
+    input_data={
+        "question": "Which technology should I use for caching?",
+    }
+)
+
+print(result.final_output)
+```
+
+The workflow engine stops when a step fails.
+
+```python
+WorkflowStepResult(
+    step_name="validate",
+    success=False,
+    error="Missing required context.",
+)
+```
+
+If a step raises an unexpected exception, the engine converts it into a failed step result.
+
+This keeps workflow execution inspectable.
+
+```python
+result.success
+result.steps
+result.steps[-1].error
+```
+
+Current workflow support:
+
+- `WorkflowContext`
+- `WorkflowStepResult`
+- `WorkflowRunResult`
+- `BaseWorkflowStep`
+- `FunctionWorkflowStep`
+- sequential `WorkflowEngine`
+- shared workflow state
+- workflow metadata
+- execution history
+- final output helper
+- fail-fast behavior
+- exception-to-step-failure conversion
+
+Not yet supported:
+
+- branching workflows
+- parallel workflow execution
+- workflow step retries
+- async workflow engine
+- durable workflow persistence
+- visual workflow builder
+
+The workflow engine is intentionally simple.
+
+It provides the foundation for composing more complex AI workflows from reusable steps.
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.
