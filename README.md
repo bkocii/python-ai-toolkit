@@ -1809,6 +1809,153 @@ The workflow engine is intentionally simple.
 
 It provides the foundation for composing more complex AI workflows from reusable steps.
 
+---
+
+## Multi-Agent Orchestration
+
+Multi-agent orchestration lets applications coordinate multiple specialized agents.
+
+A single agent handles one role.
+
+A multi-agent orchestrator can combine several roles.
+
+Example roles:
+
+```text
+technical agent
+    ↓
+reviewer agent
+    ↓
+summary agent
+```
+
+The toolkit includes an explicit `MultiAgentOrchestrator`.
+
+It does not perform autonomous routing, recursive loops, or agent-to-agent debate.
+
+```python
+from ai.agent import Agent
+from ai.client import AIClient
+from ai.memory import InMemoryConversationMemory
+from ai.orchestrator import MultiAgentOrchestrator
+
+ai = AIClient()
+
+technical_agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a technical assistant. "
+        "Explain the concept clearly and accurately."
+    ),
+    memory=InMemoryConversationMemory(),
+)
+
+reviewer_agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a reviewer. "
+        "Check the previous answer for clarity and correctness."
+    ),
+    memory=InMemoryConversationMemory(),
+)
+
+summary_agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a summarizer. "
+        "Make the previous answer shorter and easier for a beginner."
+    ),
+    memory=InMemoryConversationMemory(),
+)
+
+orchestrator = MultiAgentOrchestrator(
+    agents={
+        "technical": technical_agent,
+        "reviewer": reviewer_agent,
+        "summary": summary_agent,
+    }
+)
+
+response = orchestrator.run_sequence(
+    agent_names=[
+        "technical",
+        "reviewer",
+        "summary",
+    ],
+    message="Explain how Redis can help a Django application.",
+)
+
+print(response.success)
+print(response.final_output)
+```
+
+Agents can also be run individually by name.
+
+```python
+result = orchestrator.run_agent(
+    agent_name="technical",
+    message="Explain Redis for Django.",
+)
+
+print(result.success)
+
+if result.response is not None:
+    print(result.response.output)
+```
+
+Registered agent names can be inspected.
+
+```python
+print(orchestrator.agent_names())
+```
+
+`run_sequence(...)` passes each successful agent output to the next agent.
+
+```text
+original message
+    ↓
+technical agent output
+    ↓
+reviewer agent output
+    ↓
+summary agent output
+```
+
+If an agent fails, the orchestrator stops the sequence and returns the results so far.
+
+```python
+response.success
+response.results
+response.final_output
+```
+
+Current multi-agent support:
+
+- `AgentRunResult`
+- `MultiAgentResponse`
+- `MultiAgentOrchestrator`
+- named agent registration
+- running one selected agent
+- running multiple agents sequentially
+- passing output from one agent to the next
+- collecting all agent results
+- failure handling
+- final output helper
+
+Not yet supported:
+
+- AI-based agent routing
+- parallel multi-agent execution
+- agent-to-agent debate
+- shared multi-agent memory
+- recursive agent loops
+- tool-using multi-agent workflows
+- autonomous multi-agent planning
+
+The first orchestrator is intentionally explicit and controlled.
+
+It provides a safe foundation for more advanced orchestration later.
+
 ## Structured Responses
 
 Supports returning validated Pydantic models instead of raw text.

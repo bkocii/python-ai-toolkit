@@ -225,6 +225,24 @@ Demonstrates:
 - inspecting final output and workflow state
 
 
+---
+
+## 18 – Multi-Agent Orchestration
+
+**File**
+
+```text
+18_multi_agent_orchestration.py
+```
+Demonstrates:
+
+- creating multiple specialized agents
+- registering agents in MultiAgentOrchestrator
+- running agents sequentially
+- passing one agent's output to the next agent
+- inspecting multi-agent results
+
+
 ## Running
 ```bash
 python -m examples.01_summarize_text
@@ -248,3 +266,4 @@ python -m examples.01_summarize_text
 15. Conversation Memory
 16. Agent
 17. Workflow Engine
+18. Multi-Agent Orchestration

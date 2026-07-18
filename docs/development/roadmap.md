@@ -149,11 +149,11 @@ Tasks
 - [x] AGENT-001 Conversation memory
 - [x] AGENT-002 Agent abstraction
 - [x] AGENT-003 Workflow engine
-- [ ] AGENT-004 Multi-agent orchestration
+- [x] AGENT-004 Multi-agent orchestration
 
 Exit Criteria
 
-- Complex AI workflows can be composed from reusable components.
+- [x] Complex AI workflows can be composed from reusable components.
 
 ---
 
@@ -250,7 +250,12 @@ Ideas
 - Async workflow engine
 - Durable workflow persistence
 - Visual workflow builder
-
+- AI-based agent routing
+- Parallel multi-agent execution
+- Agent-to-agent debate
+- Shared multi-agent memory
+- Recursive agent loops
+- Tool-using multi-agent workflows
 
 
 Future backlog items may become roadmap tasks after the completion of a sprint.
