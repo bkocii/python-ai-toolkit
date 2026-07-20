@@ -256,6 +256,9 @@ Ideas
 - Shared multi-agent memory
 - Recursive agent loops
 - Tool-using multi-agent workflows
+- Test-safe logging configuration
+- Configurable log file path and log level
+- Option to disable file logging during tests
 
 
 Future backlog items may become roadmap tasks after the completion of a sprint.

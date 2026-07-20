@@ -6,34 +6,159 @@ The format loosely follows Keep a Changelog.
 
 ---
 
-## [0.3.0] - In Development
+## [0.7.0] - In Development
 
 ### Added
 
-- Provider abstraction layer
-- OpenAI provider
-- AIClient
-- Structured Pydantic responses
-- AIResult wrapper
-- ProviderResponse wrapper
-- TokenUsage model
-- Automatic JSON parsing
-- Schema validation
-- Automatic retry for structured responses
-- Request duration tracking
-- Request IDs
-- Token usage aggregation
-- Cost estimation
-- File logging
-- Custom exception hierarchy
+* Conversation memory
+* Message roles for system, user, assistant, and tool messages
+* In-memory conversation memory
+* Conversation formatting helper
+* Agent abstraction
+* Memory-backed agent implementation
+* Agent response model
+* Recent memory limit for agents
+* Workflow engine
+* Workflow context
+* Workflow step results
+* Function-backed workflow steps
+* Sequential workflow execution
+* Workflow state passing
+* Workflow execution history
+* Multi-agent orchestration
+* Named agent registration
+* Single-agent execution by name
+* Sequential multi-agent execution
+* Multi-agent result collection
+* Multi-agent failure handling
 
 ### Improved
 
-- Provider independence
-- Response validation
-- Logging quality
-- Error reporting
-- Request traceability
+* Agent and workflow composability
+* Multi-turn conversation support
+* Reusable AI workflow primitives
+* Separation between agents, memory, workflows, and orchestration
+
+---
+
+## [0.6.0]
+
+### Added
+
+* Embedding support
+* Provider-independent embedding models
+* OpenAI embedding adapter
+* Embedding metadata preservation
+* Separate embedding model configuration
+* Optional embedding dimensions configuration
+* Vector store abstraction
+* In-memory vector store
+* Cosine similarity search
+* Metadata filtering for vector search
+* Retriever interface
+* Vector-store-backed retriever
+* Retrieved context model
+* Retrieved context formatting helper
+* RAG response model
+* RAG prompt builder
+* RAG pipeline
+* Answer generation with returned sources
+* Document model
+* Base document loader interface
+* Text file loader
+* Markdown file loader
+* Directory loader
+* Document-to-embedding conversion helper
+
+### Improved
+
+* Retrieval-Augmented Generation support
+* Provider-independent retrieval architecture
+* Document-based knowledge workflows
+* Source metadata preservation
+* End-to-end RAG examples
+
+---
+
+## [0.5.0]
+
+### Added
+
+* Streaming text responses
+* Async AI client
+* Async request executor
+* Async provider method support
+* Tool calling models
+* Provider-independent tool definitions
+* Provider-independent tool call responses
+* OpenAI tool-call adapter
+* Image input models
+* Provider-independent image inputs
+* OpenAI image-input adapter
+* Image requests with plain text responses
+* Image requests with structured responses
+* Centralized structured-output helpers
+
+### Improved
+
+* Structured-output prompt construction
+* Structured-response parsing
+* Sync and async request consistency
+* Advanced provider capability support
+* Public API coverage for streaming, async, tools, and image inputs
+
+---
+
+## [0.4.0]
+
+### Added
+
+* Fluent request builder
+* `AIClient.request()`
+* Prompt templates
+* Example gallery
+* Configuration validator
+* Error message guidelines
+
+### Improved
+
+* Developer experience
+* Configuration validation
+* Helpful error messages
+* README documentation
+* Example coverage
+
+---
+
+## [0.3.0]
+
+### Added
+
+* Provider abstraction layer
+* Base provider interface
+* OpenAI provider implementation
+* Provider factory
+* Provider registry
+* Custom provider registration
+* Provider-aware configuration
+* Provider-specific API key and model settings
+* Generic provider fallback settings
+* Configurable retry count
+* Provider response wrapper
+* Token usage model
+* Cost estimation support
+* Request IDs
+* Request duration tracking
+* File logging
+* Custom exception hierarchy
+
+### Improved
+
+* Provider independence
+* Request traceability
+* Logging quality
+* Error reporting
+* Configuration cleanup
 
 ---
 
@@ -41,10 +166,27 @@ The format loosely follows Keep a Changelog.
 
 ### Added
 
-- PromptBuilder
-- Environment configuration
-- Initial project structure
-- Basic tests
+* Core `AIClient`
+* Request executor
+* Structured Pydantic responses
+* `AIResult` wrapper
+* Automatic JSON parsing
+* Schema validation
+* Automatic retry for structured responses
+* Retry repair prompt helper
+* Prompt builder
+* Environment configuration
+* Architecture documentation
+* Development roadmap
+* Project state documentation
+* Initial test coverage
+
+### Improved
+
+* Core request lifecycle
+* Structured response validation
+* Retry behavior
+* Project documentation
 
 ---
 
@@ -52,7 +194,8 @@ The format loosely follows Keep a Changelog.
 
 ### Added
 
-- Repository initialization
-- Virtual environment
-- Git configuration
-- Initial README
+* Repository initialization
+* Initial project structure
+* Virtual environment setup
+* Git configuration
+* Initial README

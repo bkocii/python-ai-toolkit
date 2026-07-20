@@ -60,7 +60,7 @@ def main() -> None:
     response = rag.ask(
         question="Which technology should I use for caching?",
         limit=2,
-        instructions="Answer in three short paragraphs.",
+        instructions="Answer in one short paragraph.",
     )
 
     print("Answer:")

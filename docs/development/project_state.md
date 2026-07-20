@@ -6,23 +6,22 @@ Python AI Toolkit
 
 ## Current Version
 
-0.5.0-dev
+0.7.0-dev
 
 ## Current Milestone
 
-Sprint 5 completed — Advanced Requests
+Sprint 7 completed — Agents & Workflows
 
 ## Current Sprint Status
 
-Sprint 5 is complete.
+Sprint 7 is complete.
 
-Completed Sprint 5 tasks:
+Completed Sprint 7 tasks:
 
-- REQUEST-001 Streaming responses
-- REQUEST-002 Async AIClient
-- REQUEST-003 Tool Calling
-- REQUEST-004 Image inputs
-- REQUEST-005 Structured output improvements
+- AGENT-001 Conversation memory
+- AGENT-002 Agent abstraction
+- AGENT-003 Workflow engine
+- AGENT-004 Multi-agent orchestration
 
 ## Implemented Capabilities
 
@@ -52,6 +51,8 @@ Completed Sprint 5 tasks:
 - `.env` based configuration
 - provider-specific API keys and models
 - generic fallback API key and model
+- separate embedding model configuration
+- optional embedding dimensions configuration
 - configurable retry count
 - configuration validation through `ConfigValidator`
 - helpful configuration error messages
@@ -84,6 +85,51 @@ Completed Sprint 5 tasks:
 - provider-independent image inputs
 - OpenAI image-input adapter
 - structured output support for text, async, and image requests
+
+### Retrieval & Knowledge
+
+- provider-independent embedding models
+- OpenAI embedding adapter
+- embedding metadata preservation
+- vector store abstraction
+- in-memory vector store
+- cosine similarity search
+- metadata filtering
+- retriever interface
+- vector-store-backed retriever
+- prompt-ready retrieved context formatting
+- RAG prompt builder
+- RAG pipeline
+- answer generation with returned sources
+- document model
+- text file loader
+- Markdown file loader
+- directory loader
+- document-to-embedding conversion helper
+
+### Agents & Workflows
+
+- provider-independent conversation message model
+- conversation memory interface
+- in-memory conversation memory
+- conversation formatting helper
+- memory-backed agent abstraction
+- agent response model
+- system instructions
+- recent memory limit
+- sequential workflow engine
+- workflow context
+- workflow step results
+- function-backed workflow steps
+- workflow state passing
+- workflow execution history
+- fail-fast workflow behavior
+- multi-agent orchestration
+- named agent registration
+- single-agent execution by name
+- sequential multi-agent execution
+- multi-agent result collection
+- multi-agent failure handling
 
 ## Current Architecture
 
@@ -125,32 +171,78 @@ ai.structured.parse_structured_response()
 AIResult[data]
 ```
 
-Tool-calling flow:
+Embedding flow:
 
 ```text
-ToolDefinition
+text / EmbeddingInput
     ↓
-AIClient.ask_with_tools()
+AIClient.embed_text() / AIClient.embed_texts()
     ↓
-RequestExecutor.execute_with_tools()
+Provider.embed_texts()
     ↓
-Provider.ask_with_tools()
-    ↓
-ToolResponse
+EmbeddingResponse
 ```
 
-Image-input flow:
+Retriever and RAG flow:
 
 ```text
-ImageInput
+question
     ↓
-AIClient.ask_with_images()
+RAGPipeline
     ↓
-RequestExecutor.execute_with_images()
+BaseRetriever.retrieve()
     ↓
-Provider.ask_with_images()
+format_retrieved_context()
     ↓
-AIResult
+build_rag_prompt()
+    ↓
+AIClient.ask()
+    ↓
+RAGResponse(answer, contexts)
+```
+
+Agent flow:
+
+```text
+user message
+    ↓
+Agent
+    ↓
+ConversationMemory
+    ↓
+AIClient.ask()
+    ↓
+AgentResponse
+```
+
+Workflow flow:
+
+```text
+input
+    ↓
+WorkflowEngine
+    ↓
+WorkflowStep
+    ↓
+WorkflowContext.state
+    ↓
+WorkflowRunResult
+```
+
+Multi-agent flow:
+
+```text
+message
+    ↓
+MultiAgentOrchestrator
+    ↓
+agent 1
+    ↓
+agent 2
+    ↓
+agent 3
+    ↓
+MultiAgentResponse
 ```
 
 ## Completed Milestones
@@ -195,23 +287,42 @@ Completed:
 - image inputs
 - structured output improvements
 
+### Sprint 6 — Retrieval & Knowledge
+
+Completed:
+
+- embeddings
+- vector store abstraction
+- retriever interface
+- RAG pipeline
+- document loaders
+
+### Sprint 7 — Agents & Workflows
+
+Completed:
+
+- conversation memory
+- agent abstraction
+- workflow engine
+- multi-agent orchestration
+
 ## Next Milestone
 
-Sprint 6 — Agents and Workflows
+To be selected from roadmap.
 
 ## Next Recommended Focus
 
-The toolkit now supports individual advanced request capabilities.
+Sprint 7 completed the first reusable agents and workflows layer.
 
-The next architectural step is to build controlled multi-step workflows on top of those capabilities.
+The next recommended focus depends on the remaining roadmap.
 
-Recommended next tasks:
+Strong candidates:
 
-- define agent/workflow scope
-- add tool result submission
-- add one-step tool execution helper
-- add multi-step agent loop later
-- keep application approval/control explicit
+- testing and quality hardening
+- packaging and public API cleanup
+- provider expansion
+- production persistence features
+- evaluation and observability
 
 ## Important Design Decisions
 
@@ -222,7 +333,16 @@ Recommended next tasks:
 - Image inputs support URLs and Base64 data URLs, not local paths directly.
 - Structured output remains provider-independent for now.
 - Provider-native strict structured output is deferred.
-- Agents should build on top of tools, not be mixed into basic request execution.
+- Embeddings use a separate embedding model configuration.
+- Retrieval is provider-independent.
+- Vector storage is abstracted behind `BaseVectorStore`.
+- `InMemoryVectorStore` is for tests, examples, demos, and small local workflows.
+- Production RAG should later use a persistent vector store.
+- Document loaders produce `Document`; embedding happens separately.
+- Chunking is intentionally deferred.
+- Agents are explicit and memory-backed.
+- Multi-agent orchestration is explicit and sequential.
+- Autonomous routing, recursive loops, and agent debate are deferred.
 
 ## Current Testing Expectation
 

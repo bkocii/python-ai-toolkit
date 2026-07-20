@@ -1,7 +1,8 @@
 import asyncio
 
 from pydantic import BaseModel
-
+from ai.config import AIConfig
+from ai.providers.factory import ProviderFactory
 from ai.async_client import AsyncAIClient
 from ai.async_executor import AsyncRequestExecutor
 from ai.providers.base import BaseAIProvider
@@ -119,3 +120,74 @@ def test_async_client_ask_delegates_to_executor():
         assert result == "async: Hello"
 
     asyncio.run(run_test())
+
+
+def test_async_client_accepts_explicit_config(monkeypatch):
+    class ConfigurableFakeProvider(BaseAIProvider):
+        def __init__(self, api_key: str, model: str):
+            self.api_key = api_key
+            self.model = model
+
+        def ask_text(self, prompt: str) -> ProviderResponse:
+            return ProviderResponse(text="sync response")
+
+        async def ask_text_async(self, prompt: str) -> ProviderResponse:
+            return ProviderResponse(text="async response")
+
+    config = AIConfig(
+        provider="fake-async",
+        api_key="fake-key",
+        model="fake-model",
+        max_retries=3,
+    )
+
+    monkeypatch.setitem(
+        ProviderFactory._registry,
+        "fake-async",
+        ConfigurableFakeProvider,
+    )
+
+    client = AsyncAIClient(config=config)
+
+    assert client.model == "fake-model"
+    assert isinstance(client.provider, ConfigurableFakeProvider)
+    assert client.provider.api_key == "fake-key"
+    assert client.executor.max_retries == 3
+
+
+def test_async_client_loads_environment_config_when_config_not_supplied(
+    monkeypatch,
+):
+    class ConfigurableFakeProvider(BaseAIProvider):
+        def __init__(self, api_key: str, model: str):
+            self.api_key = api_key
+            self.model = model
+
+        def ask_text(self, prompt: str) -> ProviderResponse:
+            return ProviderResponse(text="sync response")
+
+        async def ask_text_async(self, prompt: str) -> ProviderResponse:
+            return ProviderResponse(text="async response")
+
+    config = AIConfig(
+        provider="fake-async",
+        api_key="environment-key",
+        model="environment-model",
+        max_retries=2,
+    )
+
+    monkeypatch.setattr(
+        "ai.async_client.get_ai_config",
+        lambda: config,
+    )
+    monkeypatch.setitem(
+        ProviderFactory._registry,
+        "fake-async",
+        ConfigurableFakeProvider,
+    )
+
+    client = AsyncAIClient()
+
+    assert client.model == "environment-model"
+    assert client.provider.api_key == "environment-key"
+    assert client.executor.max_retries == 2

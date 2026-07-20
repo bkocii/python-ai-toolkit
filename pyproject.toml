@@ -1,3 +1,33 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-ai-toolkit"
+version = "0.7.0"
+description = "Reusable infrastructure for integrating LLMs into Python applications."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Burim Koci" }
+]
+dependencies = [
+    "openai",
+    "pydantic",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "ruff",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ai*"]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
@@ -7,3 +37,4 @@ line-length = 88
 
 [tool.black]
 line-length = 88
+target-version = ["py314"]

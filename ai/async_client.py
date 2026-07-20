@@ -3,7 +3,7 @@ from typing import TypeVar, overload
 from pydantic import BaseModel
 
 from ai.async_executor import AsyncRequestExecutor
-from ai.config import get_ai_config
+from ai.config import get_ai_config, AIConfig
 from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
 
@@ -18,16 +18,16 @@ class AsyncAIClient:
     and provider async methods.
     """
 
-    def __init__(self):
-        config = get_ai_config()
-        self.model = config.model
+    def __init__(self, config: AIConfig | None = None):
+        resolved_config = config if config is not None else get_ai_config()
+        self.model = resolved_config.model
 
-        self.provider = ProviderFactory.create(config)
+        self.provider = ProviderFactory.create(resolved_config)
 
         self.executor = AsyncRequestExecutor(
             provider=self.provider,
             model=self.model,
-            max_retries=config.max_retries,
+            max_retries=resolved_config.max_retries,
         )
 
     @overload

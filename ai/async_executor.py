@@ -124,7 +124,7 @@ class AsyncRequestExecutor:
                 try:
                     parsed = parse_structured_response(raw_response, response_type)
                     break
-                except (AIJSONParseError, AISchemaValidationError):
+                except AIJSONParseError, AISchemaValidationError:
                     if retries_used >= self.max_retries:
                         raise
 

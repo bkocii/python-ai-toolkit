@@ -1,7 +1,7 @@
 from typing import Iterator, TypeVar, overload
 from pydantic import BaseModel
 from ai.request_builder import AIRequestBuilder
-from ai.config import get_ai_config
+from ai.config import get_ai_config, AIConfig
 from ai.executor import RequestExecutor
 from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
@@ -19,7 +19,7 @@ class AIClient:
     AIClient is intentionally small.
 
     Responsibilities:
-    - Load configuration
+    - Resolve supplied or environment-based configuration
     - Select provider
     - Expose public ask() and ask_text() methods
 
@@ -27,16 +27,16 @@ class AIClient:
     are handled by RequestExecutor.
     """
 
-    def __init__(self):
-        config = get_ai_config()
-        self.model = config.model
+    def __init__(self, config: AIConfig | None = None):
+        resolved_config = config or get_ai_config()
+        self.model = resolved_config.model
 
-        self.provider = ProviderFactory.create(config)
+        self.provider = ProviderFactory.create(resolved_config)
 
         self.executor = RequestExecutor(
             provider=self.provider,
             model=self.model,
-            max_retries=config.max_retries,
+            max_retries=resolved_config.max_retries,
         )
 
     @overload
