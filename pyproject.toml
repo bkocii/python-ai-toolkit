@@ -21,12 +21,17 @@ dependencies = [
 django = [
     "django>=5.0",
 ]
+fastapi = [
+    "fastapi>=0.100,<1",
+]
 
 dev = [
     "pytest",
     "black",
     "ruff",
     "django>=5.0",
+    "fastapi>=0.100,<1",
+    "httpx2",
 ]
 
 [tool.setuptools.packages.find]

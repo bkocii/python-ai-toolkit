@@ -17,11 +17,20 @@ The format loosely follows Keep a Changelog.
 * Synchronous Django client helper
 * Asynchronous Django client helper
 * Django support ticket analysis example
+* Optional FastAPI integration
+* Synchronous FastAPI client dependency
+* Asynchronous FastAPI client dependency
+* Reusable FastAPI `Annotated` dependency aliases
+* FastAPI endpoint testing with dependency overrides
+* FastAPI support ticket analysis example
 
 ### Improved
 * Framework integration architecture
 * Configuration flexibility for applications and tests
 * Django configuration without process-wide environment mutation
+* Framework integration coverage
+* FastAPI endpoint integration with less dependency boilerplate
+* Testability through FastAPI dependency overrides
 
 ## [0.7.0] - In Development
 

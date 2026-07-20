@@ -927,7 +927,8 @@ Framework integrations translate framework-specific configuration into the toolk
 
 Current integration
 
-* Django
+- Django
+- FastAPI
 
 Future integrations may include
 
@@ -1040,36 +1041,172 @@ Reason
 
 Framework-specific concerns remain at the application boundary while the core toolkit stays framework-independent.
 
-# Request Lifecycle
+## FastAPI Integration
 
-## Plain Text Request
+FastAPI integration uses the framework's dependency injection system.
+
+Flow:
 
 ```text
-Application
+HTTP request
         │
         ▼
-AIClient.ask()
+FastAPI endpoint
         │
         ▼
-RequestExecutor.execute()
+AIClientDependency / AsyncAIClientDependency
         │
         ▼
-Provider.ask_text()
+get_ai_client() / get_async_ai_client()
         │
         ▼
-Language Model
+AIClient / AsyncAIClient
         │
         ▼
-ProviderResponse
+ProviderFactory
         │
         ▼
-Create AIResult
-        │
-        ▼
-Return to application
+Configured provider
 ```
 
----
+Responsibilities
+
+* Provide synchronous and asynchronous client dependencies.
+* Expose reusable `Annotated` dependency aliases.
+* Allow FastAPI to inject toolkit clients into endpoints.
+* Support FastAPI dependency overrides during tests.
+* Reuse the existing environment-based toolkit configuration.
+* Keep endpoint and application logic outside the toolkit.
+
+Public dependency helpers
+
+```python
+from ai.integrations.fastapi import (
+    get_ai_client,
+    get_async_ai_client,
+)
+```
+
+Public dependency aliases
+
+```python
+from ai.integrations.fastapi import (
+    AIClientDependency,
+    AsyncAIClientDependency,
+)
+```
+
+Synchronous endpoint example:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AIClientDependency
+
+app = FastAPI()
+
+
+class SummaryRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize")
+def summarize(
+    request: SummaryRequest,
+    client: AIClientDependency,
+):
+    result = client.ask(
+        f"Summarize the following text:\n\n{request.text}"
+    )
+
+    return {
+        "summary": result.data,
+    }
+```
+
+Asynchronous endpoint example:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AsyncAIClientDependency
+
+app = FastAPI()
+
+
+class SummaryRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize-async")
+async def summarize_async(
+    request: SummaryRequest,
+    client: AsyncAIClientDependency,
+):
+    result = await client.ask(
+        f"Summarize the following text:\n\n{request.text}"
+    )
+
+    return {
+        "summary": result.data,
+    }
+```
+
+Testing flow:
+
+```text
+FastAPI test request
+        │
+        ▼
+app.dependency_overrides
+        │
+        ▼
+Fake AI client
+        │
+        ▼
+Endpoint execution
+        │
+        ▼
+Test response
+```
+
+FastAPI applications can replace the real toolkit dependency during tests:
+
+```python
+from types import SimpleNamespace
+
+from ai.integrations.fastapi import get_ai_client
+
+
+class FakeAIClient:
+    def ask(self, prompt: str):
+        return SimpleNamespace(data="Test response")
+
+
+app.dependency_overrides[get_ai_client] = FakeAIClient
+```
+
+Does NOT
+
+* Add API routes.
+* Add request or response schemas.
+* Add middleware.
+* Manage authentication or permissions.
+* Perform database operations.
+* Define application prompts.
+* Add application business logic.
+* Automatically create application-lifetime singleton clients.
+* Automatically manage FastAPI lifespan resources.
+
+Reason
+
+FastAPI dependency aliases reduce repeated dependency declaration boilerplate while preserving the existing `AIClient` and `AsyncAIClient` configuration and execution lifecycle.
+
+The first implementation creates clients through normal FastAPI dependencies.
+
+Application-lifetime client management is intentionally deferred until there is a clear lifecycle, connection-management, caching, or resource-cleanup requirement.
 
 ## Structured Request
 

@@ -166,7 +166,7 @@ Integrate with common Python ecosystems.
 Tasks
 
 - [x] INTEGRATION-001 Django integration
-- [ ] INTEGRATION-002 FastAPI integration
+- [x] INTEGRATION-002 FastAPI integration
 - [ ] INTEGRATION-003 Command Line Interface
 - [ ] INTEGRATION-004 Configuration CLI
 

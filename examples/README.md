@@ -281,6 +281,49 @@ The Django integration only creates the configured client. Views, models,
 Celery tasks, prompts, and application decisions remain the responsibility
 of the Django project.
 
+## 20. FastAPI Integration
+
+File:
+
+```text
+examples/20_fastapi_integration.py
+```
+This example shows how an existing FastAPI application can inject an
+AsyncAIClient into an asynchronous API endpoint.
+
+The endpoint accepts a customer support ticket and returns a validated
+TicketAnalysis model.
+
+Install FastAPI integration support:
+```python
+pip install python-ai-toolkit[fastapi]
+```
+Use the dependency alias:
+```python
+from ai.integrations.fastapi import AsyncAIClientDependency
+
+@app.post("/analyze-ticket")
+async def analyze_ticket(
+    request: TicketRequest,
+    client: AsyncAIClientDependency,
+):
+    result = await client.ask(
+        prompt=f"Analyze this ticket:\n\n{request.message}",
+        response_type=TicketAnalysis,
+    )
+
+    return result.data
+```
+
+FastAPI handles dependency injection. The toolkit handles client creation,
+provider communication, structured parsing, and validation.
+
+Application routes, prompts, schemas, and business decisions remain inside
+the FastAPI application.
+
+
+FastAPI also supports replacing dependencies through `app.dependency_overrides`, which is why the integration can be tested without making real provider calls. :contentReference[oaicite:1]{index=1}
+
 
 ## Running
 ```bash
@@ -306,3 +349,5 @@ python -m examples.01_summarize_text
 16. Agent
 17. Workflow Engine
 18. Multi-Agent Orchestration
+19. Django Integration
+20. FastAPI Integration

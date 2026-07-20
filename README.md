@@ -2294,6 +2294,188 @@ client = get_ai_client("CUSTOM_AI_CONFIG")
 
 The Django integration does not require an entry in `INSTALLED_APPS` and does not add models or migrations.
 
+## FastAPI Integration
+
+FastAPI support is optional. Install the toolkit with the FastAPI extra:
+
+```bash
+pip install python-ai-toolkit[fastapi]
+```
+
+For local toolkit development:
+
+```bash
+python -m pip install -e ".[fastapi]"
+```
+
+### Inject a synchronous client
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AIClientDependency
+
+app = FastAPI()
+
+
+class SummaryRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize")
+def summarize(
+    request: SummaryRequest,
+    client: AIClientDependency,
+):
+    result = client.ask(
+        f"Summarize the following text:\n\n{request.text}"
+    )
+
+    return {
+        "summary": result.data,
+    }
+```
+
+FastAPI resolves `AIClientDependency` through its dependency injection system.
+
+The integration performs this flow:
+
+```text
+HTTP request
+        ↓
+FastAPI endpoint
+        ↓
+AIClientDependency
+        ↓
+get_ai_client()
+        ↓
+AIClient
+        ↓
+Configured provider
+```
+
+### Inject an asynchronous client
+
+Use `AsyncAIClientDependency` inside asynchronous endpoints:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AsyncAIClientDependency
+
+app = FastAPI()
+
+
+class SummaryRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize-async")
+async def summarize_async(
+    request: SummaryRequest,
+    client: AsyncAIClientDependency,
+):
+    result = await client.ask(
+        f"Summarize the following text:\n\n{request.text}"
+    )
+
+    return {
+        "summary": result.data,
+    }
+```
+
+### Structured-output example
+
+```python
+from typing import Literal
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AsyncAIClientDependency
+
+app = FastAPI()
+
+
+class TicketRequest(BaseModel):
+    message: str
+
+
+class TicketAnalysis(BaseModel):
+    category: Literal[
+        "billing",
+        "technical",
+        "account",
+        "other",
+    ]
+    priority: Literal[
+        "low",
+        "medium",
+        "high",
+    ]
+    summary: str
+
+
+@app.post(
+    "/analyze-ticket",
+    response_model=TicketAnalysis,
+)
+async def analyze_ticket(
+    request: TicketRequest,
+    client: AsyncAIClientDependency,
+) -> TicketAnalysis:
+    result = await client.ask(
+        prompt=(
+            "Analyze this support ticket. Determine its category "
+            "and priority, and return a short summary.\n\n"
+            f"Ticket:\n{request.message}"
+        ),
+        response_type=TicketAnalysis,
+    )
+
+    return result.data
+```
+
+The FastAPI application remains responsible for:
+
+* routes,
+* request and response schemas,
+* prompts,
+* authentication,
+* permissions,
+* database operations,
+* business decisions.
+
+The toolkit integration is responsible only for creating and injecting the configured client.
+
+### Testing FastAPI endpoints
+
+FastAPI dependencies can be replaced during tests:
+
+```python
+from types import SimpleNamespace
+
+from fastapi.testclient import TestClient
+
+from ai.integrations.fastapi import get_ai_client
+
+
+class FakeAIClient:
+    def ask(self, prompt: str):
+        return SimpleNamespace(data="Test summary")
+
+
+app.dependency_overrides[get_ai_client] = FakeAIClient
+
+test_client = TestClient(app)
+```
+
+This allows endpoint tests to run without contacting a real AI provider.
+
+The FastAPI integration does not add routes, middleware, database models, or application business logic.
+
 
 # Development
 
