@@ -243,86 +243,82 @@ Demonstrates:
 - inspecting multi-agent results
 
 
-## 19. Django Integration
+## 19 – Django Integration
 
-File:
+**File**
 
 ```text
-examples/19_django_integration.py
+19_django_integration.py
 ```
 
-This example shows how an existing Django application can create a configured
-AIClient from the Django AI_TOOLKIT setting.
+Demonstrates:
 
-The example analyzes a support ticket and returns a validated Pydantic model.
+* configuring the toolkit through Django's `AI_TOOLKIT` setting
+* creating an `AIClient` with `get_ai_client()`
+* using the toolkit inside an existing Django application
+* analyzing a support ticket
+* returning a validated Pydantic model
+* keeping views, models, Celery tasks, and business logic outside the toolkit
 
-Install Django integration support:
-```python
+Install the optional Django integration:
+
+```bash
 pip install python-ai-toolkit[django]
 ```
-Configure the Django project:
-```python
-AI_TOOLKIT = {
-    "provider": "openai",
-    "api_key": os.environ["OPENAI_API_KEY"],
-    "model": "gpt-5.4-mini",
-    "embedding_model": "text-embedding-3-small",
-    "max_retries": 1,
-}
-```
-Use the integration inside a Django service:
-```python
-from ai.integrations.django import get_ai_client
 
-client = get_ai_client()
-result = client.ask("Summarize this support ticket.")
-```
-The Django integration only creates the configured client. Views, models,
-Celery tasks, prompts, and application decisions remain the responsibility
-of the Django project.
+---
 
-## 20. FastAPI Integration
+## 20 – FastAPI Integration
 
-File:
+**File**
 
 ```text
-examples/20_fastapi_integration.py
+20_fastapi_integration.py
 ```
-This example shows how an existing FastAPI application can inject an
-AsyncAIClient into an asynchronous API endpoint.
 
-The endpoint accepts a customer support ticket and returns a validated
-TicketAnalysis model.
+Demonstrates:
 
-Install FastAPI integration support:
-```python
+* injecting `AsyncAIClient` into a FastAPI endpoint
+* using `AsyncAIClientDependency`
+* accepting a validated API request model
+* returning a validated structured response
+* using asynchronous AI requests inside an endpoint
+* replacing the AI dependency during tests
+* keeping routes, schemas, prompts, and business logic inside the application
+
+Install the optional FastAPI integration:
+
+```bash
 pip install python-ai-toolkit[fastapi]
 ```
-Use the dependency alias:
-```python
-from ai.integrations.fastapi import AsyncAIClientDependency
 
-@app.post("/analyze-ticket")
-async def analyze_ticket(
-    request: TicketRequest,
-    client: AsyncAIClientDependency,
-):
-    result = await client.ask(
-        prompt=f"Analyze this ticket:\n\n{request.message}",
-        response_type=TicketAnalysis,
-    )
+---
 
-    return result.data
+## 21 – Command-Line Interface
+
+**Command**
+
+```text
+ai-toolkit ask "<prompt>"
 ```
 
-FastAPI handles dependency injection. The toolkit handles client creation,
-provider communication, structured parsing, and validation.
+Demonstrates:
 
-Application routes, prompts, schemas, and business decisions remain inside
-the FastAPI application.
+* sending a plain-text prompt from the terminal
+* using the same environment configuration as `AIClient`
+* printing the AI response directly to standard output
+* returning predictable command exit codes
+* showing clean configuration and provider errors
+* using the toolkit without writing a Python script
 
+Example:
 
-FastAPI also supports replacing dependencies through `app.dependency_overrides`, which is why the integration can be tested without making real provider calls. :contentReference[oaicite:1]{index=1}
+```bash
+ai-toolkit ask "Explain dependency injection simply."
+```
+
+The initial CLI supports plain-text requests only. Configuration management is handled separately by the Configuration CLI roadmap task.
+
 
 
 ## Running
@@ -351,3 +347,4 @@ python -m examples.01_summarize_text
 18. Multi-Agent Orchestration
 19. Django Integration
 20. FastAPI Integration
+21. Command-Line Interface

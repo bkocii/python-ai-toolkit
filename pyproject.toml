@@ -17,6 +17,9 @@ dependencies = [
     "python-dotenv",
 ]
 
+[project.scripts]
+ai-toolkit = "ai.cli.main:main"
+
 [project.optional-dependencies]
 django = [
     "django>=5.0",

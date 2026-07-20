@@ -23,6 +23,13 @@ The format loosely follows Keep a Changelog.
 * Reusable FastAPI `Annotated` dependency aliases
 * FastAPI endpoint testing with dependency overrides
 * FastAPI support ticket analysis example
+* Command-line interface
+* `ai-toolkit` console command
+* Plain-text `ask` subcommand
+* CLI subcommand-handler architecture
+* Standard CLI exit codes
+* Clean command-line handling for expected toolkit errors
+
 
 ### Improved
 * Framework integration architecture
@@ -31,6 +38,10 @@ The format loosely follows Keep a Changelog.
 * Framework integration coverage
 * FastAPI endpoint integration with less dependency boilerplate
 * Testability through FastAPI dependency overrides
+* Toolkit accessibility from terminal environments
+* Error reporting for command-line usage
+* Reuse of the existing `AIClient` request lifecycle from the CLI
+
 
 ## [0.7.0] - In Development
 

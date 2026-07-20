@@ -929,6 +929,7 @@ Current integration
 
 - Django
 - FastAPI
+- Command-line interface
 
 Future integrations may include
 
@@ -1207,6 +1208,147 @@ FastAPI dependency aliases reduce repeated dependency declaration boilerplate wh
 The first implementation creates clients through normal FastAPI dependencies.
 
 Application-lifetime client management is intentionally deferred until there is a clear lifecycle, connection-management, caching, or resource-cleanup requirement.
+
+## Command-Line Interface
+
+The command-line interface provides terminal access to the existing toolkit client.
+
+CLI flow:
+
+```text
+Terminal command
+        │
+        ▼
+ai-toolkit console entry point
+        │
+        ▼
+main()
+        │
+        ▼
+argparse command parser
+        │
+        ▼
+Command handler
+        │
+        ▼
+AIClient
+        │
+        ▼
+ProviderFactory
+        │
+        ▼
+Configured provider
+```
+
+Current command:
+
+```text
+ai-toolkit ask "<prompt>"
+```
+
+Example:
+
+```bash
+ai-toolkit ask "Explain dependency injection simply."
+```
+
+Responsibilities
+
+* Parse command-line arguments.
+* Route subcommands to their registered handlers.
+* Create the existing `AIClient`.
+* Send plain-text prompts.
+* Print successful responses to standard output.
+* Print expected toolkit errors to standard error.
+* Return predictable process exit codes.
+* Reuse the existing environment-based toolkit configuration.
+
+Exit codes:
+
+```text
+0   Command completed successfully
+1   Toolkit configuration or provider error
+2   Invalid command-line syntax
+```
+
+The CLI catches exceptions derived from `AIError`.
+
+This includes expected toolkit failures such as:
+
+* `AIConfigurationError`
+* `AIProviderError`
+* `AIJSONParseError`
+* `AISchemaValidationError`
+
+Unexpected exceptions are not silently hidden because they may represent programming defects.
+
+The console entry point is configured in `pyproject.toml`:
+
+```toml
+[project.scripts]
+ai-toolkit = "ai.cli.main:main"
+```
+
+This means that running:
+
+```text
+ai-toolkit
+```
+
+executes:
+
+```python
+ai.cli.main.main()
+```
+
+The CLI uses subcommand handlers.
+
+For example, the `ask` parser registers:
+
+```python
+ask_parser.set_defaults(handler=run_ask_command)
+```
+
+After parsing the command, `main()` executes the selected handler:
+
+```python
+return args.handler(args)
+```
+
+This structure allows future commands to be added without replacing the parser architecture or creating a large conditional block.
+
+Does NOT
+
+* Implement a separate AI request lifecycle.
+* Communicate directly with provider SDKs.
+* Store API keys.
+* Modify `.env` files.
+* Manage provider or model configuration.
+* Support structured output.
+* Support streaming responses.
+* Support tool calling.
+* Support image inputs.
+* Provide an interactive conversation loop.
+* Add business-specific commands.
+
+Reason
+
+The CLI is an application adapter around `AIClient`.
+
+It reuses the existing configuration, provider selection, request execution, retry, logging, and response architecture instead of duplicating them.
+
+The initial CLI uses Python's standard-library `argparse` module because the current command structure is small and does not justify another runtime dependency.
+
+The CLI package uses subcommand handlers so future commands can be added while preserving the same public console entry point.
+
+Configuration-related commands are intentionally reserved for:
+
+```text
+INTEGRATION-004 — Configuration CLI
+```
+
+
+
 
 ## Structured Request
 

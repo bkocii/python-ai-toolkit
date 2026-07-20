@@ -2476,6 +2476,147 @@ This allows endpoint tests to run without contacting a real AI provider.
 
 The FastAPI integration does not add routes, middleware, database models, or application business logic.
 
+## Command-Line Interface
+
+The toolkit includes a command-line interface for simple plain-text AI requests.
+
+The CLI uses the same environment configuration as `AIClient`.
+
+### Install the command
+
+Install the package:
+
+```bash
+python -m pip install -e .
+```
+
+For toolkit development:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+The installation creates the following command:
+
+```text
+ai-toolkit
+```
+
+Verify it:
+
+```bash
+ai-toolkit --help
+```
+
+### Ask a question
+
+```bash
+ai-toolkit ask "Explain dependency injection simply."
+```
+
+Example output:
+
+```text
+Dependency injection means giving an object the dependencies it needs instead
+of making it create them itself.
+```
+
+A longer example:
+
+```bash
+ai-toolkit ask "Explain Django models using a simple product example."
+```
+
+The command performs this flow:
+
+```text
+Terminal command
+        ↓
+ai-toolkit entry point
+        ↓
+CLI argument parser
+        ↓
+AIClient
+        ↓
+Configured provider
+        ↓
+AI response
+        ↓
+Terminal output
+```
+
+### Configuration
+
+The CLI reads the normal toolkit environment configuration.
+
+Example `.env`:
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-5.4-mini
+```
+
+The CLI does not currently save or modify configuration.
+
+Configuration commands belong to the separate Configuration CLI roadmap task.
+
+### Prompt arguments
+
+Using quotes is recommended:
+
+```bash
+ai-toolkit ask "Explain Python dictionaries in two sentences."
+```
+
+Unquoted words also work:
+
+```bash
+ai-toolkit ask Explain Python dictionaries
+```
+
+The CLI joins the separate words into one prompt.
+
+### Exit codes
+
+The command uses standard exit codes:
+
+```text
+0   Request completed successfully
+1   Toolkit configuration or provider error
+2   Invalid command syntax
+```
+
+Example configuration failure:
+
+```text
+Error: Missing API key for provider 'openai'...
+```
+
+In PowerShell, inspect the exit code with:
+
+```powershell
+$LASTEXITCODE
+```
+
+### Current CLI scope
+
+The initial CLI supports plain-text requests only.
+
+It does not yet provide:
+
+* interactive chat,
+* streaming output,
+* structured responses,
+* tool calling,
+* image input,
+* provider or model command flags,
+* API-key setup,
+* configuration-file editing.
+
+These capabilities are intentionally outside the initial command-line task.
+
+
 
 # Development
 

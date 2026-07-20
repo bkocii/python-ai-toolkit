@@ -167,7 +167,7 @@ Tasks
 
 - [x] INTEGRATION-001 Django integration
 - [x] INTEGRATION-002 FastAPI integration
-- [ ] INTEGRATION-003 Command Line Interface
+- [x] INTEGRATION-003 Command Line Interface
 - [ ] INTEGRATION-004 Configuration CLI
 
 Exit Criteria
