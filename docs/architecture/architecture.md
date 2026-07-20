@@ -1347,7 +1347,179 @@ Configuration-related commands are intentionally reserved for:
 INTEGRATION-004 — Configuration CLI
 ```
 
+## Configuration CLI
 
+The Configuration CLI extends the existing `ai-toolkit` command with safe configuration inspection and structural validation.
+
+Current commands:
+
+```text
+ai-toolkit config show
+ai-toolkit config validate
+```
+
+Configuration CLI flow:
+
+```text
+Terminal command
+        │
+        ▼
+ai-toolkit config
+        │
+        ▼
+argparse configuration subcommand
+        │
+        ▼
+Configuration command handler
+        │
+        ▼
+get_ai_config()
+        │
+        ▼
+ConfigValidator
+        │
+        ▼
+Safe terminal output
+```
+
+### Configuration Display
+
+The `config show` command displays the resolved toolkit configuration:
+
+```bash
+ai-toolkit config show
+```
+
+Example output:
+
+```text
+Provider: openai
+API key: ********1234
+Model: gpt-5.4-mini
+Embedding model: text-embedding-3-small
+Embedding dimensions: default
+Maximum retries: 1
+Input cost per 1M tokens: not configured
+Output cost per 1M tokens: not configured
+```
+
+Responsibilities
+
+* Load configuration through `get_ai_config()`.
+* Display resolved provider and model settings.
+* Display embedding configuration.
+* Display retry and cost configuration.
+* Mask API keys before writing them to standard output.
+* Format missing optional values clearly.
+
+API keys with more than four characters preserve only their final four characters:
+
+```text
+secret-api-key-1234
+        ↓
+********1234
+```
+
+Short API keys are hidden completely:
+
+```text
+key
+ ↓
+********
+```
+
+The full API key must never be printed.
+
+### Structural Configuration Validation
+
+The `config validate` command validates the configuration structure:
+
+```bash
+ai-toolkit config validate
+```
+
+Successful output:
+
+```text
+Configuration is structurally valid. Provider credentials were not verified.
+```
+
+Structural validation checks:
+
+* provider presence,
+* API-key value presence,
+* model presence,
+* retry-count validity,
+* embedding-model presence,
+* embedding-dimension validity,
+* supported configuration value types.
+
+Structural validation does not contact the configured provider.
+
+It therefore does not verify:
+
+* whether credentials are genuine,
+* whether the provider is reachable,
+* whether the configured model exists,
+* whether the account can access the model,
+* whether quota is available,
+* whether billing is active,
+* whether the provider service is currently operational.
+
+A fake but non-empty API key can pass structural validation.
+
+### Error Handling
+
+Configuration errors continue through the existing CLI error boundary:
+
+```text
+get_ai_config()
+        │
+        ▼
+AIConfigurationError
+        │
+        ▼
+main()
+        │
+        ▼
+Standard error
+        │
+        ▼
+Exit code 1
+```
+
+Example:
+
+```text
+Error: Missing API key for provider 'openai'...
+```
+
+Invalid command syntax remains handled by `argparse` with exit code `2`.
+
+### Safety Boundaries
+
+The Configuration CLI does NOT:
+
+* print complete API keys,
+* accept API keys through command arguments,
+* save API keys,
+* modify `.env`,
+* create configuration files,
+* overwrite existing settings,
+* expose secrets through machine-readable output,
+* perform live credential checks,
+* communicate directly with provider SDKs,
+* duplicate configuration parsing or validation.
+
+Reason
+
+Command-line arguments may be retained in terminal history and visible to other operating-system processes.
+
+Automatically modifying `.env` would also require explicit decisions for file discovery, permissions, overwriting, backups, source-control safety, and secret handling.
+
+The first Configuration CLI therefore remains read-only and reuses the existing configuration architecture.
+
+Live provider diagnostics and safe interactive configuration are deferred until their security and lifecycle behavior are designed explicitly.
 
 
 ## Structured Request

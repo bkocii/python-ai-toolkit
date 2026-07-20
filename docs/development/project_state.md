@@ -10,18 +10,19 @@ Python AI Toolkit
 
 ## Current Milestone
 
-Sprint 7 completed — Agents & Workflows
+Sprint 8 completed — Framework Integrations
 
 ## Current Sprint Status
 
-Sprint 7 is complete.
+Sprint 8 is complete.
 
-Completed Sprint 7 tasks:
+Completed Sprint 8 tasks:
 
-- AGENT-001 Conversation memory
-- AGENT-002 Agent abstraction
-- AGENT-003 Workflow engine
-- AGENT-004 Multi-agent orchestration
+* INTEGRATION-001 Django integration
+* INTEGRATION-002 FastAPI integration
+* INTEGRATION-003 Command Line Interface
+* INTEGRATION-004 Configuration CLI
+
 
 ## Implemented Capabilities
 
@@ -130,6 +131,25 @@ Completed Sprint 7 tasks:
 - sequential multi-agent execution
 - multi-agent result collection
 - multi-agent failure handling
+
+### Framework Integrations
+
+* optional Django integration
+* Django settings-to-`AIConfig` adapter
+* synchronous Django client helper
+* asynchronous Django client helper
+* optional FastAPI integration
+* synchronous FastAPI client dependency
+* asynchronous FastAPI client dependency
+* reusable FastAPI dependency aliases
+* FastAPI dependency-override testing support
+* `ai-toolkit` console command
+* plain-text `ask` command
+* read-only configuration inspection
+* structural configuration validation
+* masked API-key output
+* predictable CLI exit codes
+
 
 ## Current Architecture
 
@@ -306,23 +326,32 @@ Completed:
 - workflow engine
 - multi-agent orchestration
 
+### Sprint 8 — Framework Integrations
+
+Completed:
+
+* Django integration
+* FastAPI integration
+* command-line interface
+* configuration CLI
+
+
 ## Next Milestone
 
-To be selected from roadmap.
+Sprint 9 — Production Readiness
 
 ## Next Recommended Focus
 
-Sprint 7 completed the first reusable agents and workflows layer.
+Sprint 8 completed the framework and command-line integration layer.
 
-The next recommended focus depends on the remaining roadmap.
+The next roadmap milestone is Sprint 9 — Production Readiness.
 
-Strong candidates:
+The first roadmap task is:
 
-- testing and quality hardening
-- packaging and public API cleanup
-- provider expansion
-- production persistence features
-- evaluation and observability
+* PROD-001 Benchmark suite
+
+Before implementation, verify the benchmark scope against the current architecture and public API.
+
 
 ## Important Design Decisions
 

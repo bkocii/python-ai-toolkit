@@ -20,8 +20,11 @@ The project has completed:
 * Sprint 5 – Advanced Requests
 * Sprint 6 – Retrieval & Knowledge
 * Sprint 7 – Agents & Workflows
+* Sprint 8 – Framework Integrations
 
-The next step is to inspect the current roadmap and select/continue the correct next sprint.
+The next roadmap milestone is Sprint 9 – Production Readiness.
+
+Before implementation, inspect the current roadmap and architecture, then design the correct scope for `PROD-001 Benchmark suite`.
 
 ---
 
@@ -53,6 +56,9 @@ Reference documents, only if needed:
   * `0011-document-loaders-separate-from-embedding.md`
   * `0012-memory-agent-workflow-separation.md`
   * `0013-explicit-multi-agent-orchestration.md`
+  * `0014-explicit-configuration-injection-for-framework-integrations.md`
+  * `0015-command-line-interface-architecture.md`
+
 
 ---
 

@@ -1,7 +1,10 @@
 import argparse
 import sys
 from collections.abc import Sequence
-
+from ai.cli.config_commands import (
+    run_config_show_command,
+    run_config_validate_command,
+)
 from ai.client import AIClient
 from ai.exceptions import AIError
 
@@ -12,7 +15,7 @@ def build_parser() -> argparse.ArgumentParser:
     """
     parser = argparse.ArgumentParser(
         prog="ai-toolkit",
-        description="Run AI requests from the command line.",
+        description="Use the Python AI Toolkit from the command line.",
     )
 
     subparsers = parser.add_subparsers(
@@ -30,6 +33,35 @@ def build_parser() -> argparse.ArgumentParser:
         help="Prompt to send to the AI provider.",
     )
     ask_parser.set_defaults(handler=run_ask_command)
+
+    config_parser = subparsers.add_parser(
+        "config",
+        help="Inspect and validate toolkit configuration.",
+    )
+
+    config_subparsers = config_parser.add_subparsers(
+        dest="config_command",
+        required=True,
+    )
+
+    config_show_parser = config_subparsers.add_parser(
+        "show",
+        help="Display the resolved toolkit configuration.",
+    )
+    config_show_parser.set_defaults(
+        handler=run_config_show_command,
+    )
+
+    config_validate_parser = config_subparsers.add_parser(
+        "validate",
+        help=(
+            "Validate the structure of the resolved toolkit configuration "
+            "without contacting the provider."
+        ),
+    )
+    config_validate_parser.set_defaults(
+        handler=run_config_validate_command,
+    )
 
     return parser
 

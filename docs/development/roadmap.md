@@ -168,11 +168,11 @@ Tasks
 - [x] INTEGRATION-001 Django integration
 - [x] INTEGRATION-002 FastAPI integration
 - [x] INTEGRATION-003 Command Line Interface
-- [ ] INTEGRATION-004 Configuration CLI
+- [x] INTEGRATION-004 Configuration CLI
 
 Exit Criteria
 
-- Toolkit easily integrates into existing Python applications.
+- [x] Toolkit easily integrates into existing Python applications.
 
 ---
 
@@ -259,7 +259,13 @@ Ideas
 - Test-safe logging configuration
 - Configurable log file path and log level
 - Option to disable file logging during tests
-
+- Provider-independent CLI health check for credentials, connectivity, model access, and provider availability
+- Configuration source and precedence diagnostics with secrets excluded
+- Machine-readable CLI output such as `--json`
+- Safe interactive configuration bootstrap without exposing secrets in command history
+- CLI shell completion
+- Python-version CI matrix for all supported Python versions
+- Optional integration installation and import tests for Django and FastAPI extras
 
 Future backlog items may become roadmap tasks after the completion of a sprint.
 

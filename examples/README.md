@@ -320,6 +320,27 @@ ai-toolkit ask "Explain dependency injection simply."
 The initial CLI supports plain-text requests only. Configuration management is handled separately by the Configuration CLI roadmap task.
 
 
+## 22 – Configuration CLI
+
+**Commands**
+
+```text
+ai-toolkit config show
+ai-toolkit config validate
+```
+
+Demonstrates:
+
+* inspecting the resolved toolkit configuration
+* masking API keys in terminal output
+* showing provider, model, embedding, retry, and cost settings
+* validating configuration structure
+* reporting configuration errors with predictable exit codes
+* distinguishing structural validation from live credential verification
+
+The commands do not modify `.env`, save secrets, or contact the configured provider.
+
+
 
 ## Running
 ```bash
@@ -348,3 +369,4 @@ python -m examples.01_summarize_text
 19. Django Integration
 20. FastAPI Integration
 21. Command-Line Interface
+22. Configuration CLI

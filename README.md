@@ -2616,6 +2616,84 @@ It does not yet provide:
 
 These capabilities are intentionally outside the initial command-line task.
 
+### Configuration Commands
+
+The CLI can inspect and structurally validate the resolved toolkit configuration.
+
+These commands use the same configuration loader as `AIClient`.
+
+#### Show resolved configuration
+
+```bash
+ai-toolkit config show
+```
+
+Example output:
+
+```text
+Provider: openai
+API key: ********1234
+Model: gpt-5.4-mini
+Embedding model: text-embedding-3-small
+Embedding dimensions: default
+Maximum retries: 1
+Input cost per 1M tokens: not configured
+Output cost per 1M tokens: not configured
+```
+
+The complete API key is never printed.
+
+The command displays the final values after provider-specific settings, generic fallbacks, and defaults have been resolved.
+
+#### Validate configuration structure
+
+```bash
+ai-toolkit config validate
+```
+
+Example output:
+
+```text
+Configuration is structurally valid. Provider credentials were not verified.
+```
+
+Structural validation checks that:
+
+* the provider is present,
+* an API key value is present,
+* the model is present,
+* retry configuration is valid,
+* the embedding model is present,
+* embedding dimensions are valid when configured.
+
+Structural validation does not contact the configured provider.
+
+A fake but non-empty API key can therefore pass structural validation.
+
+Credential validity, provider connectivity, account permissions, model availability, quota, and billing status are not checked by this command.
+
+#### Configuration error
+
+When configuration is missing or invalid:
+
+```text
+Error: Missing API key for provider 'openai'...
+```
+
+The command returns exit code `1`.
+
+#### Current safety boundaries
+
+The Configuration CLI does not:
+
+* print complete API keys,
+* accept API keys as command arguments,
+* write API keys to disk,
+* modify `.env`,
+* overwrite existing configuration,
+* contact the provider during structural validation.
+
+These restrictions avoid exposing secrets in terminal history, process arguments, logs, or accidental source-control commits.
 
 
 # Development

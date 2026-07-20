@@ -41,6 +41,11 @@ The format loosely follows Keep a Changelog.
 * Toolkit accessibility from terminal environments
 * Error reporting for command-line usage
 * Reuse of the existing `AIClient` request lifecycle from the CLI
+* Configuration visibility and troubleshooting
+* Clear distinction between structural validation and live credential verification
+* Command-line secret-handling safeguards
+* Reuse of the existing configuration loader and validator from the CLI
+
 
 
 ## [0.7.0] - In Development
@@ -68,6 +73,13 @@ The format loosely follows Keep a Changelog.
 * Sequential multi-agent execution
 * Multi-agent result collection
 * Multi-agent failure handling
+* Read-only Configuration CLI
+* `ai-toolkit config show` command
+* `ai-toolkit config validate` command
+* API-key masking for configuration output
+* Structural configuration validation from the terminal
+* Safe formatting for optional configuration values
+
 
 ### Improved
 
