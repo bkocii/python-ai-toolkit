@@ -2165,6 +2165,136 @@ AI_OUTPUT_COST_PER_1M_TOKENS=
 
 ---
 
+## Django Integration
+
+Django support is optional. Install the toolkit with the Django extra:
+
+```bash
+pip install python-ai-toolkit[django]
+```
+
+For local toolkit development:
+
+```bash
+python -m pip install -e ".[django]"
+```
+
+### Configure Django settings
+
+Add `AI_TOOLKIT` to the Django project's `settings.py`:
+
+```python
+import os
+
+
+AI_TOOLKIT = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+    "embedding_model": "text-embedding-3-small",
+    "embedding_dimensions": None,
+    "max_retries": 1,
+}
+```
+
+Keep API keys in environment variables. Do not place real API keys directly in source code.
+
+### Create a configured client
+
+```python
+from ai.integrations.django import get_ai_client
+
+
+client = get_ai_client()
+result = client.ask("Summarize this customer message.")
+
+print(result.data)
+```
+
+The integration performs this translation:
+
+```text
+Django AI_TOOLKIT setting
+        ↓
+AIConfig
+        ↓
+AIClient
+        ↓
+Configured provider
+```
+
+### Structured-output example
+
+```python
+from pydantic import BaseModel
+
+from ai.integrations.django import get_ai_client
+
+
+class TicketAnalysis(BaseModel):
+    category: str
+    priority: str
+    summary: str
+
+
+def analyze_support_ticket(message: str) -> TicketAnalysis:
+    client = get_ai_client()
+
+    result = client.ask(
+        prompt=(
+            "Analyze this support ticket. Return its category, "
+            "priority, and a short summary.\n\n"
+            f"Ticket:\n{message}"
+        ),
+        response_type=TicketAnalysis,
+    )
+
+    return result.data
+```
+
+This function can be called from a Django view, service, Celery task, management command, or another application component.
+
+The Django integration only creates a configured toolkit client. Django models, views, background jobs, prompts, and business decisions remain the responsibility of the application.
+
+### Async client
+
+For asynchronous Django code:
+
+```python
+from ai.integrations.django import get_async_ai_client
+
+
+async def summarize_message(message: str) -> str:
+    client = get_async_ai_client()
+    result = await client.ask(f"Summarize this message:\n\n{message}")
+
+    return result.data
+```
+
+### Custom setting name
+
+A project may use a different Django setting name:
+
+```python
+CUSTOM_AI_CONFIG = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+}
+```
+
+Pass the name to the integration helper:
+
+```python
+from ai.integrations.django import get_ai_client
+
+
+client = get_ai_client("CUSTOM_AI_CONFIG")
+```
+
+The Django integration does not require an entry in `INSTALLED_APPS` and does not add models or migrations.
+
+
 # Development
 
 Run tests.

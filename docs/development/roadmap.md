@@ -12,7 +12,7 @@ outside the toolkit.
 
 # Current Version
 
-0.3.0-dev
+0.7.0-dev
 
 ---
 
@@ -165,7 +165,7 @@ Integrate with common Python ecosystems.
 
 Tasks
 
-- [ ] INTEGRATION-001 Django integration
+- [x] INTEGRATION-001 Django integration
 - [ ] INTEGRATION-002 FastAPI integration
 - [ ] INTEGRATION-003 Command Line Interface
 - [ ] INTEGRATION-004 Configuration CLI

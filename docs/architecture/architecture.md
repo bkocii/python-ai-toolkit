@@ -92,11 +92,12 @@ Application
 Responsibilities
 
 - Public synchronous API
-- Load configuration
+- Resolve supplied or environment-based configuration
 - Create provider through `ProviderFactory`
 - Delegate request execution
 - Expose advanced request helpers
 - Expose embedding helpers
+- Supports explicit AIConfig injection for framework integrations and tests.
 
 Supports
 
@@ -125,9 +126,10 @@ Does NOT
 Responsibilities
 
 - Public asynchronous API
-- Load configuration
+- Resolve supplied or environment-based configuration
 - Create provider through `ProviderFactory`
 - Delegate async request execution to `AsyncRequestExecutor`
+- Supports explicit AIConfig injection for framework integrations and tests.
 
 Supports
 
@@ -918,6 +920,125 @@ Responsibilities
 - `ProviderFactory` uses configuration to create providers
 
 ---
+
+# Framework Integration Architecture
+
+Framework integrations translate framework-specific configuration into the toolkit's provider-independent configuration model.
+
+Current integration
+
+* Django
+
+Future integrations may include
+
+* FastAPI
+* command-line applications
+* other Python frameworks
+
+Framework integration flow:
+
+```text
+Framework configuration
+        │
+        ▼
+Framework adapter
+        │
+        ▼
+AIConfig
+        │
+        ▼
+AIClient / AsyncAIClient
+        │
+        ▼
+ProviderFactory
+```
+
+## Explicit Client Configuration
+
+`AIClient` and `AsyncAIClient` accept an optional `AIConfig`.
+
+Environment-based configuration remains the default:
+
+```python
+client = AIClient()
+```
+
+Applications and framework adapters may provide explicit configuration:
+
+```python
+client = AIClient(config=config)
+```
+
+Responsibilities
+
+* `get_ai_config()` loads environment-based configuration.
+* Framework adapters create `AIConfig` from framework settings.
+* `ConfigValidator` validates provider-independent configuration.
+* `ProviderFactory` creates the configured provider.
+* Clients create the appropriate request executor.
+
+Reason
+
+Explicit configuration injection allows framework integrations without modifying environment variables or adding framework dependencies to core modules.
+
+## Django Integration
+
+Django integration flow:
+
+```text
+Django settings.AI_TOOLKIT
+        │
+        ▼
+get_django_ai_config()
+        │
+        ▼
+AIConfig
+        │
+        ▼
+get_ai_client() / get_async_ai_client()
+        │
+        ▼
+AIClient / AsyncAIClient
+```
+
+Responsibilities
+
+* Read the configured Django setting.
+* Validate that the setting is a mapping.
+* Reject unsupported fields.
+* Normalize the provider name.
+* Construct `AIConfig`.
+* Reuse `ConfigValidator`.
+* Create synchronous or asynchronous toolkit clients.
+
+Does NOT
+
+* Add Django models.
+* Add database migrations.
+* Add middleware.
+* Add views or API endpoints.
+* Add Django business logic.
+* Modify environment variables.
+* Import Django inside core toolkit modules.
+* Automatically create or cache global clients.
+
+Django remains an optional dependency.
+
+Applications explicitly import the integration:
+
+```python
+from ai.integrations.django import get_ai_client
+```
+
+Core users do not import Django when using:
+
+```python
+from ai.client import AIClient
+```
+
+Reason
+
+Framework-specific concerns remain at the application boundary while the core toolkit stays framework-independent.
 
 # Request Lifecycle
 

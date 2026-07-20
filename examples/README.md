@@ -243,6 +243,45 @@ Demonstrates:
 - inspecting multi-agent results
 
 
+## 19. Django Integration
+
+File:
+
+```text
+examples/19_django_integration.py
+```
+
+This example shows how an existing Django application can create a configured
+AIClient from the Django AI_TOOLKIT setting.
+
+The example analyzes a support ticket and returns a validated Pydantic model.
+
+Install Django integration support:
+```python
+pip install python-ai-toolkit[django]
+```
+Configure the Django project:
+```python
+AI_TOOLKIT = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+    "embedding_model": "text-embedding-3-small",
+    "max_retries": 1,
+}
+```
+Use the integration inside a Django service:
+```python
+from ai.integrations.django import get_ai_client
+
+client = get_ai_client()
+result = client.ask("Summarize this support ticket.")
+```
+The Django integration only creates the configured client. Views, models,
+Celery tasks, prompts, and application decisions remain the responsibility
+of the Django project.
+
+
 ## Running
 ```bash
 python -m examples.01_summarize_text

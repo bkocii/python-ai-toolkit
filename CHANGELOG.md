@@ -5,6 +5,23 @@ All notable changes to this project will be documented here.
 The format loosely follows Keep a Changelog.
 
 ---
+### Fixed
+
+* Python 3.11-compatible multiple-exception handling in `RequestExecutor`
+
+### Added
+* Explicit `AIConfig` injection for `AIClient`
+* Explicit `AIConfig` injection for `AsyncAIClient`
+* Optional Django integration
+* Django settings-to-`AIConfig` adapter
+* Synchronous Django client helper
+* Asynchronous Django client helper
+* Django support ticket analysis example
+
+### Improved
+* Framework integration architecture
+* Configuration flexibility for applications and tests
+* Django configuration without process-wide environment mutation
 
 ## [0.7.0] - In Development
 
