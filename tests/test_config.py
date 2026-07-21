@@ -1,6 +1,6 @@
 import pytest
 
-from ai.config import get_ai_config
+from ai.config import get_ai_config, get_ai_logging_config
 from ai.exceptions import AIConfigurationError
 
 
@@ -19,6 +19,9 @@ def clear_ai_env(monkeypatch):
         "OPENAI_EMBEDDING_MODEL",
         "AI_EMBEDDING_MODEL",
         "AI_EMBEDDING_DIMENSIONS",
+        "AI_LOG_LEVEL",
+        "AI_LOG_FILE_PATH",
+        "AI_FILE_LOGGING_ENABLED",
     ]
 
     for key in keys:
@@ -172,3 +175,141 @@ def test_get_ai_config_rejects_negative_embedding_dimensions(monkeypatch):
         match="Invalid AI_EMBEDDING_DIMENSIONS value '-1'",
     ):
         get_ai_config()
+
+
+def test_get_ai_logging_config_uses_defaults(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    config = get_ai_logging_config()
+
+    assert config.level == "INFO"
+    assert config.file_path == "logs/ai_toolkit.log"
+    assert config.file_logging_enabled is True
+
+
+def test_get_ai_logging_config_loads_environment_values(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_LOG_LEVEL", " warning ")
+    monkeypatch.setenv("AI_LOG_FILE_PATH", "custom/logs/toolkit.log")
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", "false")
+
+    config = get_ai_logging_config()
+
+    assert config.level == "WARNING"
+    assert config.file_path == "custom/logs/toolkit.log"
+    assert config.file_logging_enabled is False
+
+
+@pytest.mark.parametrize(
+    "raw_value",
+    [
+        "1",
+        "true",
+        "TRUE",
+        "yes",
+        "on",
+    ],
+)
+def test_get_ai_logging_config_accepts_enabled_values(
+    monkeypatch,
+    raw_value,
+):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", raw_value)
+
+    config = get_ai_logging_config()
+
+    assert config.file_logging_enabled is True
+
+
+@pytest.mark.parametrize(
+    "raw_value",
+    [
+        "0",
+        "false",
+        "FALSE",
+        "no",
+        "off",
+    ],
+)
+def test_get_ai_logging_config_accepts_disabled_values(
+    monkeypatch,
+    raw_value,
+):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", raw_value)
+
+    config = get_ai_logging_config()
+
+    assert config.file_logging_enabled is False
+
+
+def test_get_ai_logging_config_rejects_invalid_boolean(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", "maybe")
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="Invalid AI_FILE_LOGGING_ENABLED value 'maybe'",
+    ):
+        get_ai_logging_config()
+
+
+def test_get_ai_logging_config_rejects_invalid_log_level(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_LOG_LEVEL", "verbose")
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="Invalid AI_LOG_LEVEL value 'VERBOSE'",
+    ):
+        get_ai_logging_config()
+
+
+def test_get_ai_logging_config_rejects_empty_enabled_file_path(
+    monkeypatch,
+):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", "true")
+    monkeypatch.setenv("AI_LOG_FILE_PATH", "   ")
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="AI_LOG_FILE_PATH cannot be empty",
+    ):
+        get_ai_logging_config()
+
+
+def test_get_ai_logging_config_allows_empty_disabled_file_path(
+    monkeypatch,
+):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", "false")
+    monkeypatch.setenv("AI_LOG_FILE_PATH", "   ")
+
+    config = get_ai_logging_config()
+
+    assert config.file_logging_enabled is False
+    assert config.file_path == ""
+
+
+def test_get_ai_config_includes_logging_configuration(monkeypatch):
+    clear_ai_env(monkeypatch)
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("AI_LOG_LEVEL", "ERROR")
+    monkeypatch.setenv("AI_LOG_FILE_PATH", "runtime/ai.log")
+    monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", "false")
+
+    config = get_ai_config()
+
+    assert config.log_level == "ERROR"
+    assert config.log_file_path == "runtime/ai.log"
+    assert config.file_logging_enabled is False

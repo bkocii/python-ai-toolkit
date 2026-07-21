@@ -9,6 +9,16 @@ load_dotenv()
 DEFAULT_PROVIDER = "openai"
 DEFAULT_MODEL = "gpt-5.4-mini"
 DEFAULT_EMBEDDING_MODEL = "text-embedding-3-small"
+DEFAULT_LOG_LEVEL = "INFO"
+DEFAULT_LOG_FILE_PATH = "logs/ai_toolkit.log"
+DEFAULT_FILE_LOGGING_ENABLED = True
+
+
+@dataclass(frozen=True)
+class AILoggingConfig:
+    level: str = DEFAULT_LOG_LEVEL
+    file_path: str = DEFAULT_LOG_FILE_PATH
+    file_logging_enabled: bool = DEFAULT_FILE_LOGGING_ENABLED
 
 
 @dataclass(frozen=True)
@@ -21,6 +31,9 @@ class AIConfig:
     input_cost_per_1m_tokens: str | None = None
     output_cost_per_1m_tokens: str | None = None
     max_retries: int = 1
+    log_level: str = DEFAULT_LOG_LEVEL
+    log_file_path: str = DEFAULT_LOG_FILE_PATH
+    file_logging_enabled: bool = DEFAULT_FILE_LOGGING_ENABLED
 
 
 def _normalize_provider(provider: str | None) -> str:
@@ -72,6 +85,7 @@ def _get_max_retries() -> int:
 def get_ai_config() -> AIConfig:
     from ai.config_validator import ConfigValidator
 
+    logging_config = get_ai_logging_config()
     provider = _normalize_provider(os.getenv("AI_PROVIDER"))
 
     config = AIConfig(
@@ -83,6 +97,9 @@ def get_ai_config() -> AIConfig:
         input_cost_per_1m_tokens=os.getenv("AI_INPUT_COST_PER_1M_TOKENS"),
         output_cost_per_1m_tokens=os.getenv("AI_OUTPUT_COST_PER_1M_TOKENS"),
         max_retries=_get_max_retries(),
+        log_level=logging_config.level,
+        log_file_path=logging_config.file_path,
+        file_logging_enabled=logging_config.file_logging_enabled,
     )
 
     ConfigValidator.validate(config)
@@ -124,3 +141,50 @@ def _get_embedding_dimensions() -> int | None:
         )
 
     return dimensions
+
+
+def _get_boolean_env(
+    name: str,
+    default: bool,
+) -> bool:
+    raw_value = os.getenv(name)
+
+    if raw_value is None:
+        return default
+
+    normalized_value = raw_value.strip().lower()
+
+    if normalized_value in {"1", "true", "yes", "on"}:
+        return True
+
+    if normalized_value in {"0", "false", "no", "off"}:
+        return False
+
+    raise AIConfigurationError(
+        f"Invalid {name} value '{raw_value}'. " f"Set {name} to true or false."
+    )
+
+
+def get_ai_logging_config() -> AILoggingConfig:
+    from ai.config_validator import ConfigValidator
+
+    config = AILoggingConfig(
+        level=os.getenv(
+            "AI_LOG_LEVEL",
+            DEFAULT_LOG_LEVEL,
+        )
+        .strip()
+        .upper(),
+        file_path=os.getenv(
+            "AI_LOG_FILE_PATH",
+            DEFAULT_LOG_FILE_PATH,
+        ).strip(),
+        file_logging_enabled=_get_boolean_env(
+            "AI_FILE_LOGGING_ENABLED",
+            DEFAULT_FILE_LOGGING_ENABLED,
+        ),
+    )
+
+    ConfigValidator.validate_logging(config)
+
+    return config

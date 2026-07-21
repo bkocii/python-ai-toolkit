@@ -227,3 +227,59 @@ def test_client_helpers_return_expected_client_types(monkeypatch):
 
     assert isinstance(sync_client, AIClient)
     assert isinstance(async_client, AsyncAIClient)
+
+
+def test_get_django_ai_config_loads_logging_configuration(
+    monkeypatch,
+):
+    patch_django_settings(
+        monkeypatch,
+        AI_TOOLKIT={
+            "provider": "openai",
+            "api_key": "test-key",
+            "log_level": " warning ",
+            "log_file_path": " custom/logs/toolkit.log ",
+            "file_logging_enabled": False,
+        },
+    )
+
+    config = get_django_ai_config()
+
+    assert config.log_level == "WARNING"
+    assert config.log_file_path == "custom/logs/toolkit.log"
+    assert config.file_logging_enabled is False
+
+
+def test_get_django_ai_config_uses_logging_defaults(
+    monkeypatch,
+):
+    patch_django_settings(
+        monkeypatch,
+        AI_TOOLKIT={
+            "api_key": "test-key",
+        },
+    )
+
+    config = get_django_ai_config()
+
+    assert config.log_level == "INFO"
+    assert config.log_file_path == "logs/ai_toolkit.log"
+    assert config.file_logging_enabled is True
+
+
+def test_get_django_ai_config_rejects_non_boolean_file_logging(
+    monkeypatch,
+):
+    patch_django_settings(
+        monkeypatch,
+        AI_TOOLKIT={
+            "api_key": "test-key",
+            "file_logging_enabled": "false",
+        },
+    )
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="must be true or false",
+    ):
+        get_django_ai_config()

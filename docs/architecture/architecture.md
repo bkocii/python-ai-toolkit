@@ -1686,6 +1686,105 @@ Known future improvements
 - Test-safe logging configuration
 - Optional debug logging
 
+## Configurable Logging Architecture
+
+Toolkit logging is configured through the same provider-independent configuration boundary used by the clients.
+
+Flow:
+
+```text
+Environment variables or explicit AIConfig
+        │
+        ▼
+AILoggingConfig / AIConfig
+        │
+        ▼
+ConfigValidator
+        │
+        ▼
+get_ai_logger()
+        │
+        ▼
+AIClient / AsyncAIClient
+        │
+        ▼
+RequestExecutor / AsyncRequestExecutor
+```
+
+Supported environment variables:
+
+```env
+AI_LOG_LEVEL=INFO
+AI_LOG_FILE_PATH=logs/ai_toolkit.log
+AI_FILE_LOGGING_ENABLED=true
+```
+
+Responsibilities
+
+* Validate the configured log level.
+* Validate whether file logging is enabled.
+* Validate the file path when file logging is enabled.
+* Create toolkit-managed file handlers.
+* Preserve handlers owned by applications.
+* Prevent duplicate toolkit-managed handlers.
+* Inject the configured logger into synchronous and asynchronous executors.
+* Allow tests and benchmarks to disable file logging.
+* Prevent duplicate propagation to the root logger.
+
+Toolkit-managed handlers are identified separately from application-managed handlers.
+
+Reconfiguring logging may replace handlers created by the toolkit, but it must not remove handlers added by the embedding application.
+
+When file logging is enabled:
+
+```text
+Configured file path
+        │
+        ▼
+Create parent directory
+        │
+        ▼
+Create FileHandler
+        │
+        ▼
+Write request metadata
+```
+
+When file logging is disabled:
+
+```text
+File logging disabled
+        │
+        ▼
+Do not create directory
+        │
+        ▼
+Do not create log file
+        │
+        ▼
+Preserve application handlers
+        │
+        ▼
+Use NullHandler only when no handler exists
+```
+
+The logger is process-wide under the name:
+
+```text
+ai_toolkit
+```
+
+The most recently applied toolkit logging configuration controls the toolkit-managed handler for that process.
+
+Prompts and provider responses remain excluded from logs.
+
+Reason
+
+File-system logging can distort request benchmarks and may fail in tests, continuous integration, packaged applications, or read-only environments.
+
+Logger injection allows the request executors to remain reusable while client construction continues to own configuration resolution.
+
+
 ---
 
 # Current Technical Debt and Deferred Work

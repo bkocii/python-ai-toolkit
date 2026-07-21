@@ -10,6 +10,7 @@ from ai.tools import ToolDefinition, ToolResponse
 from ai.structured import build_structured_prompt, parse_structured_response
 from typing import Any, Iterator
 from ai.retry import build_json_repair_prompt
+import logging
 
 
 class RequestExecutor:
@@ -27,10 +28,16 @@ class RequestExecutor:
     This keeps AIClient small and focused on public API.
     """
 
-    def __init__(self, provider, model: str, max_retries: int = 1):
+    def __init__(
+        self,
+        provider,
+        model: str,
+        max_retries: int = 1,
+        logger: logging.Logger | None = None,
+    ):
         self.provider = provider
         self.model = model
-        self.logger = get_ai_logger()
+        self.logger = logger if logger is not None else get_ai_logger()
         self.max_retries = max_retries
 
     def _log_success(

@@ -1,5 +1,5 @@
 from typing import TypeVar, overload
-
+from ai.logger import get_ai_logger
 from pydantic import BaseModel
 
 from ai.async_executor import AsyncRequestExecutor
@@ -24,10 +24,17 @@ class AsyncAIClient:
 
         self.provider = ProviderFactory.create(resolved_config)
 
+        logger = get_ai_logger(
+            level=resolved_config.log_level,
+            file_path=resolved_config.log_file_path,
+            file_logging_enabled=resolved_config.file_logging_enabled,
+        )
+
         self.executor = AsyncRequestExecutor(
             provider=self.provider,
             model=self.model,
             max_retries=resolved_config.max_retries,
+            logger=logger,
         )
 
     @overload

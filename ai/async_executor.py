@@ -1,7 +1,7 @@
 from time import perf_counter
 from typing import Any
 from uuid import uuid4
-
+import logging
 from pydantic import BaseModel
 
 from ai.structured import build_structured_prompt, parse_structured_response
@@ -19,10 +19,16 @@ class AsyncRequestExecutor:
     This mirrors RequestExecutor, but calls async provider methods.
     """
 
-    def __init__(self, provider, model: str, max_retries: int = 1):
+    def __init__(
+        self,
+        provider,
+        model: str,
+        max_retries: int = 1,
+        logger: logging.Logger | None = None,
+    ):
         self.provider = provider
         self.model = model
-        self.logger = get_ai_logger()
+        self.logger = logger if logger is not None else get_ai_logger()
         self.max_retries = max_retries
 
     def _log_success(
@@ -124,7 +130,7 @@ class AsyncRequestExecutor:
                 try:
                     parsed = parse_structured_response(raw_response, response_type)
                     break
-                except AIJSONParseError, AISchemaValidationError:
+                except (AIJSONParseError, AISchemaValidationError):
                     if retries_used >= self.max_retries:
                         raise
 

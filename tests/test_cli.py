@@ -96,6 +96,9 @@ def test_config_show_prints_masked_configuration(monkeypatch, capsys):
         input_cost_per_1m_tokens="1.25",
         output_cost_per_1m_tokens=None,
         max_retries=3,
+        log_level="WARNING",
+        log_file_path="custom/toolkit.log",
+        file_logging_enabled=False,
     )
 
     monkeypatch.setattr(
@@ -124,6 +127,9 @@ def test_config_show_prints_masked_configuration(monkeypatch, capsys):
     assert "Maximum retries: 3" in output.out
     assert "Input cost per 1M tokens: 1.25" in output.out
     assert "Output cost per 1M tokens: not configured" in output.out
+    assert "Log level: WARNING" in output.out
+    assert "Log file path: custom/toolkit.log" in output.out
+    assert "File logging enabled: no" in output.out
 
 
 def test_config_show_formats_default_optional_values(monkeypatch, capsys):
@@ -147,6 +153,9 @@ def test_config_show_formats_default_optional_values(monkeypatch, capsys):
     assert "Embedding dimensions: default" in output.out
     assert "Input cost per 1M tokens: not configured" in output.out
     assert "Output cost per 1M tokens: not configured" in output.out
+    assert "Log level: INFO" in output.out
+    assert "Log file path: logs/ai_toolkit.log" in output.out
+    assert "File logging enabled: yes" in output.out
 
 
 def test_config_validate_prints_success(monkeypatch, capsys):

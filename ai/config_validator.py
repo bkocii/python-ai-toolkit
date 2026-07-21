@@ -1,5 +1,5 @@
-from ai.config import AIConfig
 from ai.exceptions import AIConfigurationError
+from ai.config import AIConfig, AILoggingConfig
 
 
 class ConfigValidator:
@@ -9,6 +9,14 @@ class ConfigValidator:
     Provider registration and availability are validated separately
     by ProviderFactory.
     """
+
+    VALID_LOG_LEVELS = {
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL",
+    }
 
     @staticmethod
     def validate(config: AIConfig) -> None:
@@ -49,4 +57,37 @@ class ConfigValidator:
             raise AIConfigurationError(
                 f"Invalid AI_EMBEDDING_DIMENSIONS value '{config.embedding_dimensions}'. "
                 "Set AI_EMBEDDING_DIMENSIONS to a positive whole number."
+            )
+
+        if config.embedding_dimensions is not None and config.embedding_dimensions <= 0:
+            raise AIConfigurationError(
+                f"Invalid AI_EMBEDDING_DIMENSIONS value '{config.embedding_dimensions}'. "
+                "Set AI_EMBEDDING_DIMENSIONS to a positive whole number."
+            )
+
+        ConfigValidator.validate_logging(
+            AILoggingConfig(
+                level=config.log_level,
+                file_path=config.log_file_path,
+                file_logging_enabled=config.file_logging_enabled,
+            )
+        )
+
+    @staticmethod
+    def validate_logging(config: AILoggingConfig) -> None:
+        if not isinstance(config.file_logging_enabled, bool):
+            raise AIConfigurationError(
+                "AI file logging enabled value must be true or false."
+            )
+        if config.level not in ConfigValidator.VALID_LOG_LEVELS:
+            valid_levels = ", ".join(sorted(ConfigValidator.VALID_LOG_LEVELS))
+
+            raise AIConfigurationError(
+                f"Invalid AI_LOG_LEVEL value '{config.level}'. "
+                f"Choose one of: {valid_levels}."
+            )
+
+        if config.file_logging_enabled and not config.file_path.strip():
+            raise AIConfigurationError(
+                "AI_LOG_FILE_PATH cannot be empty when file logging is enabled."
             )

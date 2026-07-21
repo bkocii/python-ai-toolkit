@@ -2093,6 +2093,147 @@ except AIConfigurationError as exc:
     print(f"Invalid AI configuration: {exc}")
 ```
 
+## Logging Configuration
+
+The toolkit logs request metadata by default.
+
+Logged metadata may include:
+
+* request ID
+* model
+* request duration
+* retry count
+* token usage
+* estimated cost
+* success or failure status
+
+Prompts and provider responses are not logged because they may contain confidential application data.
+
+### Default logging configuration
+
+```env
+AI_LOG_LEVEL=INFO
+AI_LOG_FILE_PATH=logs/ai_toolkit.log
+AI_FILE_LOGGING_ENABLED=true
+```
+
+### Log level
+
+Set the minimum recorded level:
+
+```env
+AI_LOG_LEVEL=WARNING
+```
+
+Supported values:
+
+```text
+DEBUG
+INFO
+WARNING
+ERROR
+CRITICAL
+```
+
+Invalid log levels raise `AIConfigurationError`.
+
+### Custom log file
+
+```env
+AI_LOG_FILE_PATH=runtime/logs/ai.log
+```
+
+The toolkit creates the parent directory when file logging is enabled.
+
+### Disable toolkit-managed file logging
+
+```env
+AI_FILE_LOGGING_ENABLED=false
+```
+
+When file logging is disabled:
+
+* the toolkit does not create the configured log directory,
+* the toolkit does not create or open a log file,
+* application-provided logging handlers remain available,
+* request execution continues normally.
+
+Disabling toolkit-managed file logging does not remove handlers added by the application.
+
+This is recommended for:
+
+* unit tests,
+* benchmarks,
+* continuous integration,
+* read-only environments,
+* applications that configure their own logging handlers.
+
+### Explicit configuration
+
+Logging can also be configured through `AIConfig`:
+
+```python
+from ai.client import AIClient
+from ai.config import AIConfig
+
+
+config = AIConfig(
+    provider="openai",
+    api_key="...",
+    model="gpt-5.4-mini",
+    log_level="WARNING",
+    log_file_path="runtime/ai.log",
+    file_logging_enabled=False,
+)
+
+client = AIClient(config=config)
+```
+
+Do not place real API keys directly in source code. The example uses a placeholder only.
+
+### Django configuration
+
+Django applications may configure logging inside `AI_TOOLKIT`:
+
+```python
+AI_TOOLKIT = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+    "log_level": "WARNING",
+    "log_file_path": "runtime/ai.log",
+    "file_logging_enabled": False,
+}
+```
+
+The `file_logging_enabled` value must be a Python Boolean:
+
+```python
+False
+```
+
+Do not use the string:
+
+```python
+"false"
+```
+
+### Configuration CLI
+
+Inspect the resolved values:
+
+```bash
+ai-toolkit config show
+```
+
+Example logging output:
+
+```text
+Log level: WARNING
+Log file path: runtime/ai.log
+File logging enabled: no
+```
+
 
 ## Why this documentation matters
 

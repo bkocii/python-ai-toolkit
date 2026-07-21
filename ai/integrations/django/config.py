@@ -18,6 +18,9 @@ _ALLOWED_CONFIG_FIELDS = {
     "input_cost_per_1m_tokens",
     "output_cost_per_1m_tokens",
     "max_retries",
+    "log_level",
+    "log_file_path",
+    "file_logging_enabled",
 }
 
 
@@ -70,6 +73,16 @@ def get_django_ai_config(
 
     if isinstance(provider, str):
         config_values["provider"] = provider.strip().lower()
+
+    log_level = config_values.get("log_level")
+
+    if isinstance(log_level, str):
+        config_values["log_level"] = log_level.strip().upper()
+
+    log_file_path = config_values.get("log_file_path")
+
+    if isinstance(log_file_path, str):
+        config_values["log_file_path"] = log_file_path.strip()
 
     try:
         config = AIConfig(**config_values)

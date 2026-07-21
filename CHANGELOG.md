@@ -29,6 +29,11 @@ The format loosely follows Keep a Changelog.
 * CLI subcommand-handler architecture
 * Standard CLI exit codes
 * Clean command-line handling for expected toolkit errors
+* Configurable toolkit log level
+* Configurable toolkit log file path
+* Option to disable toolkit-managed file logging
+* Logger injection for synchronous and asynchronous request executors
+* Benchmark-safe and test-safe logging behavior
 
 
 ### Improved
@@ -45,6 +50,10 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between structural validation and live credential verification
 * Command-line secret-handling safeguards
 * Reuse of the existing configuration loader and validator from the CLI
+* Logging behavior in tests, benchmarks, and continuous integration
+* Preservation of application-owned logging handlers
+* Synchronous and asynchronous logging consistency
+* Configuration CLI output for logging settings
 
 
 
