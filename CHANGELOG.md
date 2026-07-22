@@ -46,7 +46,8 @@ The format loosely follows Keep a Changelog.
 * Structured JSON response parsing and Pydantic validation benchmark 
 * Structured-response retry and JSON repair lifecycle benchmark 
 * In-memory vector similarity search benchmark 
-* Metadata-filtered vector search benchmark
+* Metadata-filtered vector search benchmark 
+* Retrieval-Augmented Generation orchestration benchmark
 
 
 ### Improved
@@ -76,6 +77,7 @@ The format loosely follows Keep a Changelog.
 * Performance visibility for structured-response parsing independent of provider and request lifecycle overhead 
 * Performance visibility for response repair, retry handling, and token-usage aggregation 
 * Performance visibility for cosine similarity ranking and metadata filtering
+* Performance visibility for context formatting, grounded prompt construction, and RAG response assembly
 
 
 ## [0.7.0] - In Development

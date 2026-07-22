@@ -1629,6 +1629,462 @@ Results vary based on:
 
 Use benchmark results for comparison under similar conditions rather than machine-specific pass or fail rules.
 
+## RAG Orchestration Benchmark
+
+The RAG orchestration benchmark measures the internal coordination performed by `RAGPipeline`.
+
+Benchmark file:
+
+```text
+benchmarks/test_rag_orchestration.py
+```
+
+RAG means Retrieval-Augmented Generation.
+
+The pipeline:
+
+1. retrieves relevant context,
+2. formats that context,
+3. builds a grounded prompt,
+4. asks the AI client for an answer,
+5. returns the answer together with the contexts used.
+
+### Benchmark Scope
+
+The benchmark measures the orchestration layer rather than external retrieval or AI provider performance.
+
+The measured execution path is:
+
+```text
+RAGPipeline.ask()
+        │
+        ▼
+Validate question
+        │
+        ▼
+Call deterministic fake retriever
+        │
+        ▼
+Receive five prebuilt contexts
+        │
+        ▼
+Format retrieved context
+        │
+        ▼
+Build grounded RAG prompt
+        │
+        ▼
+Include additional instructions
+        │
+        ▼
+Call deterministic fake AI client
+        │
+        ▼
+Receive prebuilt AIResult
+        │
+        ▼
+Construct RAGResponse
+```
+
+### What It Measures
+
+Measured operations include:
+
+* question validation
+* retriever method invocation
+* retrieved-context formatting
+* context numbering and text assembly
+* grounded prompt construction
+* additional-instruction formatting
+* AI client method invocation
+* extraction of AI result metadata
+* `RAGResponse` construction
+* Pydantic validation of the response object
+
+### What It Excludes
+
+The benchmark intentionally excludes:
+
+* embedding generation
+* vector similarity search
+* database retrieval
+* external vector databases
+* provider factory construction
+* real AI provider requests
+* model execution
+* API authentication
+* network latency
+* retry and repair execution
+* toolkit-managed file logging
+* pipeline construction
+* fake retriever construction
+* fake AI client construction
+* context construction
+* AI result construction
+
+Vector search performance is measured separately by the vector search benchmarks.
+
+Provider-independent request execution is measured separately by the plain request lifecycle benchmark.
+
+### Retrieved Contexts
+
+The benchmark uses five deterministic contexts:
+
+```text
+django
+postgresql
+redis
+celery
+nginx
+```
+
+Each context contains:
+
+* a stable ID
+* deterministic text
+* a deterministic relevance score
+* source metadata
+* topic metadata
+
+Example:
+
+```python
+RetrievedContext(
+    id="redis",
+    text="Redis can be used for caching and messaging.",
+    score=0.91,
+    metadata={
+        "source": "documentation",
+        "topic": "cache",
+    },
+)
+```
+
+The contexts are created before benchmark timing begins.
+
+### Fake Retriever
+
+The benchmark retriever returns the prebuilt contexts without performing retrieval work:
+
+```python
+class BenchmarkRetriever:
+    def __init__(
+        self,
+        contexts: list[RetrievedContext],
+    ):
+        self.contexts = contexts
+
+    def retrieve(
+        self,
+        query: str,
+        limit: int = 5,
+        metadata_filter: dict[str, str] | None = None,
+    ) -> list[RetrievedContext]:
+        return self.contexts
+```
+
+The fake retriever performs no:
+
+* embedding generation
+* vector search
+* metadata filtering work
+* network access
+* database access
+* file access
+
+The method call remains part of the orchestration benchmark, but actual retrieval performance does not.
+
+### Fake AI Client
+
+The benchmark AI client returns a prebuilt `AIResult`:
+
+```python
+class BenchmarkAIClient:
+    def __init__(
+        self,
+        result: AIResult,
+    ):
+        self.result = result
+
+    def ask(
+        self,
+        _prompt: str,
+    ) -> AIResult:
+        return self.result
+```
+
+The fake client performs no:
+
+* provider request
+* model execution
+* API authentication
+* retry handling
+* network access
+* token calculation
+* logging
+
+The RAG pipeline still builds and passes the complete prompt to the client method.
+
+### Pipeline Fixture
+
+The pipeline is created before benchmark timing:
+
+```python
+@pytest.fixture(scope="module")
+def rag_orchestration_pipeline() -> RAGPipeline:
+    contexts = [
+        RetrievedContext(
+            id="django",
+            text="Django is a Python web framework.",
+            score=0.99,
+            metadata={
+                "source": "documentation",
+                "topic": "web",
+            },
+        ),
+        RetrievedContext(
+            id="postgresql",
+            text="PostgreSQL is a relational database.",
+            score=0.95,
+            metadata={
+                "source": "documentation",
+                "topic": "database",
+            },
+        ),
+        RetrievedContext(
+            id="redis",
+            text="Redis can be used for caching and messaging.",
+            score=0.91,
+            metadata={
+                "source": "documentation",
+                "topic": "cache",
+            },
+        ),
+        RetrievedContext(
+            id="celery",
+            text="Celery processes background tasks.",
+            score=0.87,
+            metadata={
+                "source": "documentation",
+                "topic": "tasks",
+            },
+        ),
+        RetrievedContext(
+            id="nginx",
+            text="Nginx can proxy requests to a Python application.",
+            score=0.82,
+            metadata={
+                "source": "documentation",
+                "topic": "deployment",
+            },
+        ),
+    ]
+
+    ai_result = AIResult(
+        data=(
+            "Django can provide the web application, PostgreSQL can "
+            "store relational data, Redis can support caching and "
+            "messaging, Celery can process background tasks, and "
+            "Nginx can proxy incoming requests."
+        ),
+        model="benchmark-model",
+        raw_response=(
+            "Django can provide the web application, PostgreSQL can "
+            "store relational data, Redis can support caching and "
+            "messaging, Celery can process background tasks, and "
+            "Nginx can proxy incoming requests."
+        ),
+        original_raw_response=(
+            "Django can provide the web application, PostgreSQL can "
+            "store relational data, Redis can support caching and "
+            "messaging, Celery can process background tasks, and "
+            "Nginx can proxy incoming requests."
+        ),
+        request_id="benchmark-request",
+    )
+
+    return RAGPipeline(
+        ai_client=BenchmarkAIClient(ai_result),
+        retriever=BenchmarkRetriever(contexts),
+    )
+```
+
+The following setup work is excluded from timing:
+
+* context construction
+* `AIResult` construction
+* fake retriever construction
+* fake AI client construction
+* `RAGPipeline` construction
+
+### Benchmark Implementation
+
+```python
+def test_rag_orchestration(
+    benchmark,
+    rag_orchestration_pipeline,
+):
+    response = benchmark(
+        rag_orchestration_pipeline.ask,
+        question=QUESTION,
+        limit=RESULT_LIMIT,
+        metadata_filter={"source": "documentation"},
+        instructions=INSTRUCTIONS,
+    )
+
+    assert response.answer.startswith(
+        "Django can provide the web application"
+    )
+    assert len(response.contexts) == RESULT_LIMIT
+    assert [context.id for context in response.contexts] == [
+        "django",
+        "postgresql",
+        "redis",
+        "celery",
+        "nginx",
+    ]
+    assert response.model == "benchmark-model"
+    assert response.request_id == "benchmark-request"
+    assert response.raw_response == response.answer
+```
+
+### Grounded Prompt Construction
+
+The pipeline builds a prompt containing:
+
+* grounding rules
+* all retrieved contexts
+* the user question
+* additional instructions
+
+The benchmark uses:
+
+```text
+Question:
+Which technologies can support a Python web application?
+
+Additional instructions:
+Answer in one concise paragraph.
+```
+
+Prompt construction is included in the measured operation because it is part of RAG orchestration.
+
+### Metadata Filter
+
+The benchmark calls the pipeline with:
+
+```python
+metadata_filter={
+    "source": "documentation",
+}
+```
+
+The RAG pipeline passes this filter to the retriever.
+
+The fake retriever does not perform filtering because metadata-filter performance belongs to the vector-search benchmark.
+
+This benchmark measures only the orchestration required to pass the filter through the pipeline.
+
+### Correctness Verification
+
+After timing, the benchmark verifies:
+
+* the expected answer is returned
+* exactly five contexts are preserved
+* contexts remain in the expected order
+* the correct model is recorded
+* the request ID is preserved
+* the raw response matches the returned answer
+
+These assertions ensure that performance measurements cannot hide broken RAG response assembly.
+
+Detailed prompt-content behavior remains covered by normal unit tests in:
+
+```text
+tests/test_rag.py
+```
+
+### Run the Benchmark
+
+Run only the RAG orchestration benchmark:
+
+```bash
+python -m pytest benchmarks/test_rag_orchestration.py --benchmark-only
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m pytest benchmarks\test_rag_orchestration.py --benchmark-only
+```
+
+### Debug Without Timing Statistics
+
+```bash
+python -m pytest benchmarks/test_rag_orchestration.py --benchmark-disable -v
+```
+
+Use this mode when debugging:
+
+* fake retriever behavior
+* context formatting
+* prompt construction
+* fake AI client behavior
+* `RAGResponse` construction
+* output assertions
+
+### Run All Benchmarks
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After BENCH-007, the benchmark table should contain:
+
+```text
+test_benchmark_tooling_is_available
+test_plain_request_lifecycle
+test_structured_response_parsing
+test_structured_response_retry_and_repair
+test_vector_similarity_search
+test_vector_similarity_search_with_metadata_filter
+test_rag_orchestration
+```
+
+Infrastructure-only tests remain skipped when `--benchmark-only` is used.
+
+### Benchmark Interpretation
+
+The benchmark establishes a Version 1.0 performance baseline for RAG orchestration.
+
+It can help detect regressions caused by changes to:
+
+* retrieved-context formatting
+* prompt construction
+* instruction handling
+* metadata-filter forwarding
+* AI result processing
+* `RAGResponse` construction
+
+It does not indicate how fast a complete production RAG request will be.
+
+Production speed will also depend on:
+
+* embedding provider latency
+* vector-store performance
+* document count
+* network latency
+* model response time
+* provider availability
+
+### Timing Policy
+
+No fixed duration threshold is enforced.
+
+Use results to compare similar runs on the same or comparable environments.
+
+Do not compare unrelated machines as if their benchmark values were directly equivalent.
+
 
 ## Save Local Benchmark Results
 
