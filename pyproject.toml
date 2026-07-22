@@ -37,6 +37,11 @@ dev = [
     "httpx2",
 ]
 
+benchmark = [
+    "pytest",
+    "pytest-benchmark",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["ai*"]
@@ -51,3 +56,8 @@ line-length = 88
 [tool.black]
 line-length = 88
 target-version = ["py311"]
+
+[tool.pytest-benchmark]
+disable_gc = false
+min_rounds = 5
+warmup = false

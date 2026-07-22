@@ -34,6 +34,11 @@ The format loosely follows Keep a Changelog.
 * Option to disable toolkit-managed file logging
 * Logger injection for synchronous and asynchronous request executors
 * Benchmark-safe and test-safe logging behavior
+* Isolated benchmark suite powered by pytest-benchmark
+* Separate benchmark optional dependency group
+* Benchmark smoke test
+* Benchmark-specific configuration and fixtures
+* Benchmark development documentation
 
 
 ### Improved
@@ -54,6 +59,10 @@ The format loosely follows Keep a Changelog.
 * Preservation of application-owned logging handlers
 * Synchronous and asynchronous logging consistency
 * Configuration CLI output for logging settings
+* Separation between correctness tests and performance benchmarks
+* Benchmark reproducibility through deterministic execution rules
+* Benchmark safety by disabling toolkit-managed file logging
+
 
 
 
