@@ -617,7 +617,6 @@ Timing varies across:
 
 The benchmark is intended for profiling and comparison, not machine-specific pass or fail thresholds.
 
-
 ## Benchmark Results
 
 `pytest-benchmark` may store local result files under:
@@ -647,6 +646,247 @@ The generated results directory contains machine-specific measurements:
 Generated benchmark results are ignored by Git because measurements from different machines are not directly comparable.
 
 ---
+
+## Structured Response Parsing Benchmark
+
+The structured response parsing benchmark measures conversion of a valid JSON response into a validated Pydantic model.
+
+Benchmark file:
+
+```text
+benchmarks/test_structured_parsing.py
+```
+
+### What It Measures
+
+The benchmark measures:
+
+* JSON decoding
+* Pydantic model validation
+* Python model construction
+* primitive field validation
+* list-field validation
+
+The measured path is:
+
+```text
+Valid JSON response
+        │
+        ▼
+parse_structured_response()
+        │
+        ▼
+Decode JSON object
+        │
+        ▼
+Validate fields with Pydantic
+        │
+        ▼
+Construct BenchmarkContact
+```
+
+### What It Excludes
+
+The benchmark intentionally excludes:
+
+* structured prompt construction
+* AI provider calls
+* network access
+* model execution
+* API credentials
+* response repair
+* retry execution
+* request ID generation
+* request duration calculation
+* token-cost estimation
+* logging
+* `AIResult` construction
+
+These operations are measured separately so the result represents structured parsing and validation rather than the complete request lifecycle.
+
+### Benchmark Schema
+
+The benchmark validates the response against:
+
+```python
+class BenchmarkContact(BaseModel):
+    name: str
+    email: str
+    age: int
+    active: bool
+    tags: list[str]
+```
+
+This schema includes:
+
+* string fields
+* an integer field
+* a Boolean field
+* a list of strings
+
+It provides a small but representative structured response without adding unrelated model complexity.
+
+### Benchmark Input
+
+The benchmark uses a deterministic valid JSON response:
+
+```json
+{
+    "name": "Benchmark User",
+    "email": "benchmark@example.com",
+    "age": 35,
+    "active": true,
+    "tags": [
+        "python",
+        "automation",
+        "ai"
+    ]
+}
+```
+
+The same response and schema are used for every benchmark iteration.
+
+No random data or provider-generated content is involved.
+
+### Benchmark Implementation
+
+```python
+from pydantic import BaseModel
+
+from ai.structured import parse_structured_response
+
+
+class BenchmarkContact(BaseModel):
+    name: str
+    email: str
+    age: int
+    active: bool
+    tags: list[str]
+
+
+STRUCTURED_RESPONSE = """
+{
+    "name": "Benchmark User",
+    "email": "benchmark@example.com",
+    "age": 35,
+    "active": true,
+    "tags": [
+        "python",
+        "automation",
+        "ai"
+    ]
+}
+""".strip()
+
+
+def test_structured_response_parsing(benchmark):
+    result = benchmark(
+        parse_structured_response,
+        STRUCTURED_RESPONSE,
+        BenchmarkContact,
+    )
+
+    assert isinstance(result, BenchmarkContact)
+    assert result.name == "Benchmark User"
+    assert result.email == "benchmark@example.com"
+    assert result.age == 35
+    assert result.active is True
+    assert result.tags == [
+        "python",
+        "automation",
+        "ai",
+    ]
+```
+
+The schema class and JSON response are defined before timing begins.
+
+The measured operation is only the call to `parse_structured_response()`.
+
+### Run the Benchmark
+
+Run only the structured parsing benchmark:
+
+```bash
+python -m pytest benchmarks/test_structured_parsing.py --benchmark-only
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m pytest benchmarks\test_structured_parsing.py --benchmark-only
+```
+
+### Debug Without Timing Statistics
+
+```bash
+python -m pytest benchmarks/test_structured_parsing.py --benchmark-disable -v
+```
+
+This runs the benchmark as a normal correctness test without collecting timing statistics.
+
+Use this mode when debugging:
+
+* JSON input
+* Pydantic schema definitions
+* parsing behavior
+* validation behavior
+* correctness assertions
+
+### Run All Benchmarks
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After BENCH-004, the measured benchmark table should contain:
+
+```text
+test_benchmark_tooling_is_available
+test_plain_request_lifecycle
+test_structured_response_parsing
+```
+
+Infrastructure tests that do not use the benchmark fixture remain skipped when `--benchmark-only` is used.
+
+### Correctness Verification
+
+After timing, the benchmark verifies:
+
+* the result is a `BenchmarkContact`
+* string fields contain the expected values
+* the integer field is correct
+* the Boolean field is correct
+* the list field contains the expected values
+
+These assertions ensure that performance results cannot hide parsing or validation errors.
+
+### Benchmark Scope
+
+This benchmark represents the successful structured-response path.
+
+It does not measure invalid JSON, schema validation failures, or repair retries.
+
+Invalid-response repair and retry overhead are measured separately by:
+
+```text
+BENCH-005 — Retry and Repair Benchmark
+```
+
+### Timing Policy
+
+The benchmark does not enforce a fixed maximum duration.
+
+Results may vary depending on:
+
+* Python version
+* Pydantic version
+* processor
+* operating system
+* virtual machine environment
+* continuous integration hardware
+* background system activity
+
+Results should be used for profiling and comparisons under similar conditions, not machine-specific pass or fail thresholds.
 
 ## Save Local Benchmark Results
 

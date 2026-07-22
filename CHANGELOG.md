@@ -42,7 +42,8 @@ The format loosely follows Keep a Changelog.
 * Deterministic synchronous and asynchronous benchmark providers 
 * Sequential fake provider for retry and response-repair benchmarks 
 * Shared benchmark token-usage and provider-response fixtures 
-* Isolated no-output logger for direct executor benchmarks
+* Isolated no-output logger for direct executor benchmarks 
+* Structured JSON response parsing and Pydantic validation benchmark
 
 
 ### Improved
@@ -69,6 +70,7 @@ The format loosely follows Keep a Changelog.
 * Benchmark independence from network access and provider credentials 
 * Detection of unexpected additional provider calls in retry benchmarks 
 * Separation between benchmark infrastructure correctness tests and timing measurements
+* Performance visibility for structured-response parsing independent of provider and request lifecycle overhead
 
 
 
