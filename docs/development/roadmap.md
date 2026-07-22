@@ -248,7 +248,7 @@ Create deterministic benchmarks that measure toolkit overhead without depending 
 * [x] BENCH-005 Benchmark structured-output retry repair
 * [x] BENCH-006 Benchmark in-memory vector search
 * [x] BENCH-007 Benchmark RAG pipeline orchestration
-* [ ] BENCH-008 Benchmark workflow execution overhead
+* [x] BENCH-008 Benchmark workflow execution overhead
 * [ ] BENCH-009 Document benchmark commands and comparison workflow
 
 ### Benchmark Rules

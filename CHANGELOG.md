@@ -48,6 +48,8 @@ The format loosely follows Keep a Changelog.
 * In-memory vector similarity search benchmark 
 * Metadata-filtered vector search benchmark 
 * Retrieval-Augmented Generation orchestration benchmark
+* Single-step workflow execution benchmark 
+* Five-step sequential workflow and state-propagation benchmark
 
 
 ### Improved
@@ -78,6 +80,7 @@ The format loosely follows Keep a Changelog.
 * Performance visibility for response repair, retry handling, and token-usage aggregation 
 * Performance visibility for cosine similarity ranking and metadata filtering
 * Performance visibility for context formatting, grounded prompt construction, and RAG response assembly
+* Performance visibility for workflow context creation, sequential step execution, state updates, and result assembly
 
 
 ## [0.7.0] - In Development

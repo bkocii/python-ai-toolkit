@@ -2085,6 +2085,487 @@ Use results to compare similar runs on the same or comparable environments.
 
 Do not compare unrelated machines as if their benchmark values were directly equivalent.
 
+## Workflow Execution Benchmarks
+
+The workflow execution benchmarks measure the internal overhead of the sequential `WorkflowEngine`.
+
+Benchmark file:
+
+```text
+benchmarks/test_workflow_execution.py
+```
+
+Two workflow sizes are measured:
+
+* a one-step workflow representing the minimum successful execution path
+* a five-step workflow representing sequential execution with shared state
+
+### Benchmark Scope
+
+The benchmarks measure the workflow engine itself.
+
+They include:
+
+* creation of a fresh `WorkflowContext`
+* sequential step invocation
+* `WorkflowStepResult` construction
+* collection of executed step results
+* state updates between steps
+* success checks after every step
+* `WorkflowRunResult` construction
+* final-output access during correctness verification
+
+They exclude:
+
+* workflow-engine construction
+* workflow-step construction
+* AI provider execution
+* network access
+* database access
+* file access
+* asynchronous execution
+* workflow retries
+* workflow persistence
+* branching
+* parallel execution
+* failure and exception paths
+
+Those excluded capabilities are either covered by normal correctness tests or remain Future Backlog items.
+
+### One-Step Workflow
+
+The one-step benchmark establishes the minimum successful workflow baseline.
+
+Its execution path is:
+
+```text
+WorkflowEngine.run()
+        │
+        ▼
+Create WorkflowContext
+        │
+        ▼
+Execute one FunctionWorkflowStep
+        │
+        ▼
+Construct WorkflowStepResult
+        │
+        ▼
+Append step result
+        │
+        ▼
+Apply state update
+        │
+        ▼
+Construct WorkflowRunResult
+```
+
+The step reads the initial input value, increments it, and stores the result in workflow state:
+
+```python
+def run_single_step(
+    context: WorkflowContext,
+) -> WorkflowStepResult:
+    value = context.input["value"] + 1
+
+    return WorkflowStepResult(
+        step_name="single",
+        output=value,
+        state_updates={
+            "value": value,
+        },
+    )
+```
+
+The benchmark starts with:
+
+```python
+INPUT_DATA = {
+    "value": 5,
+}
+```
+
+The expected output and final state are:
+
+```text
+Output: 6
+State:  {"value": 6}
+```
+
+Benchmark implementation:
+
+```python
+def test_single_step_workflow_execution(
+    benchmark,
+    single_step_workflow,
+):
+    result = benchmark(
+        single_step_workflow.run,
+        input_data=INPUT_DATA,
+        metadata=WORKFLOW_METADATA,
+    )
+
+    assert result.success is True
+    assert len(result.steps) == 1
+    assert result.steps[0].step_name == "single"
+    assert result.steps[0].output == 6
+    assert result.context.state == {
+        "value": 6,
+    }
+    assert result.final_output == 6
+```
+
+### Five-Step Workflow
+
+The five-step benchmark measures sequential state propagation across multiple workflow steps.
+
+The workflow contains:
+
+```text
+initialize
+double
+increment
+square
+finalize
+```
+
+Its calculation is:
+
+```text
+Initial value: 5
+        │
+        ▼
+Double
+        │
+        ▼
+10
+        │
+        ▼
+Add 3
+        │
+        ▼
+13
+        │
+        ▼
+Square
+        │
+        ▼
+169
+```
+
+The final step returns:
+
+```python
+{
+    "result": 169,
+    "source": "benchmark",
+}
+```
+
+The measured execution path is:
+
+```text
+Create WorkflowContext
+        │
+        ▼
+Run initialize step
+        │
+        ▼
+Apply state update
+        │
+        ▼
+Run double step
+        │
+        ▼
+Apply state update
+        │
+        ▼
+Run increment step
+        │
+        ▼
+Apply state update
+        │
+        ▼
+Run square step
+        │
+        ▼
+Apply state update
+        │
+        ▼
+Run finalize step
+        │
+        ▼
+Construct WorkflowRunResult
+```
+
+Benchmark implementation:
+
+```python
+def test_five_step_workflow_execution(
+    benchmark,
+    five_step_workflow,
+):
+    result = benchmark(
+        five_step_workflow.run,
+        input_data=INPUT_DATA,
+        metadata=WORKFLOW_METADATA,
+    )
+
+    assert result.success is True
+    assert len(result.steps) == 5
+
+    assert [
+        step.step_name
+        for step in result.steps
+    ] == [
+        "initialize",
+        "double",
+        "increment",
+        "square",
+        "finalize",
+    ]
+
+    assert result.context.state == {
+        "value": 169,
+    }
+
+    assert result.final_output == {
+        "result": 169,
+        "source": "benchmark",
+    }
+
+    assert all(
+        step.success
+        for step in result.steps
+    )
+```
+
+### Fresh Context Per Run
+
+`WorkflowEngine.run()` creates a new `WorkflowContext` for every execution.
+
+The same prebuilt workflow engine can therefore be benchmarked repeatedly without reusing state from a previous run.
+
+Each benchmark iteration starts with:
+
+```python
+input_data={
+    "value": 5,
+}
+```
+
+and:
+
+```python
+metadata={
+    "source": "benchmark",
+}
+```
+
+State created during one workflow run does not carry into the next run.
+
+### Prebuilt Workflow Engines
+
+The workflow engines and `FunctionWorkflowStep` objects are created through module-scoped fixtures before timing begins.
+
+Example:
+
+```python
+@pytest.fixture(scope="module")
+def five_step_workflow() -> WorkflowEngine:
+    return WorkflowEngine(
+        steps=[
+            FunctionWorkflowStep(
+                name="initialize",
+                function=initialize_value,
+            ),
+            FunctionWorkflowStep(
+                name="double",
+                function=double_value,
+            ),
+            FunctionWorkflowStep(
+                name="increment",
+                function=increment_value,
+            ),
+            FunctionWorkflowStep(
+                name="square",
+                function=square_value,
+            ),
+            FunctionWorkflowStep(
+                name="finalize",
+                function=finalize_value,
+            ),
+        ]
+    )
+```
+
+The following operations are excluded from benchmark timing:
+
+* validating workflow step names
+* constructing `FunctionWorkflowStep` objects
+* constructing the `WorkflowEngine`
+* building the workflow step list
+
+This keeps the measurement focused on workflow execution.
+
+### State Propagation
+
+The five-step benchmark exercises the workflow engine's shared-state behavior.
+
+Each successful step may return:
+
+```python
+state_updates={
+    "value": value,
+}
+```
+
+The workflow engine applies these updates using:
+
+```python
+context.state.update(result.state_updates)
+```
+
+The next step then reads the updated value from:
+
+```python
+context.state["value"]
+```
+
+This means the benchmark includes real state propagation rather than five unrelated function calls.
+
+### Correctness Verification
+
+The one-step benchmark verifies:
+
+* successful workflow completion
+* exactly one executed step
+* the expected step name
+* the expected output
+* the expected final state
+* the expected final output
+
+The five-step benchmark verifies:
+
+* successful workflow completion
+* exactly five executed steps
+* correct execution order
+* successful status for every step
+* the expected final state
+* the expected final output
+* preservation of workflow metadata
+
+These assertions ensure that performance measurements cannot hide broken workflow behavior.
+
+### Failure Paths
+
+The benchmarks measure successful execution only.
+
+They do not measure:
+
+* a step returning `success=False`
+* workflow termination after failure
+* exceptions raised by workflow steps
+* conversion of exceptions into failed step results
+* failed-step state updates
+
+Those behaviors remain covered by normal unit tests in:
+
+```text
+tests/test_workflow.py
+```
+
+Successful execution provides a more stable performance baseline than exceptional control flow.
+
+### Run Both Workflow Benchmarks
+
+```bash
+python -m pytest benchmarks/test_workflow_execution.py --benchmark-only
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m pytest benchmarks\test_workflow_execution.py --benchmark-only
+```
+
+### Debug Without Timing Statistics
+
+```bash
+python -m pytest benchmarks/test_workflow_execution.py --benchmark-disable -v
+```
+
+Use this mode when debugging:
+
+* workflow fixture construction
+* step execution order
+* state updates
+* workflow metadata
+* final output
+* correctness assertions
+
+### Run All Benchmarks
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After BENCH-008, the benchmark table should contain:
+
+```text
+test_benchmark_tooling_is_available
+test_plain_request_lifecycle
+test_structured_response_parsing
+test_structured_response_retry_and_repair
+test_vector_similarity_search
+test_vector_similarity_search_with_metadata_filter
+test_rag_orchestration
+test_single_step_workflow_execution
+test_five_step_workflow_execution
+```
+
+Infrastructure-only tests remain skipped when `--benchmark-only` is used.
+
+### Benchmark Interpretation
+
+The one-step benchmark provides the minimum workflow execution baseline.
+
+The five-step benchmark provides a representative sequential workflow baseline with shared state.
+
+Comparing them helps show the additional work introduced by:
+
+* more step calls
+* more `WorkflowStepResult` objects
+* more state updates
+* more result-list entries
+* additional success checks
+
+The benchmarks can help detect regressions caused by changes to:
+
+* workflow context creation
+* sequential execution
+* state propagation
+* step-result handling
+* final workflow-result construction
+
+They do not represent workflows that perform real AI, network, database, or file operations.
+
+### Timing Policy
+
+No fixed execution-time threshold is enforced.
+
+Benchmark timing may vary based on:
+
+* processor
+* Python version
+* Pydantic version
+* operating system
+* available memory
+* continuous integration hardware
+* background system activity
+
+Use results for comparisons under similar conditions rather than machine-specific pass or fail rules.
+
 
 ## Save Local Benchmark Results
 
