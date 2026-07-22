@@ -243,7 +243,7 @@ Create deterministic benchmarks that measure toolkit overhead without depending 
 
 * [x] BENCH-001 Add benchmark development tooling
 * [x] BENCH-002 Create reusable fake providers and benchmark fixtures
-* [ ] BENCH-003 Benchmark the plain-text request lifecycle
+* [x] BENCH-003 Benchmark the plain-text request lifecycle
 * [ ] BENCH-004 Benchmark structured-output parsing
 * [ ] BENCH-005 Benchmark structured-output retry repair
 * [ ] BENCH-006 Benchmark in-memory vector search

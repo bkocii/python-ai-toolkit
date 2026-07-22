@@ -395,6 +395,229 @@ benchmarks/test_benchmark_fixtures.py
 
 Correctness tests verify the benchmark infrastructure before it is used for performance measurement.
 
+## Plain Request Lifecycle Benchmark
+
+The plain request lifecycle benchmark measures the synchronous internal request path through `RequestExecutor`.
+
+Benchmark file:
+
+```text
+benchmarks/test_request_lifecycle.py
+```
+
+### What It Measures
+
+The benchmark measures the following operations:
+
+* request ID generation
+* synchronous fake-provider invocation
+* request duration calculation
+* token-cost estimation
+* metadata logging through a no-output benchmark logger
+* `AIResult` construction
+
+The measured execution path is:
+
+```text
+RequestExecutor.execute()
+        │
+        ▼
+Generate request ID
+        │
+        ▼
+Call deterministic fake provider
+        │
+        ▼
+Read response and token usage
+        │
+        ▼
+Calculate duration
+        │
+        ▼
+Estimate request cost
+        │
+        ▼
+Log request metadata through NullHandler
+        │
+        ▼
+Construct AIResult
+```
+
+### What It Excludes
+
+The benchmark intentionally excludes:
+
+* network requests
+* real model execution
+* API authentication
+* provider latency
+* provider factory construction
+* environment-variable loading
+* configuration validation
+* executor construction
+* logger construction
+* toolkit-managed file logging
+* console logging
+
+These operations are excluded so the benchmark measures the toolkit's internal request lifecycle rather than external provider or setup overhead.
+
+### Deterministic Provider
+
+The benchmark uses `FakeTextProvider`.
+
+The fake provider:
+
+* performs no network calls
+* requires no API key
+* returns a prebuilt `ProviderResponse`
+* returns deterministic token usage
+* performs no sleeping or simulated latency
+* performs no file access
+
+The response object is created before benchmark timing begins.
+
+### Benchmark Logger
+
+The executor receives the shared `benchmark_logger` fixture:
+
+```python
+executor = RequestExecutor(
+    provider=fake_text_provider,
+    model="benchmark-model",
+    logger=benchmark_logger,
+)
+```
+
+The benchmark logger:
+
+* uses `logging.NullHandler`
+* creates no log file
+* produces no console output
+* does not propagate records to the root logger
+
+The metadata logging call remains part of the request lifecycle, but no logging I/O is performed.
+
+### Benchmark Implementation
+
+```python
+from ai.executor import RequestExecutor
+
+
+def test_plain_request_lifecycle(
+    benchmark,
+    fake_text_provider,
+    benchmark_logger,
+):
+    executor = RequestExecutor(
+        provider=fake_text_provider,
+        model="benchmark-model",
+        logger=benchmark_logger,
+    )
+
+    result = benchmark(
+        executor.execute,
+        "Benchmark prompt",
+    )
+
+    assert result.data == "Benchmark response"
+    assert result.raw_response == "Benchmark response"
+    assert result.original_raw_response == "Benchmark response"
+    assert result.model == "benchmark-model"
+    assert result.retries_used == 0
+    assert result.request_id
+    assert result.duration_ms is not None
+    assert result.duration_ms >= 0
+    assert result.token_usage is not None
+    assert result.token_usage.input_tokens == 10
+    assert result.token_usage.output_tokens == 5
+    assert result.token_usage.total_tokens == 15
+```
+
+Executor construction happens before `benchmark(...)` is called and is therefore excluded from timing.
+
+### Run the Benchmark
+
+Run only the plain request lifecycle benchmark:
+
+```bash
+python -m pytest benchmarks/test_request_lifecycle.py --benchmark-only
+```
+
+On Windows PowerShell, this may also be written as:
+
+```powershell
+python -m pytest benchmarks\test_request_lifecycle.py --benchmark-only
+```
+
+### Debug Without Timing Statistics
+
+Run the benchmark as a normal correctness test:
+
+```bash
+python -m pytest benchmarks/test_request_lifecycle.py --benchmark-disable -v
+```
+
+This mode is useful when debugging:
+
+* fixture loading
+* fake-provider behavior
+* executor behavior
+* returned `AIResult`
+* correctness assertions
+
+### Run All Performance Benchmarks
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After BENCH-003, the benchmark table should contain:
+
+```text
+test_benchmark_tooling_is_available
+test_plain_request_lifecycle
+```
+
+Infrastructure-only tests that do not use the `benchmark` fixture are expected to be skipped when `--benchmark-only` is used.
+
+### Correctness Verification
+
+The benchmark verifies the resulting `AIResult` after timing completes.
+
+It confirms:
+
+* the expected response text is returned
+* raw and original responses are preserved
+* the configured model is recorded
+* no retry is reported
+* a request ID is generated
+* duration metadata is present
+* token usage is preserved
+
+These assertions ensure that benchmark results cannot hide broken request behavior.
+
+### Timing Policy
+
+The benchmark does not contain a strict timing assertion.
+
+Do not add checks such as:
+
+```python
+assert result.duration_ms < 1
+```
+
+Timing varies across:
+
+* processors
+* operating systems
+* Python versions
+* virtual machines
+* continuous integration runners
+* background system load
+
+The benchmark is intended for profiling and comparison, not machine-specific pass or fail thresholds.
+
+
 ## Benchmark Results
 
 `pytest-benchmark` may store local result files under:
