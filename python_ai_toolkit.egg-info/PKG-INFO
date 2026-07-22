@@ -1,0 +1,2947 @@
+Metadata-Version: 2.4
+Name: python-ai-toolkit
+Version: 0.7.0
+Summary: Reusable infrastructure for integrating LLMs into Python applications.
+Author: Burim Koci
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: openai
+Requires-Dist: pydantic
+Requires-Dist: python-dotenv
+Provides-Extra: django
+Requires-Dist: django>=5.0; extra == "django"
+Provides-Extra: fastapi
+Requires-Dist: fastapi<1,>=0.100; extra == "fastapi"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
+Requires-Dist: django>=5.0; extra == "dev"
+Requires-Dist: fastapi<1,>=0.100; extra == "dev"
+Requires-Dist: httpx2; extra == "dev"
+Provides-Extra: benchmark
+Requires-Dist: pytest; extra == "benchmark"
+Requires-Dist: pytest-benchmark; extra == "benchmark"
+
+# Python AI Toolkit
+
+A reusable AI engineering toolkit for Python developers.
+
+The goal of this project is to provide clean, reusable building blocks for integrating Large Language Models (LLMs) into Python applications.
+
+Instead of scattering AI code across projects, this toolkit centralizes configuration, provider integrations, validation, logging, and future AI capabilities behind a consistent interface.
+
+---
+
+## Philosophy
+
+The LLM is only one part of an AI application.
+
+Business logic should remain in Python.
+
+```text
+Application
+        │
+        ▼
+ AI Toolkit
+        │
+        ▼
+ AI Provider
+        │
+        ▼
+ Language Model
+```
+
+The toolkit is responsible for:
+
+- communicating with AI providers
+- validating responses
+- tracking usage
+- handling retries
+- exposing a clean developer API
+
+Applications remain responsible for business logic.
+
+---
+
+# Current Features
+
+## AI Client
+
+Single entry point for all AI requests.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+response = ai.ask(...)
+```
+
+---
+
+## Fluent Request Builder
+
+For simple requests, use `AIClient.ask()`:
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+result = ai.ask("Explain dependency injection in one paragraph.")
+```
+
+For advanced requests, use the fluent request builder:
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+result = (
+    ai.request()
+    .prompt("Explain dependency injection in one paragraph.")
+    .execute()
+)
+
+print(result.data)
+```
+
+Structured responses also work through the builder:
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+
+
+class Recommendation(BaseModel):
+    title: str
+    reason: str
+
+
+ai = AIClient()
+
+result = (
+    ai.request()
+    .prompt("Recommend one beginner Python project.")
+    .response_type(Recommendation)
+    .execute()
+)
+
+print(result.data.title)
+```
+
+The builder is intentionally mutable. Each method updates the current builder and returns `self`, which allows method chaining.
+
+Request execution is still handled by `RequestExecutor`.
+
+---
+
+## Prompt Templates
+
+Prompt templates provide a reusable way to build prompts by substituting named variables into a template.
+
+```python
+from ai.client import AIClient
+from ai.prompts import PromptTemplate
+
+template = PromptTemplate(
+    "Summarize this article in {language}: {article}"
+)
+
+prompt = template.render(
+    language="English",
+    article="Python is popular.",
+)
+
+ai = AIClient()
+
+result = ai.ask(prompt)
+
+print(result.data)
+```
+
+Prompt templates are ideal for reusable prompts that differ only by input values.
+
+For prompts assembled dynamically from multiple sections, use `PromptBuilder`.
+
+---
+
+---
+
+## Structured Outputs
+
+Structured outputs allow the toolkit to return validated Pydantic models instead of plain text.
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+
+
+class Answer(BaseModel):
+    summary: str
+    confidence: float
+
+
+ai = AIClient()
+
+result = ai.ask(
+    prompt="Summarize dependency injection in one sentence.",
+    response_type=Answer,
+)
+
+print(result.data.summary)
+print(result.data.confidence)
+```
+
+When `response_type` is provided, the toolkit:
+
+- builds a schema-aware prompt
+- asks the model to return valid JSON
+- parses the raw response
+- validates the response with Pydantic
+- retries once when JSON parsing or schema validation fails, depending on `AI_MAX_RETRIES`
+
+The structured-output logic is centralized in:
+
+```text
+ai/structured.py
+```
+
+This keeps structured prompt construction and structured response parsing separate from request execution.
+
+The same structured-output behavior is used by:
+
+- `AIClient.ask(...)`
+- `AsyncAIClient.ask(...)`
+- `AIClient.ask_with_images(...)`
+
+Example with image input:
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+from ai.images import ImageInput
+
+
+class ImageDescription(BaseModel):
+    subject: str
+    colors: list[str]
+    visible_text: str | None = None
+
+
+ai = AIClient()
+
+result = ai.ask_with_images(
+    prompt="Extract structured information from this image.",
+    images=[
+        ImageInput(
+            source=(
+                "https://api.nga.gov/iiif/"
+                "a2e6da57-3cd1-4235-b20e-95dcaefed6c8/"
+                "full/!800,800/0/default.jpg"
+            ),
+        )
+    ],
+    response_type=ImageDescription,
+)
+
+print(result.data.subject)
+print(result.data.colors)
+```
+
+Current structured-output support:
+
+- Pydantic response models
+- schema-aware prompt generation
+- JSON parsing
+- Pydantic validation
+- repair retry for invalid JSON or schema mismatch
+- sync requests
+- async requests
+- image requests with structured responses
+
+Not yet supported:
+
+- provider-native strict structured output
+- OpenAI `response_format` integration
+- streaming structured output
+- partial structured validation while streaming
+
+Provider-native strict structured output may be added later without changing the public `response_type` API.
+
+---
+
+## Streaming Responses
+
+For plain text responses, you can stream chunks as they arrive.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+for chunk in ai.stream("Explain dependency injection in one short paragraph."):
+    print(chunk, end="", flush=True)
+
+print()
+```
+
+Streaming is useful when you want to show output immediately instead of waiting for the full response.
+
+Current streaming support:
+
+* plain text responses
+* synchronous iteration
+* provider-level streaming through `stream_text()`
+
+Not yet supported:
+
+* structured streaming
+* async streaming
+* token usage metadata during streaming
+
+Structured responses should still use:
+
+```python
+ai.ask(..., response_type=...)
+```
+
+`ai.stream(...)` returns streamed text chunks as an iterator, not a full `AIResult`.
+
+---
+
+## Async AI Client
+
+For async Python applications, use `AsyncAIClient`.
+
+```python
+import asyncio
+
+from ai.async_client import AsyncAIClient
+
+
+async def main() -> None:
+    ai = AsyncAIClient()
+
+    result = await ai.ask(
+        "Explain dependency injection in one short paragraph."
+    )
+
+    print(result.data)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Structured responses also work with the async client.
+
+```python
+import asyncio
+
+from pydantic import BaseModel
+
+from ai.async_client import AsyncAIClient
+
+
+class Summary(BaseModel):
+    title: str
+    key_point: str
+
+
+async def main() -> None:
+    ai = AsyncAIClient()
+
+    result = await ai.ask(
+        prompt="Summarize dependency injection.",
+        response_type=Summary,
+    )
+
+    print(result.data.title)
+    print(result.data.key_point)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+Use `AIClient` for synchronous applications.
+
+Use `AsyncAIClient` for asynchronous applications, such as FastAPI apps, async workers, or other event-loop based systems.
+
+Current async support:
+
+* plain text requests
+* structured responses
+* retry for structured responses
+* full `AIResult` return values
+
+Not yet supported:
+
+* async streaming
+* async fluent request builder
+* async tool calling
+
+---
+
+## Tool Calling
+
+Tool calling allows the model to request external capabilities, such as searching documents, checking weather, querying a database, or calling an application service.
+
+The toolkit defines tools in a provider-independent way.
+
+```python
+from ai.client import AIClient
+from ai.tools import ToolDefinition
+
+ai = AIClient()
+
+weather_tool = ToolDefinition(
+    name="get_weather",
+    description="Get the current weather for a city.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "location": {
+                "type": "string",
+                "description": "City name, for example Paris or London.",
+            }
+        },
+        "required": ["location"],
+        "additionalProperties": False,
+    },
+)
+
+response = ai.ask_with_tools(
+    prompt="What is the weather in Paris?",
+    tools=[weather_tool],
+)
+
+for tool_call in response.tool_calls:
+    print(tool_call.name)
+    print(tool_call.arguments)
+```
+
+Tool calling currently returns requested tool calls to the application.
+
+The toolkit does **not** automatically execute tools.
+
+That means application code remains responsible for deciding whether and how to run a requested tool.
+
+```python
+for tool_call in response.tool_calls:
+    if tool_call.name == "get_weather":
+        location = tool_call.arguments["location"]
+        # Application decides what to do next.
+```
+
+Current tool-calling support:
+
+* provider-independent `ToolDefinition`
+* provider-independent `ToolCall`
+* provider-independent `ToolResponse`
+* OpenAI tool-call adapter
+* requested tool calls returned to the application
+
+Not yet supported:
+
+* automatic tool execution
+* submitting tool results back to the model
+* multi-step agent loops
+* parallel tool execution
+* async tool calling
+
+Automatic tool execution belongs later in the Agents and Workflows roadmap.
+
+
+---
+
+## Image Inputs
+
+Image inputs allow the toolkit to send one or more images together with a text prompt.
+
+The public API uses provider-independent `ImageInput` objects.
+
+```python
+from ai.client import AIClient
+from ai.images import ImageInput
+
+ai = AIClient()
+
+image = ImageInput(
+    source=(
+        "https://api.nga.gov/iiif/"
+        "a2e6da57-3cd1-4235-b20e-95dcaefed6c8/"
+        "full/!800,800/0/default.jpg"
+    ),
+)
+
+result = ai.ask_with_images(
+    prompt="Describe this image in one short paragraph.",
+    images=[image],
+)
+
+print(result.data)
+```
+
+Structured responses are also supported.
+
+```python
+from pydantic import BaseModel
+
+from ai.client import AIClient
+from ai.images import ImageInput
+
+
+class ImageDescription(BaseModel):
+    subject: str
+    colors: list[str]
+    visible_text: str | None = None
+
+
+ai = AIClient()
+
+result = ai.ask_with_images(
+    prompt="Extract structured information from this image.",
+    images=[
+        ImageInput(
+            source=(
+                "https://api.nga.gov/iiif/"
+                "a2e6da57-3cd1-4235-b20e-95dcaefed6c8/"
+                "full/!800,800/0/default.jpg"
+            ),
+        )
+    ],
+    response_type=ImageDescription,
+)
+
+print(result.data.subject)
+print(result.data.colors)
+```
+
+Current image-input support:
+
+- image URL input
+- Base64 data URL input
+- multiple images
+- plain text responses
+- structured Pydantic responses
+- OpenAI Responses API adapter
+
+Not yet supported:
+
+- local file helper
+- OpenAI file ID helper
+- async image input
+- streaming image input
+- image generation
+- image editing
+
+### Note about image URLs
+
+When using image URLs, the model provider must be able to download the image.
+
+Some public image hosts block automated downloads, redirects, or hotlinking. If a URL fails with an error like `Error while downloading file`, try another public image URL or use a Base64 data URL instead.
+
+
+## Provider Architecture
+
+Current:
+
+- OpenAI
+
+Planned:
+
+- Anthropic
+- Google Gemini
+- Ollama
+- Azure OpenAI
+- Custom providers
+
+---
+
+---
+
+## Embeddings
+
+Embeddings convert text into vectors of numbers.
+
+Those vectors can later be stored and searched to build Retrieval-Augmented Generation workflows.
+
+Typical uses include:
+
+- semantic search
+- document search
+- product search
+- support knowledge search
+- FAQ matching
+- RAG pipelines
+
+The toolkit exposes embeddings through `AIClient`.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+response = ai.embed_text(
+    "Django is a Python web framework."
+)
+
+embedding = response.embeddings[0]
+
+print(embedding.text)
+print(len(embedding.vector))
+print(response.model)
+```
+
+Batch embedding is also supported.
+
+```python
+from ai.client import AIClient
+
+ai = AIClient()
+
+response = ai.embed_texts(
+    [
+        "Django is a Python web framework.",
+        "Redis is often used as a cache.",
+        "PostgreSQL is a relational database.",
+    ]
+)
+
+print(response.texts)
+print(len(response.vectors))
+```
+
+Use `EmbeddingInput` when you need metadata.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+
+ai = AIClient()
+
+response = ai.embed_texts(
+    [
+        EmbeddingInput(
+            text="Django is a Python web framework.",
+            metadata={
+                "source": "notes.md",
+                "topic": "django",
+            },
+        )
+    ]
+)
+
+embedding = response.embeddings[0]
+
+print(embedding.text)
+print(embedding.metadata)
+print(len(embedding.vector))
+```
+
+Embedding configuration uses a separate model setting from normal AI requests.
+
+```env
+AI_PROVIDER=openai
+
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5.4-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+
+# Optional generic fallback
+AI_EMBEDDING_MODEL=
+
+# Optional custom embedding vector size
+AI_EMBEDDING_DIMENSIONS=
+```
+
+The embedding model is separate because normal text requests and embedding requests use different provider capabilities.
+
+```env
+OPENAI_MODEL=gpt-5.4-mini
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+```
+
+Current embedding support:
+
+- embed one text
+- embed multiple texts
+- preserve metadata
+- provider-independent embedding models
+- OpenAI embeddings adapter
+- optional embedding dimensions
+- token usage when reported by the provider
+
+Not yet supported:
+
+- vector store
+- retriever
+- RAG pipeline
+- document loaders
+- database loaders
+- embedding cache
+- async embeddings
+
+Embeddings are the first building block for RAG.
+
+A later RAG flow will look like this:
+
+```text
+Documents / database rows
+    ↓
+Embeddings
+    ↓
+Vector store
+    ↓
+Retriever
+    ↓
+Relevant context
+    ↓
+AI answer
+```
+
+---
+
+## Vector Store
+
+A vector store saves embedded text records and allows similarity search.
+
+This is the second building block for Retrieval-Augmented Generation.
+
+The basic flow is:
+
+```text
+Text
+    ↓
+Embedding vector
+    ↓
+VectorRecord
+    ↓
+Vector store
+    ↓
+Similarity search
+    ↓
+Relevant results
+```
+
+The toolkit includes a dependency-free in-memory vector store.
+
+```python
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+store = InMemoryVectorStore()
+
+store.add(
+    [
+        VectorRecord(
+            id="doc-1",
+            text="Django is a Python web framework.",
+            vector=[1.0, 0.0, 0.0],
+            metadata={
+                "topic": "django",
+            },
+        ),
+        VectorRecord(
+            id="doc-2",
+            text="Redis is often used as a cache.",
+            vector=[0.0, 1.0, 0.0],
+            metadata={
+                "topic": "redis",
+            },
+        ),
+    ]
+)
+
+results = store.similarity_search(
+    query_vector=[0.0, 0.9, 0.1],
+    limit=1,
+)
+
+for result in results:
+    print(result.text)
+    print(result.score)
+    print(result.metadata)
+```
+
+A more realistic example uses embeddings from `AIClient`.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+texts = [
+    EmbeddingInput(
+        text="Django is a Python web framework.",
+        metadata={"topic": "django"},
+    ),
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={"topic": "redis"},
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database.",
+        metadata={"topic": "postgres"},
+    ),
+]
+
+embedding_response = ai.embed_texts(texts)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+query_response = ai.embed_text(
+    "Which technology should I use for caching?"
+)
+
+query_vector = query_response.embeddings[0].vector
+
+results = store.similarity_search(
+    query_vector=query_vector,
+    limit=2,
+)
+
+for result in results:
+    print(result.text)
+    print(result.score)
+    print(result.metadata)
+```
+
+The in-memory vector store supports metadata filtering.
+
+```python
+results = store.similarity_search(
+    query_vector=query_vector,
+    limit=5,
+    metadata_filter={
+        "topic": "redis",
+    },
+)
+```
+
+Current vector store support:
+
+- provider-independent `VectorRecord`
+- provider-independent `VectorSearchResult`
+- `BaseVectorStore` interface
+- dependency-free `InMemoryVectorStore`
+- cosine similarity search
+- metadata preservation
+- metadata filtering
+- record replacement by ID
+- count and clear operations
+
+Not yet supported:
+
+- persistent storage
+- PostgreSQL / pgvector
+- Chroma
+- Pinecone
+- FAISS
+- Qdrant
+- retriever interface
+- full RAG pipeline
+- document loaders
+
+The in-memory store is best for tests, examples, demos, and small local workflows.
+
+Production applications should later use a persistent vector store implementation behind the same `BaseVectorStore` interface.
+
+## Retriever
+
+A retriever connects embeddings and a vector store.
+
+It takes a user query, embeds it, searches the vector store, and returns relevant context.
+
+The basic flow is:
+
+```text
+User question
+    ↓
+Query embedding
+    ↓
+Vector store similarity search
+    ↓
+Retrieved context
+```
+
+The toolkit includes `VectorStoreRetriever`.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.retriever import VectorStoreRetriever, format_retrieved_context
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+knowledge = [
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={"topic": "redis"},
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database.",
+        metadata={"topic": "postgres"},
+    ),
+    EmbeddingInput(
+        text="Django is a Python web framework.",
+        metadata={"topic": "django"},
+    ),
+]
+
+embedding_response = ai.embed_texts(knowledge)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+contexts = retriever.retrieve(
+    query="Which technology should I use for caching?",
+    limit=2,
+)
+
+context_text = format_retrieved_context(contexts)
+
+print(context_text)
+```
+
+`RetrievedContext` contains only the information needed by higher-level RAG code.
+
+```python
+context.id
+context.text
+context.score
+context.metadata
+```
+
+The raw vector is not exposed by the retriever result.
+
+Metadata filtering is supported.
+
+```python
+contexts = retriever.retrieve(
+    query="How should I cache data?",
+    limit=5,
+    metadata_filter={
+        "topic": "redis",
+    },
+)
+```
+
+Retrieved context can be inserted into a prompt.
+
+```python
+prompt = f"""
+Answer the question using only the context below.
+
+Context:
+{context_text}
+
+Question:
+Which technology should I use for caching?
+"""
+```
+
+Current retriever support:
+
+- provider-independent `RetrievedContext`
+- `BaseRetriever` interface
+- `VectorStoreRetriever`
+- query embedding through `AIClient`
+- vector store similarity search
+- metadata filtering
+- prompt-ready context formatting
+
+Not yet supported:
+
+- full RAG answer pipeline
+- reranking
+- hybrid keyword and vector search
+- retrieval evaluation
+- document loaders
+- database loaders
+
+The retriever finds relevant context. It does not generate the final answer yet.
+
+Answer generation is added by the RAG pipeline.
+
+## RAG Pipeline
+
+The RAG pipeline combines retrieval and answer generation.
+
+RAG means Retrieval-Augmented Generation.
+
+Instead of asking the model to answer only from general knowledge, the application first retrieves relevant context from its own stored knowledge, then sends that context to the model.
+
+The basic flow is:
+
+```text
+User question
+    ↓
+Retriever
+    ↓
+Relevant context
+    ↓
+Grounded prompt
+    ↓
+AI answer
+    ↓
+Answer + sources
+```
+
+The toolkit includes `RAGPipeline`.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.rag import RAGPipeline
+from ai.retriever import VectorStoreRetriever
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+knowledge = [
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={
+            "topic": "redis",
+            "source": "technical_notes",
+        },
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database used for structured data.",
+        metadata={
+            "topic": "postgres",
+            "source": "technical_notes",
+        },
+    ),
+    EmbeddingInput(
+        text="Django is a Python web framework for building web applications.",
+        metadata={
+            "topic": "django",
+            "source": "technical_notes",
+        },
+    ),
+]
+
+embedding_response = ai.embed_texts(knowledge)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+rag = RAGPipeline(
+    ai_client=ai,
+    retriever=retriever,
+)
+
+response = rag.ask(
+    question="Which technology should I use for caching?",
+    limit=2,
+    instructions="Answer in one short paragraph.",
+)
+
+print(response.answer)
+
+for context in response.contexts:
+    print(context.id)
+    print(context.score)
+    print(context.metadata)
+    print(context.text)
+```
+
+`RAGPipeline.ask(...)` returns a `RAGResponse`.
+
+```python
+response.answer
+response.contexts
+response.model
+response.request_id
+response.raw_response
+```
+
+The answer is generated from retrieved context.
+
+The contexts are returned so the application can show sources, debug retrieval quality, or inspect which records were used.
+
+Example source display:
+
+```python
+for context in response.contexts:
+    print(f"Source: {context.metadata}")
+    print(f"Score: {context.score:.4f}")
+    print(context.text)
+```
+
+Additional instructions can be passed to the RAG prompt.
+
+```python
+response = rag.ask(
+    question="Which technology should I use for caching?",
+    instructions="Answer briefly and mention only technologies found in the context.",
+)
+```
+
+Metadata filtering is also supported.
+
+```python
+response = rag.ask(
+    question="How should I cache data?",
+    metadata_filter={
+        "topic": "redis",
+    },
+)
+```
+
+Current RAG pipeline support:
+
+- `RAGResponse`
+- grounded RAG prompt builder
+- `RAGPipeline`
+- retrieval through `BaseRetriever`
+- answer generation through `AIClient`
+- returned answer and retrieved contexts
+- metadata filtering
+- additional prompt instructions
+
+Not yet supported:
+
+- streaming RAG responses
+- async RAG pipeline
+- structured RAG responses
+- citation formatting
+- reranking
+- retrieval evaluation
+- hybrid keyword and vector search
+- document loaders
+- database loaders
+
+The RAG pipeline is the first complete end-to-end Retrieval-Augmented Generation workflow in the toolkit.
+
+At this stage, knowledge must still be added manually or through application code.
+
+Document loading is added later in the Sprint 6 roadmap.
+
+## Document Loaders
+
+Document loaders turn files into `Document` objects that can be embedded, stored, retrieved, and used in RAG workflows.
+
+The basic flow is:
+
+```text
+File / directory
+    ↓
+Document loader
+    ↓
+Document
+    ↓
+EmbeddingInput
+    ↓
+Embeddings
+    ↓
+Vector store
+    ↓
+Retriever
+    ↓
+RAG pipeline
+```
+
+The toolkit includes simple dependency-free loaders for text and Markdown files.
+
+```python
+from ai.documents import TextFileLoader, MarkdownFileLoader
+
+text_documents = TextFileLoader("notes.txt").load()
+markdown_documents = MarkdownFileLoader("guide.md").load()
+```
+
+Each loader returns a list of `Document` objects.
+
+```python
+document.text
+document.metadata
+```
+
+Example metadata:
+
+```python
+{
+    "source": "examples/sample_docs/redis.md",
+    "filename": "redis.md",
+    "extension": ".md",
+    "loader": "MarkdownFileLoader",
+}
+```
+
+A directory can be loaded with `DirectoryLoader`.
+
+```python
+from ai.documents import DirectoryLoader
+
+documents = DirectoryLoader(
+    path="examples/sample_docs",
+    recursive=True,
+).load()
+
+for document in documents:
+    print(document.metadata["filename"])
+    print(document.text[:100])
+```
+
+Loaded documents can be converted into embedding inputs.
+
+```python
+from ai.documents import DirectoryLoader, documents_to_embedding_inputs
+
+documents = DirectoryLoader(
+    path="examples/sample_docs",
+    recursive=True,
+).load()
+
+embedding_inputs = documents_to_embedding_inputs(documents)
+```
+
+A full document-based RAG flow looks like this:
+
+```python
+from ai.client import AIClient
+from ai.documents import DirectoryLoader, documents_to_embedding_inputs
+from ai.rag import RAGPipeline
+from ai.retriever import VectorStoreRetriever
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+documents = DirectoryLoader(
+    path="examples/sample_docs",
+    recursive=True,
+).load()
+
+embedding_inputs = documents_to_embedding_inputs(documents)
+
+embedding_response = ai.embed_texts(embedding_inputs)
+
+records = [
+    VectorRecord(
+        id=f"doc-{embedding.index}",
+        text=embedding.text,
+        vector=embedding.vector,
+        metadata=embedding.metadata,
+    )
+    for embedding in embedding_response.embeddings
+]
+
+store.add(records)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+rag = RAGPipeline(
+    ai_client=ai,
+    retriever=retriever,
+)
+
+response = rag.ask(
+    question="Which technology should I use for caching?",
+    limit=2,
+)
+
+print(response.answer)
+
+for context in response.contexts:
+    print(context.metadata.get("filename"))
+    print(context.score)
+    print(context.text)
+```
+
+Current document-loader support:
+
+- provider-independent `Document`
+- `BaseDocumentLoader`
+- `TextFileLoader`
+- `MarkdownFileLoader`
+- `DirectoryLoader`
+- recursive directory loading
+- configurable file extensions
+- source metadata preservation
+- conversion from documents to embedding inputs
+
+Not yet supported:
+
+- PDF loader
+- DOCX loader
+- HTML loader
+- database loader
+- automatic chunking
+- Markdown section-aware loading
+- file watching and re-indexing
+- high-level document indexing helper
+
+Document loaders complete the first end-to-end RAG workflow:
+
+```text
+Documents
+    ↓
+Embeddings
+    ↓
+Vector store
+    ↓
+Retriever
+    ↓
+RAG pipeline
+    ↓
+Answer with sources
+```
+
+## Conversation Memory
+
+Conversation memory stores messages across turns.
+
+Agents and workflows need memory because they often operate over multiple user and assistant messages, not one isolated prompt.
+
+The basic flow is:
+
+```text
+User message
+    ↓
+Memory
+    ↓
+Assistant response
+    ↓
+Memory
+    ↓
+Next user message with previous context
+```
+
+The toolkit includes provider-independent memory models.
+
+```python
+from ai.memory import (
+    InMemoryConversationMemory,
+    format_conversation_messages,
+)
+
+memory = InMemoryConversationMemory()
+
+memory.add_system_message("You are a helpful AI assistant.")
+memory.add_user_message("What is Redis?")
+memory.add_assistant_message(
+    "Redis is often used as a cache and message broker."
+)
+
+conversation_text = format_conversation_messages(
+    memory.messages()
+)
+
+print(conversation_text)
+```
+
+Output shape:
+
+```text
+SYSTEM:
+You are a helpful AI assistant.
+
+USER:
+What is Redis?
+
+ASSISTANT:
+Redis is often used as a cache and message broker.
+```
+
+Memory supports system, user, assistant, and tool messages.
+
+```python
+memory.add_system_message("You are a concise assistant.")
+memory.add_user_message("What is the weather?")
+memory.add_assistant_message("I need to call a weather tool.")
+memory.add_tool_message(
+    '{"temperature": "18C"}',
+    metadata={"tool_name": "get_weather"},
+)
+```
+
+Recent messages can be retrieved for prompt context.
+
+```python
+recent = memory.recent_messages(limit=5)
+
+conversation_text = format_conversation_messages(recent)
+```
+
+Memory can be cleared.
+
+```python
+memory.clear()
+```
+
+Current conversation memory support:
+
+- provider-independent `ConversationMessage`
+- `MessageRole`
+- `BaseConversationMemory`
+- `InMemoryConversationMemory`
+- system messages
+- user messages
+- assistant messages
+- tool messages
+- metadata preservation
+- recent message retrieval
+- memory clearing
+- prompt-ready conversation formatting
+
+Not yet supported:
+
+- persistent conversation memory
+- database-backed conversation memory
+- token-aware memory trimming
+- conversation summarization memory
+- vector-based long-term memory
+
+Conversation memory is the first building block for agents and workflows.
+
+## Agent
+
+An agent combines an AI client, instructions, and conversation memory.
+
+The basic flow is:
+
+```text
+User message
+    ↓
+Conversation memory
+    ↓
+Agent prompt
+    ↓
+AIClient
+    ↓
+Assistant response
+    ↓
+Conversation memory
+```
+
+The toolkit includes a simple memory-backed `Agent`.
+
+```python
+from ai.agent import Agent
+from ai.client import AIClient
+from ai.memory import InMemoryConversationMemory
+
+ai = AIClient()
+memory = InMemoryConversationMemory()
+
+agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a concise technical assistant. "
+        "Answer clearly and remember the previous conversation."
+    ),
+    memory=memory,
+    memory_limit=6,
+)
+
+response = agent.run("What is Redis?")
+
+print(response.output)
+print(response.model)
+print(response.request_id)
+```
+
+Agents reuse memory across turns.
+
+```python
+agent.run("What is Redis?")
+
+response = agent.run("Can it help with Django apps?")
+
+print(response.output)
+```
+
+`Agent.run(...)` returns an `AgentResponse`.
+
+```python
+response.output
+response.model
+response.request_id
+response.messages
+```
+
+User message metadata can be passed into memory.
+
+```python
+response = agent.run(
+    "What is Redis?",
+    metadata={
+        "user_id": "123",
+        "source": "web_chat",
+    },
+)
+```
+
+The agent stores assistant response metadata automatically.
+
+```python
+assistant_message = response.messages[-1]
+
+print(assistant_message.metadata["request_id"])
+print(assistant_message.metadata["model"])
+```
+
+Current agent support:
+
+- `AgentResponse`
+- `BaseAgent`
+- memory-backed `Agent`
+- system instructions
+- conversation memory integration
+- recent memory limit
+- user metadata preservation
+- assistant request metadata preservation
+- multi-turn conversation support
+
+Not yet supported:
+
+- automatic tool execution
+- RAG-aware agent
+- workflow engine
+- multi-agent orchestration
+- streaming agent responses
+- async agent
+- custom agent prompt templates
+
+The first agent implementation is intentionally simple.
+
+It provides a reusable foundation for workflow and multi-agent features.
+
+## Workflow Engine
+
+The workflow engine lets applications compose multiple AI or non-AI steps into a reusable sequence.
+
+An agent handles a conversational turn.
+
+A workflow handles a process.
+
+The basic flow is:
+
+```text
+Input
+    ↓
+Step 1
+    ↓
+Step 2
+    ↓
+Step 3
+    ↓
+Final result
+```
+
+The toolkit includes a sequential `WorkflowEngine`.
+
+```python
+from ai.workflow import (
+    FunctionWorkflowStep,
+    WorkflowContext,
+    WorkflowEngine,
+    WorkflowStepResult,
+)
+
+
+def first_step(context: WorkflowContext) -> WorkflowStepResult:
+    return WorkflowStepResult(
+        step_name="first",
+        output="first output",
+        state_updates={
+            "first_result": "first output",
+        },
+    )
+
+
+def second_step(context: WorkflowContext) -> WorkflowStepResult:
+    return WorkflowStepResult(
+        step_name="second",
+        output=f"Second step used: {context.state['first_result']}",
+    )
+
+
+workflow = WorkflowEngine(
+    steps=[
+        FunctionWorkflowStep("first", first_step),
+        FunctionWorkflowStep("second", second_step),
+    ]
+)
+
+result = workflow.run(
+    input_data={
+        "question": "Which technology should I use for caching?",
+    },
+    metadata={
+        "workflow": "example",
+    },
+)
+
+print(result.success)
+print(result.final_output)
+print(result.context.state)
+```
+
+Workflow steps receive a shared `WorkflowContext`.
+
+```python
+context.input
+context.state
+context.metadata
+```
+
+`context.input` contains the original workflow input.
+
+```python
+{
+    "question": "Which technology should I use for caching?"
+}
+```
+
+`context.state` stores data produced by previous steps.
+
+```python
+{
+    "retrieved_context": "...",
+    "answer": "Redis is a good choice."
+}
+```
+
+`context.metadata` stores application-level tracking information.
+
+```python
+{
+    "user_id": "123",
+    "workflow": "support_answer",
+}
+```
+
+Each workflow step returns a `WorkflowStepResult`.
+
+```python
+WorkflowStepResult(
+    step_name="retrieve",
+    output="retrieved context",
+    state_updates={
+        "context_text": "retrieved context",
+    },
+)
+```
+
+The workflow engine applies `state_updates` after each step.
+
+A workflow can compose retrieval and answering.
+
+```python
+from ai.client import AIClient
+from ai.embeddings import EmbeddingInput
+from ai.retriever import VectorStoreRetriever, format_retrieved_context
+from ai.vector_store import InMemoryVectorStore, VectorRecord
+from ai.workflow import FunctionWorkflowStep, WorkflowContext, WorkflowEngine, WorkflowStepResult
+
+ai = AIClient()
+store = InMemoryVectorStore()
+
+knowledge = [
+    EmbeddingInput(
+        text="Redis is often used as a cache and message broker.",
+        metadata={"topic": "redis"},
+    ),
+    EmbeddingInput(
+        text="PostgreSQL is a relational database.",
+        metadata={"topic": "postgres"},
+    ),
+]
+
+embedding_response = ai.embed_texts(knowledge)
+
+store.add(
+    [
+        VectorRecord(
+            id=f"doc-{embedding.index}",
+            text=embedding.text,
+            vector=embedding.vector,
+            metadata=embedding.metadata,
+        )
+        for embedding in embedding_response.embeddings
+    ]
+)
+
+retriever = VectorStoreRetriever(
+    ai_client=ai,
+    vector_store=store,
+)
+
+
+def retrieve_step(context: WorkflowContext) -> WorkflowStepResult:
+    question = context.input["question"]
+
+    contexts = retriever.retrieve(
+        query=question,
+        limit=2,
+    )
+
+    context_text = format_retrieved_context(contexts)
+
+    return WorkflowStepResult(
+        step_name="retrieve",
+        output=context_text,
+        state_updates={
+            "question": question,
+            "context_text": context_text,
+        },
+    )
+
+
+def answer_step(context: WorkflowContext) -> WorkflowStepResult:
+    prompt = f"""
+Answer the question using only the context below.
+
+Context:
+{context.state["context_text"]}
+
+Question:
+{context.state["question"]}
+"""
+
+    result = ai.ask(prompt)
+
+    return WorkflowStepResult(
+        step_name="answer",
+        output=result.data,
+        state_updates={
+            "answer": result.data,
+            "request_id": result.request_id,
+            "model": result.model,
+        },
+    )
+
+
+workflow = WorkflowEngine(
+    steps=[
+        FunctionWorkflowStep("retrieve", retrieve_step),
+        FunctionWorkflowStep("answer", answer_step),
+    ]
+)
+
+result = workflow.run(
+    input_data={
+        "question": "Which technology should I use for caching?",
+    }
+)
+
+print(result.final_output)
+```
+
+The workflow engine stops when a step fails.
+
+```python
+WorkflowStepResult(
+    step_name="validate",
+    success=False,
+    error="Missing required context.",
+)
+```
+
+If a step raises an unexpected exception, the engine converts it into a failed step result.
+
+This keeps workflow execution inspectable.
+
+```python
+result.success
+result.steps
+result.steps[-1].error
+```
+
+Current workflow support:
+
+- `WorkflowContext`
+- `WorkflowStepResult`
+- `WorkflowRunResult`
+- `BaseWorkflowStep`
+- `FunctionWorkflowStep`
+- sequential `WorkflowEngine`
+- shared workflow state
+- workflow metadata
+- execution history
+- final output helper
+- fail-fast behavior
+- exception-to-step-failure conversion
+
+Not yet supported:
+
+- branching workflows
+- parallel workflow execution
+- workflow step retries
+- async workflow engine
+- durable workflow persistence
+- visual workflow builder
+
+The workflow engine is intentionally simple.
+
+It provides the foundation for composing more complex AI workflows from reusable steps.
+
+---
+
+## Multi-Agent Orchestration
+
+Multi-agent orchestration lets applications coordinate multiple specialized agents.
+
+A single agent handles one role.
+
+A multi-agent orchestrator can combine several roles.
+
+Example roles:
+
+```text
+technical agent
+    ↓
+reviewer agent
+    ↓
+summary agent
+```
+
+The toolkit includes an explicit `MultiAgentOrchestrator`.
+
+It does not perform autonomous routing, recursive loops, or agent-to-agent debate.
+
+```python
+from ai.agent import Agent
+from ai.client import AIClient
+from ai.memory import InMemoryConversationMemory
+from ai.orchestrator import MultiAgentOrchestrator
+
+ai = AIClient()
+
+technical_agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a technical assistant. "
+        "Explain the concept clearly and accurately."
+    ),
+    memory=InMemoryConversationMemory(),
+)
+
+reviewer_agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a reviewer. "
+        "Check the previous answer for clarity and correctness."
+    ),
+    memory=InMemoryConversationMemory(),
+)
+
+summary_agent = Agent(
+    ai_client=ai,
+    instructions=(
+        "You are a summarizer. "
+        "Make the previous answer shorter and easier for a beginner."
+    ),
+    memory=InMemoryConversationMemory(),
+)
+
+orchestrator = MultiAgentOrchestrator(
+    agents={
+        "technical": technical_agent,
+        "reviewer": reviewer_agent,
+        "summary": summary_agent,
+    }
+)
+
+response = orchestrator.run_sequence(
+    agent_names=[
+        "technical",
+        "reviewer",
+        "summary",
+    ],
+    message="Explain how Redis can help a Django application.",
+)
+
+print(response.success)
+print(response.final_output)
+```
+
+Agents can also be run individually by name.
+
+```python
+result = orchestrator.run_agent(
+    agent_name="technical",
+    message="Explain Redis for Django.",
+)
+
+print(result.success)
+
+if result.response is not None:
+    print(result.response.output)
+```
+
+Registered agent names can be inspected.
+
+```python
+print(orchestrator.agent_names())
+```
+
+`run_sequence(...)` passes each successful agent output to the next agent.
+
+```text
+original message
+    ↓
+technical agent output
+    ↓
+reviewer agent output
+    ↓
+summary agent output
+```
+
+If an agent fails, the orchestrator stops the sequence and returns the results so far.
+
+```python
+response.success
+response.results
+response.final_output
+```
+
+Current multi-agent support:
+
+- `AgentRunResult`
+- `MultiAgentResponse`
+- `MultiAgentOrchestrator`
+- named agent registration
+- running one selected agent
+- running multiple agents sequentially
+- passing output from one agent to the next
+- collecting all agent results
+- failure handling
+- final output helper
+
+Not yet supported:
+
+- AI-based agent routing
+- parallel multi-agent execution
+- agent-to-agent debate
+- shared multi-agent memory
+- recursive agent loops
+- tool-using multi-agent workflows
+- autonomous multi-agent planning
+
+The first orchestrator is intentionally explicit and controlled.
+
+It provides a safe foundation for more advanced orchestration later.
+
+## Structured Responses
+
+Supports returning validated Pydantic models instead of raw text.
+
+```python
+recommendation = ai.ask(
+    prompt=prompt,
+    response_type=DrinkRecommendation,
+)
+
+print(recommendation.data.recommended_item)
+```
+
+---
+
+## Automatic Validation
+
+Responses are validated using Pydantic schemas.
+
+Invalid JSON and schema mismatches raise custom exceptions.
+
+---
+
+## Retry
+
+Structured responses are automatically retried using the configured retry count if validation fails.
+
+---
+
+## Logging
+
+Each request is logged with:
+
+- request id
+- model
+- duration
+- retry count
+- token usage
+- estimated cost
+
+Prompts and model responses are not logged by default.
+
+---
+
+## Token Usage
+
+Provider token usage is tracked and returned with every request.
+
+---
+
+## Cost Estimation
+
+Supports configurable token pricing for estimating request cost.
+
+---
+
+## Custom Exceptions
+
+Includes dedicated exception hierarchy.
+
+Examples:
+
+- `AIConfigurationError`
+- `AIProviderError`
+- `AIJSONParseError`
+- `AISchemaValidationError`
+
+---
+
+# Current Project Structure
+
+```text
+python-ai-toolkit/
+
+├── ai/
+│   ├── client.py
+│   ├── config.py
+│   ├── cost.py
+│   ├── exceptions.py
+│   ├── executor.py
+│   ├── logger.py
+│   ├── parser.py
+│   ├── prompts.py
+│   ├── request_builder.py
+│   ├── schemas.py
+│   └── providers/
+│       ├── base.py
+│       ├── factory.py
+│       └── openai_provider.py
+│
+├── docs/
+│   ├── architecture/
+│   └── development/
+│
+├── examples/
+│
+├── tests/
+│
+├── logs/
+│
+└── README.md
+```
+
+## Configuration Validation
+
+Configuration is validated when `AIClient` loads the toolkit settings.
+
+The toolkit fails early with `AIConfigurationError` when configuration is invalid.
+
+Currently validated:
+
+- provider is not empty
+- API key is not empty
+- model is not empty
+- retry count is zero or greater
+
+Example:
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-5.4-mini
+AI_MAX_RETRIES=1
+```
+
+Invalid configuration raises an error before an AI request is sent.
+
+```python
+from ai.client import AIClient
+from ai.exceptions import AIConfigurationError
+
+try:
+    ai = AIClient()
+except AIConfigurationError as exc:
+    print(f"Invalid AI configuration: {exc}")
+```
+
+## Logging Configuration
+
+The toolkit logs request metadata by default.
+
+Logged metadata may include:
+
+* request ID
+* model
+* request duration
+* retry count
+* token usage
+* estimated cost
+* success or failure status
+
+Prompts and provider responses are not logged because they may contain confidential application data.
+
+### Default logging configuration
+
+```env
+AI_LOG_LEVEL=INFO
+AI_LOG_FILE_PATH=logs/ai_toolkit.log
+AI_FILE_LOGGING_ENABLED=true
+```
+
+### Log level
+
+Set the minimum recorded level:
+
+```env
+AI_LOG_LEVEL=WARNING
+```
+
+Supported values:
+
+```text
+DEBUG
+INFO
+WARNING
+ERROR
+CRITICAL
+```
+
+Invalid log levels raise `AIConfigurationError`.
+
+### Custom log file
+
+```env
+AI_LOG_FILE_PATH=runtime/logs/ai.log
+```
+
+The toolkit creates the parent directory when file logging is enabled.
+
+### Disable toolkit-managed file logging
+
+```env
+AI_FILE_LOGGING_ENABLED=false
+```
+
+When file logging is disabled:
+
+* the toolkit does not create the configured log directory,
+* the toolkit does not create or open a log file,
+* application-provided logging handlers remain available,
+* request execution continues normally.
+
+Disabling toolkit-managed file logging does not remove handlers added by the application.
+
+This is recommended for:
+
+* unit tests,
+* benchmarks,
+* continuous integration,
+* read-only environments,
+* applications that configure their own logging handlers.
+
+### Explicit configuration
+
+Logging can also be configured through `AIConfig`:
+
+```python
+from ai.client import AIClient
+from ai.config import AIConfig
+
+
+config = AIConfig(
+    provider="openai",
+    api_key="...",
+    model="gpt-5.4-mini",
+    log_level="WARNING",
+    log_file_path="runtime/ai.log",
+    file_logging_enabled=False,
+)
+
+client = AIClient(config=config)
+```
+
+Do not place real API keys directly in source code. The example uses a placeholder only.
+
+### Django configuration
+
+Django applications may configure logging inside `AI_TOOLKIT`:
+
+```python
+AI_TOOLKIT = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+    "log_level": "WARNING",
+    "log_file_path": "runtime/ai.log",
+    "file_logging_enabled": False,
+}
+```
+
+The `file_logging_enabled` value must be a Python Boolean:
+
+```python
+False
+```
+
+Do not use the string:
+
+```python
+"false"
+```
+
+### Configuration CLI
+
+Inspect the resolved values:
+
+```bash
+ai-toolkit config show
+```
+
+Example logging output:
+
+```text
+Log level: WARNING
+Log file path: runtime/ai.log
+File logging enabled: no
+```
+
+
+## Why this documentation matters
+
+Configuration validation affects application startup behavior. Developers need to know that:
+
+```python
+AIClient()
+```
+may raise:
+```python
+AIConfigurationError
+```
+before any request is made.
+
+That is intentional fail-fast behavior.
+
+---
+
+# Installation
+
+Clone the repository.
+
+```bash
+git clone https://github.com/<your-username>/python-ai-toolkit.git
+```
+
+Create a virtual environment.
+
+```bash
+python -m venv .venv
+```
+
+Activate it.
+
+Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Linux / macOS:
+
+```bash
+source .venv/bin/activate
+```
+
+Install dependencies.
+
+```bash
+pip install -r requirements.txt
+```
+
+Create a `.env`.
+
+```env
+AI_PROVIDER=openai
+
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-5.4-mini
+
+# Optional generic fallback for custom providers
+AI_API_KEY=
+AI_MODEL=
+
+AI_MAX_RETRIES=1
+
+AI_INPUT_COST_PER_1M_TOKENS=
+AI_OUTPUT_COST_PER_1M_TOKENS=
+```
+
+---
+
+## Django Integration
+
+Django support is optional. Install the toolkit with the Django extra:
+
+```bash
+pip install python-ai-toolkit[django]
+```
+
+For local toolkit development:
+
+```bash
+python -m pip install -e ".[django]"
+```
+
+### Configure Django settings
+
+Add `AI_TOOLKIT` to the Django project's `settings.py`:
+
+```python
+import os
+
+
+AI_TOOLKIT = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+    "embedding_model": "text-embedding-3-small",
+    "embedding_dimensions": None,
+    "max_retries": 1,
+}
+```
+
+Keep API keys in environment variables. Do not place real API keys directly in source code.
+
+### Create a configured client
+
+```python
+from ai.integrations.django import get_ai_client
+
+
+client = get_ai_client()
+result = client.ask("Summarize this customer message.")
+
+print(result.data)
+```
+
+The integration performs this translation:
+
+```text
+Django AI_TOOLKIT setting
+        ↓
+AIConfig
+        ↓
+AIClient
+        ↓
+Configured provider
+```
+
+### Structured-output example
+
+```python
+from pydantic import BaseModel
+
+from ai.integrations.django import get_ai_client
+
+
+class TicketAnalysis(BaseModel):
+    category: str
+    priority: str
+    summary: str
+
+
+def analyze_support_ticket(message: str) -> TicketAnalysis:
+    client = get_ai_client()
+
+    result = client.ask(
+        prompt=(
+            "Analyze this support ticket. Return its category, "
+            "priority, and a short summary.\n\n"
+            f"Ticket:\n{message}"
+        ),
+        response_type=TicketAnalysis,
+    )
+
+    return result.data
+```
+
+This function can be called from a Django view, service, Celery task, management command, or another application component.
+
+The Django integration only creates a configured toolkit client. Django models, views, background jobs, prompts, and business decisions remain the responsibility of the application.
+
+### Async client
+
+For asynchronous Django code:
+
+```python
+from ai.integrations.django import get_async_ai_client
+
+
+async def summarize_message(message: str) -> str:
+    client = get_async_ai_client()
+    result = await client.ask(f"Summarize this message:\n\n{message}")
+
+    return result.data
+```
+
+### Custom setting name
+
+A project may use a different Django setting name:
+
+```python
+CUSTOM_AI_CONFIG = {
+    "provider": "openai",
+    "api_key": os.environ["OPENAI_API_KEY"],
+    "model": "gpt-5.4-mini",
+}
+```
+
+Pass the name to the integration helper:
+
+```python
+from ai.integrations.django import get_ai_client
+
+
+client = get_ai_client("CUSTOM_AI_CONFIG")
+```
+
+The Django integration does not require an entry in `INSTALLED_APPS` and does not add models or migrations.
+
+## FastAPI Integration
+
+FastAPI support is optional. Install the toolkit with the FastAPI extra:
+
+```bash
+pip install python-ai-toolkit[fastapi]
+```
+
+For local toolkit development:
+
+```bash
+python -m pip install -e ".[fastapi]"
+```
+
+### Inject a synchronous client
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AIClientDependency
+
+app = FastAPI()
+
+
+class SummaryRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize")
+def summarize(
+    request: SummaryRequest,
+    client: AIClientDependency,
+):
+    result = client.ask(
+        f"Summarize the following text:\n\n{request.text}"
+    )
+
+    return {
+        "summary": result.data,
+    }
+```
+
+FastAPI resolves `AIClientDependency` through its dependency injection system.
+
+The integration performs this flow:
+
+```text
+HTTP request
+        ↓
+FastAPI endpoint
+        ↓
+AIClientDependency
+        ↓
+get_ai_client()
+        ↓
+AIClient
+        ↓
+Configured provider
+```
+
+### Inject an asynchronous client
+
+Use `AsyncAIClientDependency` inside asynchronous endpoints:
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AsyncAIClientDependency
+
+app = FastAPI()
+
+
+class SummaryRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize-async")
+async def summarize_async(
+    request: SummaryRequest,
+    client: AsyncAIClientDependency,
+):
+    result = await client.ask(
+        f"Summarize the following text:\n\n{request.text}"
+    )
+
+    return {
+        "summary": result.data,
+    }
+```
+
+### Structured-output example
+
+```python
+from typing import Literal
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+from ai.integrations.fastapi import AsyncAIClientDependency
+
+app = FastAPI()
+
+
+class TicketRequest(BaseModel):
+    message: str
+
+
+class TicketAnalysis(BaseModel):
+    category: Literal[
+        "billing",
+        "technical",
+        "account",
+        "other",
+    ]
+    priority: Literal[
+        "low",
+        "medium",
+        "high",
+    ]
+    summary: str
+
+
+@app.post(
+    "/analyze-ticket",
+    response_model=TicketAnalysis,
+)
+async def analyze_ticket(
+    request: TicketRequest,
+    client: AsyncAIClientDependency,
+) -> TicketAnalysis:
+    result = await client.ask(
+        prompt=(
+            "Analyze this support ticket. Determine its category "
+            "and priority, and return a short summary.\n\n"
+            f"Ticket:\n{request.message}"
+        ),
+        response_type=TicketAnalysis,
+    )
+
+    return result.data
+```
+
+The FastAPI application remains responsible for:
+
+* routes,
+* request and response schemas,
+* prompts,
+* authentication,
+* permissions,
+* database operations,
+* business decisions.
+
+The toolkit integration is responsible only for creating and injecting the configured client.
+
+### Testing FastAPI endpoints
+
+FastAPI dependencies can be replaced during tests:
+
+```python
+from types import SimpleNamespace
+
+from fastapi.testclient import TestClient
+
+from ai.integrations.fastapi import get_ai_client
+
+
+class FakeAIClient:
+    def ask(self, prompt: str):
+        return SimpleNamespace(data="Test summary")
+
+
+app.dependency_overrides[get_ai_client] = FakeAIClient
+
+test_client = TestClient(app)
+```
+
+This allows endpoint tests to run without contacting a real AI provider.
+
+The FastAPI integration does not add routes, middleware, database models, or application business logic.
+
+## Command-Line Interface
+
+The toolkit includes a command-line interface for simple plain-text AI requests.
+
+The CLI uses the same environment configuration as `AIClient`.
+
+### Install the command
+
+Install the package:
+
+```bash
+python -m pip install -e .
+```
+
+For toolkit development:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+The installation creates the following command:
+
+```text
+ai-toolkit
+```
+
+Verify it:
+
+```bash
+ai-toolkit --help
+```
+
+### Ask a question
+
+```bash
+ai-toolkit ask "Explain dependency injection simply."
+```
+
+Example output:
+
+```text
+Dependency injection means giving an object the dependencies it needs instead
+of making it create them itself.
+```
+
+A longer example:
+
+```bash
+ai-toolkit ask "Explain Django models using a simple product example."
+```
+
+The command performs this flow:
+
+```text
+Terminal command
+        ↓
+ai-toolkit entry point
+        ↓
+CLI argument parser
+        ↓
+AIClient
+        ↓
+Configured provider
+        ↓
+AI response
+        ↓
+Terminal output
+```
+
+### Configuration
+
+The CLI reads the normal toolkit environment configuration.
+
+Example `.env`:
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_api_key
+OPENAI_MODEL=gpt-5.4-mini
+```
+
+The CLI does not currently save or modify configuration.
+
+Configuration commands belong to the separate Configuration CLI roadmap task.
+
+### Prompt arguments
+
+Using quotes is recommended:
+
+```bash
+ai-toolkit ask "Explain Python dictionaries in two sentences."
+```
+
+Unquoted words also work:
+
+```bash
+ai-toolkit ask Explain Python dictionaries
+```
+
+The CLI joins the separate words into one prompt.
+
+### Exit codes
+
+The command uses standard exit codes:
+
+```text
+0   Request completed successfully
+1   Toolkit configuration or provider error
+2   Invalid command syntax
+```
+
+Example configuration failure:
+
+```text
+Error: Missing API key for provider 'openai'...
+```
+
+In PowerShell, inspect the exit code with:
+
+```powershell
+$LASTEXITCODE
+```
+
+### Current CLI scope
+
+The initial CLI supports plain-text requests only.
+
+It does not yet provide:
+
+* interactive chat,
+* streaming output,
+* structured responses,
+* tool calling,
+* image input,
+* provider or model command flags,
+* API-key setup,
+* configuration-file editing.
+
+These capabilities are intentionally outside the initial command-line task.
+
+### Configuration Commands
+
+The CLI can inspect and structurally validate the resolved toolkit configuration.
+
+These commands use the same configuration loader as `AIClient`.
+
+#### Show resolved configuration
+
+```bash
+ai-toolkit config show
+```
+
+Example output:
+
+```text
+Provider: openai
+API key: ********1234
+Model: gpt-5.4-mini
+Embedding model: text-embedding-3-small
+Embedding dimensions: default
+Maximum retries: 1
+Input cost per 1M tokens: not configured
+Output cost per 1M tokens: not configured
+```
+
+The complete API key is never printed.
+
+The command displays the final values after provider-specific settings, generic fallbacks, and defaults have been resolved.
+
+#### Validate configuration structure
+
+```bash
+ai-toolkit config validate
+```
+
+Example output:
+
+```text
+Configuration is structurally valid. Provider credentials were not verified.
+```
+
+Structural validation checks that:
+
+* the provider is present,
+* an API key value is present,
+* the model is present,
+* retry configuration is valid,
+* the embedding model is present,
+* embedding dimensions are valid when configured.
+
+Structural validation does not contact the configured provider.
+
+A fake but non-empty API key can therefore pass structural validation.
+
+Credential validity, provider connectivity, account permissions, model availability, quota, and billing status are not checked by this command.
+
+#### Configuration error
+
+When configuration is missing or invalid:
+
+```text
+Error: Missing API key for provider 'openai'...
+```
+
+The command returns exit code `1`.
+
+#### Current safety boundaries
+
+The Configuration CLI does not:
+
+* print complete API keys,
+* accept API keys as command arguments,
+* write API keys to disk,
+* modify `.env`,
+* overwrite existing configuration,
+* contact the provider during structural validation.
+
+These restrictions avoid exposing secrets in terminal history, process arguments, logs, or accidental source-control commits.
+
+
+# Development
+
+Run tests.
+
+```bash
+python -m pytest
+```
+
+Format code.
+
+```bash
+python -m black .
+```
+
+Lint code.
+
+```bash
+python -m ruff check .
+```
+
+---
+
+# Roadmap
+
+## Core
+
+- [x] Configuration management
+- [x] Provider abstraction
+- [x] Provider factory
+- [x] Provider registry
+- [x] Provider registration API
+- [x] Provider configuration cleanup
+- [x] OpenAI provider
+- [x] AI client
+- [x] Fluent request builder
+- [x] Prompt builder
+- [x] Prompt templates
+- [x] Structured responses
+- [x] Schema validation
+- [x] Retry
+- [x] Logging
+- [x] Token tracking
+- [x] Cost estimation
+- [x] Request IDs
+
+---
+
+## Planned
+
+- [ ] Example gallery
+- [ ] Configuration validation improvements
+- [ ] Better error messages
+- [ ] Streaming responses
+- [ ] Async client
+- [ ] Tool calling
+- [ ] Image inputs
+- [ ] Conversation memory
+- [ ] Embeddings
+- [ ] Vector store abstraction
+- [ ] RAG pipeline
+- [ ] Agent framework
+- [ ] Workflow engine
+- [ ] Django integration
+- [ ] FastAPI integration
+- [ ] PyPI package
+
+---
+
+# Design Principles
+
+- Single Responsibility Principle
+- Dependency Inversion
+- Composition over inheritance
+- Strong typing
+- Reusable components
+- Clear interfaces
+- Production-oriented architecture
+
+---
+
+# License
+
+MIT

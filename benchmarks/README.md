@@ -265,6 +265,136 @@ Benchmark output should support comparison and profiling, not machine-specific p
 
 ---
 
+## Deterministic Fake Providers
+
+Benchmark requests use fake providers from:
+
+```text
+benchmarks/fakes.py
+```
+
+These providers implement only the behavior required by the benchmarked toolkit component.
+
+They do not:
+
+* access the network
+* require provider credentials
+* call external APIs
+* sleep or simulate model latency
+* write files
+* generate random responses
+* perform application logging
+
+### Synchronous fake provider
+
+`FakeTextProvider` returns one prebuilt `ProviderResponse` for every request.
+
+```python
+from benchmarks.fakes import FakeTextProvider
+
+
+provider = FakeTextProvider(
+    response_text="Benchmark response",
+)
+```
+
+The response object is created before benchmark timing begins. This reduces fake-provider construction overhead inside the measured request lifecycle.
+
+### Asynchronous fake provider
+
+`FakeAsyncTextProvider` provides deterministic async request behavior:
+
+```python
+from benchmarks.fakes import FakeAsyncTextProvider
+
+
+provider = FakeAsyncTextProvider(
+    response_text="Benchmark response",
+)
+```
+
+It performs no asynchronous I/O. The async method exists only to satisfy the asynchronous provider interface.
+
+### Sequence provider
+
+`SequenceTextProvider` returns predefined responses in order:
+
+```python
+from benchmarks.fakes import SequenceTextProvider
+
+
+provider = SequenceTextProvider(
+    responses=[
+        "Invalid response",
+        '{"name": "Valid response"}',
+    ]
+)
+```
+
+This provider is intended for deterministic retry and structured-response repair benchmarks.
+
+It raises an error when all configured responses have been consumed. Unexpected additional provider calls therefore fail visibly instead of silently reusing a response.
+
+### Shared token usage
+
+Benchmark fixtures use deterministic token metadata:
+
+```python
+TokenUsage(
+    input_tokens=10,
+    output_tokens=5,
+    total_tokens=15,
+)
+```
+
+This allows request-result construction and cost calculation to run without depending on provider-generated usage data.
+
+### Benchmark logger
+
+Directly constructed executors receive an isolated logger:
+
+```python
+executor = RequestExecutor(
+    provider=provider,
+    model="benchmark-model",
+    logger=benchmark_logger,
+)
+```
+
+The benchmark logger:
+
+* uses a `NullHandler`
+* does not propagate records
+* creates no file handler
+* performs no console output
+* prevents logging I/O from affecting benchmark measurements
+
+The environment fixture also sets:
+
+```env
+AI_FILE_LOGGING_ENABLED=false
+```
+
+The environment setting protects configuration-loaded clients. Explicit logger injection protects directly constructed executors.
+
+### Correctness tests
+
+Fake-provider correctness tests are stored under:
+
+```text
+tests/test_benchmark_fakes.py
+```
+
+These tests run as part of the normal test suite.
+
+Benchmark fixture checks are stored under:
+
+```text
+benchmarks/test_benchmark_fixtures.py
+```
+
+Correctness tests verify the benchmark infrastructure before it is used for performance measurement.
+
 ## Benchmark Results
 
 `pytest-benchmark` may store local result files under:
