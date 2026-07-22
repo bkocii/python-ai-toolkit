@@ -233,103 +233,141 @@ writing unexpectedly during clean package verification.
 
 ---
 
-## PROD-001 — Benchmark Suite
+### PROD-001 — Benchmark Suite
 
-### Goal
+Status: Completed
 
-Create deterministic benchmarks that measure toolkit overhead without depending on live AI providers.
+Goal:
 
-### Tasks
+Establish deterministic performance baselines for the toolkit's main internal execution paths before Version 1.0.
 
-* [x] BENCH-001 Add benchmark development tooling
-* [x] BENCH-002 Create reusable fake providers and benchmark fixtures
-* [x] BENCH-003 Benchmark the plain-text request lifecycle
-* [x] BENCH-004 Benchmark structured-output parsing
-* [x] BENCH-005 Benchmark structured-output retry repair
-* [x] BENCH-006 Benchmark in-memory vector search
-* [x] BENCH-007 Benchmark RAG pipeline orchestration
-* [x] BENCH-008 Benchmark workflow execution overhead
-* [ ] BENCH-009 Document benchmark commands and comparison workflow
+The benchmark suite must measure toolkit overhead rather than network latency, model execution, provider availability, or machine-specific external services.
 
-### Benchmark Rules
+#### BENCH-000 — Make Logging Safe for Tests and Benchmarks
 
-* Benchmarks must not contact live AI providers by default.
-* Benchmarks must not require real API keys.
-* Benchmarks must use deterministic fake providers and fixed test data.
-* Benchmarks must be stored separately from functional tests.
-* Normal `python -m pytest` execution must not run the benchmark suite.
-* Benchmark results must not use strict timing assertions initially.
-* Machine-specific benchmark result files must not be committed.
-* Functional correctness remains covered by the normal test suite.
+* [x] Add configurable log level
+* [x] Add configurable log file path
+* [x] Add an option to disable toolkit-managed file logging
+* [x] Disable file logging during benchmark execution
+* [x] Preserve application-owned logging handlers
+* [x] Support synchronous and asynchronous executor logger injection
+* [x] Add logging configuration and behavior tests
+* [x] Document logging configuration
 
-### Initial Benchmark Groups
+#### BENCH-001 — Add Benchmark Tooling
 
-#### Request Lifecycle
+* [x] Add a separate benchmark dependency group
+* [x] Add `pytest-benchmark`
+* [x] Create the isolated `benchmarks/` directory
+* [x] Add benchmark-specific fixtures
+* [x] Exclude benchmarks from normal test discovery
+* [x] Ignore generated benchmark result files
+* [x] Add a benchmark smoke test
+* [x] Document benchmark execution
 
-Measure the overhead of:
+#### BENCH-002 — Add Deterministic Fake Providers and Fixtures
 
-```text
-AIClient
-    ↓
-RequestExecutor
-    ↓
-Fake provider
-    ↓
-AIResult
-```
+* [x] Add a deterministic synchronous provider
+* [x] Add a deterministic asynchronous provider
+* [x] Add a sequential retry provider
+* [x] Add shared token-usage fixtures
+* [x] Add shared provider-response fixtures
+* [x] Add a no-output benchmark logger
+* [x] Add fake-provider correctness tests
+* [x] Add benchmark fixture correctness tests
 
-The fake provider should return immediately so the result measures toolkit overhead rather than network latency.
+#### BENCH-003 — Benchmark Plain Request Lifecycle
 
-#### Structured Output
+* [x] Benchmark synchronous plain-text request execution
+* [x] Use a deterministic fake provider
+* [x] Exclude executor and provider construction
+* [x] Exclude file and console logging I/O
+* [x] Verify returned `AIResult`
 
-Measure:
+#### BENCH-004 — Benchmark Structured Response Parsing
 
-* valid JSON parsing
-* Pydantic model validation
-* structured prompt construction
-* one failed response followed by a successful repair response
+* [x] Add deterministic valid JSON input
+* [x] Add a representative Pydantic schema
+* [x] Benchmark JSON decoding and schema validation
+* [x] Exclude provider and request lifecycle overhead
+* [x] Verify parsed-model correctness
 
-#### Vector Search
+#### BENCH-005 — Benchmark Retry and Repair Lifecycle
 
-Measure similarity search using fixed vector dimensions and dataset sizes such as:
+* [x] Add deterministic invalid and repaired responses
+* [x] Reset provider state before each measured round
+* [x] Benchmark one successful retry and repair cycle
+* [x] Include repair prompt construction
+* [x] Include token-usage aggregation
+* [x] Verify original response, repaired response, and retry metadata
 
-* 100 records
-* 1,000 records
-* 10,000 records, only if runtime remains practical
+#### BENCH-006 — Benchmark Vector Search
 
-The benchmark should use deterministic vectors.
+* [x] Add 1,000 deterministic vector records
+* [x] Use 64-dimensional vectors
+* [x] Benchmark unfiltered similarity search
+* [x] Benchmark metadata-filtered similarity search
+* [x] Exclude dataset and vector-store construction
+* [x] Verify ranking, result limits, and metadata filtering
 
-#### RAG Pipeline
+#### BENCH-007 — Benchmark RAG Orchestration
 
-Measure orchestration overhead using:
+* [x] Add deterministic retrieved contexts
+* [x] Add a no-I/O retriever
+* [x] Add a no-I/O AI client
+* [x] Benchmark context formatting
+* [x] Benchmark grounded prompt construction
+* [x] Benchmark RAG response assembly
+* [x] Exclude vector search and provider execution
+* [x] Verify returned answer, contexts, and metadata
 
-* a fake retriever
-* fixed retrieved contexts
-* a fake AI client
-* no embedding API call
-* no network request
+#### BENCH-008 — Benchmark Workflow Execution Overhead
 
-#### Workflow Engine
+* [x] Benchmark a one-step workflow
+* [x] Benchmark a five-step workflow
+* [x] Prebuild workflow engines and steps
+* [x] Include fresh context creation
+* [x] Include state propagation
+* [x] Include step and workflow result construction
+* [x] Verify step order, state, success, and final output
 
-Measure sequential execution using fixed workflow sizes such as:
+#### BENCH-009 — Document and Review the Benchmark Suite
 
-* 5 steps
-* 25 steps
-* 100 steps
+* [x] Add a complete benchmark catalog
+* [x] Document measured and excluded operations
+* [x] Document normal-test and benchmark-test isolation
+* [x] Document benchmark-only expected behavior
+* [x] Document clean-run verification
+* [x] Document local result saving and comparison
+* [x] Document benchmark interpretation
+* [x] Document benchmark stability policy
+* [x] Document rules for future benchmarks
+* [x] Review benchmark correctness and deterministic behavior
+* [x] Complete benchmark-suite validation
 
-Workflow functions should perform small deterministic state updates.
+#### Exit Criteria
 
-### Exit Criteria
+* [x] Normal tests do not automatically execute benchmarks
+* [x] Performance benchmarks run explicitly through `pytest-benchmark`
+* [x] Benchmarks require no real API keys
+* [x] Benchmarks perform no network calls
+* [x] Benchmarks perform no provider or model execution
+* [x] Toolkit-managed file logging is disabled during benchmarks
+* [x] Benchmark inputs and responses are deterministic
+* [x] Unrelated setup work is excluded from timing
+* [x] Every benchmark contains correctness assertions
+* [x] No strict machine-specific timing thresholds are used
+* [x] Generated benchmark results are ignored by Git
+* [x] Benchmark usage and interpretation are documented
+* [x] The normal test suite passes
+* [x] All benchmark correctness checks pass
+* [x] All performance benchmarks pass
+* [x] Black passes
+* [x] Ruff passes
 
-* [ ] Benchmark suite runs with one documented command
-* [ ] No benchmark makes a live provider request
-* [ ] No API key is required
-* [ ] Major toolkit layers have representative benchmarks
-* [ ] Benchmark results include timing and operation-rate statistics
-* [ ] Benchmark comparison instructions are documented
-* [ ] Normal test execution remains unchanged
+Result:
 
----
+Python AI Toolkit now has a deterministic internal performance baseline covering request execution, structured parsing, response repair, vector search, RAG orchestration, and workflow execution.
 
 ## PROD-002 — Performance Profiling
 

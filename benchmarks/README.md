@@ -2566,6 +2566,474 @@ Benchmark timing may vary based on:
 
 Use results for comparisons under similar conditions rather than machine-specific pass or fail rules.
 
+## Benchmark Suite Completion Review
+
+The initial Python AI Toolkit benchmark suite is complete.
+
+It establishes a deterministic Version 1.0 performance baseline for the toolkit's main internal execution paths.
+
+The suite measures toolkit behavior independently from:
+
+* external AI providers
+* model response speed
+* network latency
+* API authentication
+* real embedding generation
+* external vector databases
+* database access
+* file access
+* toolkit-managed file logging
+
+The benchmark suite is intended to detect internal performance regressions as the toolkit evolves.
+
+---
+
+## Benchmark Catalog
+
+The suite currently contains nine measured benchmarks.
+
+| Benchmark                    | File                         | Primary Measurement                                        |
+| ---------------------------- | ---------------------------- | ---------------------------------------------------------- |
+| Benchmark tooling smoke test | `test_benchmark_smoke.py`    | Confirms that benchmark tooling works                      |
+| Plain request lifecycle      | `test_request_lifecycle.py`  | Synchronous `RequestExecutor` overhead                     |
+| Structured response parsing  | `test_structured_parsing.py` | JSON decoding and Pydantic validation                      |
+| Retry and repair lifecycle   | `test_retry_repair.py`       | One failed parse followed by successful repair             |
+| Vector similarity search     | `test_vector_search.py`      | Unfiltered in-memory vector ranking                        |
+| Filtered vector search       | `test_vector_search.py`      | Metadata filtering and vector ranking                      |
+| RAG orchestration            | `test_rag_orchestration.py`  | Context formatting, prompt building, and response assembly |
+| One-step workflow            | `test_workflow_execution.py` | Minimum sequential workflow overhead                       |
+| Five-step workflow           | `test_workflow_execution.py` | Sequential execution and shared-state propagation          |
+
+The smoke benchmark validates benchmark infrastructure. It should not be interpreted as toolkit application performance.
+
+---
+
+## Measured Toolkit Areas
+
+### Request Execution
+
+The request lifecycle benchmark measures:
+
+* request ID generation
+* deterministic provider invocation
+* request duration calculation
+* token-cost estimation
+* metadata logging through a no-output logger
+* `AIResult` construction
+
+### Structured Responses
+
+The structured parsing benchmark measures:
+
+* JSON decoding
+* schema validation
+* Pydantic model construction
+
+The retry and repair benchmark additionally measures:
+
+* parsing failure handling
+* repair prompt construction
+* retry execution
+* repaired-response validation
+* token-usage aggregation
+
+### Vector Search
+
+The vector search benchmarks measure:
+
+* metadata filtering
+* cosine similarity calculation
+* vector dot products and norms
+* `VectorSearchResult` construction
+* score sorting
+* result limiting
+
+The benchmark dataset contains:
+
+```text
+1,000 records
+64 dimensions per vector
+5 returned results
+```
+
+### RAG Orchestration
+
+The RAG benchmark measures:
+
+* question validation
+* retriever invocation
+* context formatting
+* grounded prompt construction
+* additional-instruction handling
+* AI client invocation
+* `RAGResponse` construction
+
+Retrieval and provider execution are represented by deterministic no-I/O fakes.
+
+### Workflow Execution
+
+The workflow benchmarks measure:
+
+* workflow context creation
+* sequential step execution
+* workflow step-result construction
+* shared-state updates
+* executed-step collection
+* workflow result construction
+
+Both a minimum one-step workflow and a representative five-step workflow are included.
+
+---
+
+## Benchmark Infrastructure
+
+Shared benchmark infrastructure is located in:
+
+```text
+benchmarks/conftest.py
+benchmarks/fakes.py
+```
+
+It provides:
+
+* deterministic synchronous provider responses
+* deterministic asynchronous provider responses
+* sequential retry responses
+* deterministic token usage
+* prebuilt provider results
+* a no-output benchmark logger
+* automatic disabling of toolkit-managed file logging
+
+Fake-provider correctness is verified by:
+
+```text
+tests/test_benchmark_fakes.py
+```
+
+Benchmark fixture correctness is verified by:
+
+```text
+benchmarks/test_benchmark_fixtures.py
+```
+
+---
+
+## Run the Normal Test Suite
+
+```bash
+python -m pytest
+```
+
+Normal test discovery is restricted to:
+
+```text
+tests/
+```
+
+The benchmark suite is therefore excluded from ordinary test execution.
+
+---
+
+## Run All Benchmark-Directory Tests
+
+Run benchmark tests and infrastructure checks:
+
+```bash
+python -m pytest benchmarks -v
+```
+
+Run all benchmark-directory tests without collecting timing statistics:
+
+```bash
+python -m pytest benchmarks --benchmark-disable -v
+```
+
+After completion of the initial benchmark suite, this command should normally report:
+
+```text
+13 passed
+```
+
+This includes:
+
+* nine measured benchmark tests
+* four benchmark infrastructure tests
+
+---
+
+## Run Performance Benchmarks Only
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After completion of the initial suite, this command should normally report:
+
+```text
+9 passed, 4 skipped
+```
+
+The four skipped tests are infrastructure correctness tests that do not use the `benchmark` fixture.
+
+Their exclusion from `--benchmark-only` execution is expected.
+
+---
+
+## Run Individual Benchmark Areas
+
+Plain request lifecycle:
+
+```bash
+python -m pytest benchmarks/test_request_lifecycle.py --benchmark-only
+```
+
+Structured parsing:
+
+```bash
+python -m pytest benchmarks/test_structured_parsing.py --benchmark-only
+```
+
+Retry and repair:
+
+```bash
+python -m pytest benchmarks/test_retry_repair.py --benchmark-only
+```
+
+Vector search:
+
+```bash
+python -m pytest benchmarks/test_vector_search.py --benchmark-only
+```
+
+RAG orchestration:
+
+```bash
+python -m pytest benchmarks/test_rag_orchestration.py --benchmark-only
+```
+
+Workflow execution:
+
+```bash
+python -m pytest benchmarks/test_workflow_execution.py --benchmark-only
+```
+
+---
+
+## Clean Benchmark Verification
+
+Before a clean benchmark run, remove old generated artifacts:
+
+```powershell
+if (Test-Path logs) {
+    Remove-Item logs -Recurse -Force
+}
+
+if (Test-Path .benchmarks) {
+    Remove-Item .benchmarks -Recurse -Force
+}
+```
+
+Run the benchmark suite:
+
+```powershell
+python -m pytest benchmarks --benchmark-only
+```
+
+Verify that toolkit logging did not create a log directory:
+
+```powershell
+Test-Path logs
+```
+
+Expected result:
+
+```text
+False
+```
+
+The `.benchmarks/` directory may be created only when benchmark results are explicitly saved.
+
+---
+
+## API-Key Independence
+
+The benchmark suite must run without real provider credentials.
+
+No benchmark may require:
+
+* `OPENAI_API_KEY`
+* Anthropic credentials
+* Google credentials
+* local model services
+* external provider configuration
+
+Fake configuration values may be used only where a non-empty value is structurally required.
+
+---
+
+## Save a Local Baseline
+
+A developer may save machine-specific benchmark results locally:
+
+```bash
+python -m pytest benchmarks --benchmark-only --benchmark-save=version-1-baseline
+```
+
+Generated results are stored under:
+
+```text
+.benchmarks/
+```
+
+This directory is excluded from Git.
+
+Saved results are useful for comparisons made on the same or a closely comparable environment.
+
+They should not be committed as universal project performance results.
+
+---
+
+## Compare Local Runs
+
+Save an initial result:
+
+```bash
+python -m pytest benchmarks --benchmark-only --benchmark-save=before-change
+```
+
+After modifying implementation code, save another result:
+
+```bash
+python -m pytest benchmarks --benchmark-only --benchmark-save=after-change
+```
+
+Compare them:
+
+```bash
+python -m pytest-benchmark compare
+```
+
+A comparison is most meaningful when both runs use similar:
+
+* hardware
+* operating systems
+* Python versions
+* dependency versions
+* background system conditions
+
+---
+
+## How to Interpret Results
+
+Benchmark results can indicate that a toolkit operation became faster or slower.
+
+They do not automatically explain why.
+
+A meaningful regression should be investigated with profiling before implementation changes are made.
+
+Possible causes include:
+
+* additional object construction
+* repeated validation
+* unnecessary copying
+* slower loops
+* additional sorting
+* expanded prompt formatting
+* logging changes
+* dependency-version changes
+
+Small differences between individual runs may be normal measurement noise.
+
+---
+
+## Benchmark Stability Policy
+
+Existing benchmarks should normally remain unchanged when internal implementation is optimized.
+
+This allows the suite to compare the old and new implementations using the same measurement.
+
+A benchmark should be changed only when:
+
+* the public API changes intentionally
+* the measured behavior changes intentionally
+* the benchmark no longer represents the real execution path
+* the benchmark contains an error
+* setup work is incorrectly included in timing
+
+New capabilities should usually receive separate benchmarks rather than replacing unrelated existing baselines.
+
+---
+
+## Adding Future Benchmarks
+
+New benchmarks must:
+
+* measure one clearly defined operation
+* use deterministic input
+* avoid network access
+* avoid real API keys
+* avoid artificial sleeps
+* avoid file and console logging
+* keep unrelated setup outside timing
+* include correctness assertions
+* avoid strict machine-specific timing thresholds
+* document what is included and excluded
+
+A future feature does not require every existing benchmark to change.
+
+For example, adding a persistent vector store should normally result in a new persistent-store benchmark while preserving the existing `InMemoryVectorStore` baseline.
+
+---
+
+## Performance Threshold Policy
+
+The benchmark suite does not currently fail builds based on fixed duration thresholds.
+
+Checks such as the following are intentionally avoided:
+
+```python
+assert duration < 0.001
+```
+
+Fixed thresholds are unreliable across:
+
+* developer laptops
+* virtual machines
+* operating systems
+* supported Python versions
+* continuous integration runners
+* processors
+* background workloads
+
+The initial Version 1.0 benchmark suite provides observational baselines.
+
+Automated regression thresholds may be considered later after enough stable measurement history exists.
+
+---
+
+## Version 1.0 Baseline
+
+This suite represents the initial performance baseline for the path toward Python AI Toolkit Version 1.0.
+
+It covers:
+
+* plain request execution
+* structured response parsing
+* response repair and retry
+* vector similarity search
+* metadata-filtered vector search
+* RAG orchestration
+* minimum workflow execution
+* multi-step workflow execution
+
+Live provider and model comparisons are intentionally excluded.
+
+Those remain part of the post-Version-1.0 Future Backlog under:
+
+```text
+Automatic model benchmarking
+```
+
 
 ## Save Local Benchmark Results
 

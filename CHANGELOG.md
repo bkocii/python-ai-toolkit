@@ -49,7 +49,9 @@ The format loosely follows Keep a Changelog.
 * Metadata-filtered vector search benchmark 
 * Retrieval-Augmented Generation orchestration benchmark
 * Single-step workflow execution benchmark 
-* Five-step sequential workflow and state-propagation benchmark
+* Five-step sequential workflow and state-propagation benchmark 
+* Complete deterministic benchmark suite for request execution, structured parsing, retry repair, vector search, RAG orchestration, and workflow execution 
+* Version 1.0 internal performance baseline documentation
 
 
 ### Improved
@@ -80,7 +82,9 @@ The format loosely follows Keep a Changelog.
 * Performance visibility for response repair, retry handling, and token-usage aggregation 
 * Performance visibility for cosine similarity ranking and metadata filtering
 * Performance visibility for context formatting, grounded prompt construction, and RAG response assembly
-* Performance visibility for workflow context creation, sequential step execution, state updates, and result assembly
+* Performance visibility for workflow context creation, sequential step execution, state updates, and result assembly 
+* Benchmark execution, interpretation, comparison, and extension guidance
+* Benchmark completion verification without network access, provider credentials, or toolkit-managed file logging
 
 
 ## [0.7.0] - In Development
