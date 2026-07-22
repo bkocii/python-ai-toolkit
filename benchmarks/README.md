@@ -888,6 +888,363 @@ Results may vary depending on:
 
 Results should be used for profiling and comparisons under similar conditions, not machine-specific pass or fail thresholds.
 
+## Retry and Repair Benchmark
+
+The retry and repair benchmark measures the synchronous structured-response recovery path through `RequestExecutor`.
+
+Benchmark file:
+
+```text
+benchmarks/test_retry_repair.py
+```
+
+### What It Measures
+
+The benchmark measures a structured request that receives one invalid response and then successfully repairs it with one retry.
+
+Measured operations include:
+
+* structured prompt construction
+* initial deterministic provider invocation
+* failed JSON parsing
+* JSON parsing error handling
+* repair prompt construction
+* retry decision logic
+* second deterministic provider invocation
+* repaired JSON parsing
+* Pydantic model validation
+* token-usage aggregation
+* request duration calculation
+* token-cost estimation
+* metadata logging through a no-output logger
+* `AIResult` construction
+
+The measured execution path is:
+
+```text
+RequestExecutor.execute()
+        │
+        ▼
+Build structured prompt
+        │
+        ▼
+Receive invalid response
+        │
+        ▼
+Attempt structured parsing
+        │
+        ▼
+Catch parsing failure
+        │
+        ▼
+Check retry allowance
+        │
+        ▼
+Build JSON repair prompt
+        │
+        ▼
+Receive valid repaired response
+        │
+        ▼
+Parse and validate response
+        │
+        ▼
+Aggregate token usage
+        │
+        ▼
+Construct AIResult
+```
+
+### What It Excludes
+
+The benchmark intentionally excludes:
+
+* network access
+* real model execution
+* API authentication
+* provider latency
+* provider factory construction
+* environment loading
+* configuration validation
+* toolkit-managed file logging
+* console logging
+* persistent benchmark result storage
+
+The provider and executor are created by benchmark setup before each measured round.
+
+### Deterministic Responses
+
+The first provider response is intentionally invalid:
+
+```text
+This is not valid JSON.
+```
+
+The second response is valid:
+
+```json
+{
+    "name": "Recovered User",
+    "age": 35,
+    "active": true
+}
+```
+
+The same two responses are used for every benchmark round.
+
+No random content or provider-generated output is involved.
+
+### Response Schema
+
+The repaired response is validated against:
+
+```python
+class RepairedContact(BaseModel):
+    name: str
+    age: int
+    active: bool
+```
+
+The benchmark therefore measures both JSON recovery and Pydantic model validation.
+
+### Fresh State Per Round
+
+`SequenceTextProvider` consumes its configured responses in order.
+
+A fresh provider and executor must therefore be created before every measured execution.
+
+The benchmark uses pedantic setup:
+
+```python
+def setup():
+    provider = make_sequence_text_provider(
+        [
+            INVALID_RESPONSE,
+            VALID_RESPONSE,
+        ]
+    )
+
+    executor = RequestExecutor(
+        provider=provider,
+        model="benchmark-model",
+        max_retries=1,
+        logger=benchmark_logger,
+    )
+
+    return (executor,), {}
+```
+
+Setup executes outside the measured request function.
+
+Each measured round receives a fresh executor backed by a fresh sequential provider.
+
+The benchmark uses:
+
+```python
+rounds=100
+iterations=1
+```
+
+One iteration is used per round because one request consumes the complete two-response sequence.
+
+### Benchmark Implementation
+
+```python
+from pydantic import BaseModel
+
+from ai.executor import RequestExecutor
+
+BENCHMARK_ROUNDS = 100
+
+INVALID_RESPONSE = "This is not valid JSON."
+
+VALID_RESPONSE = """
+{
+    "name": "Recovered User",
+    "age": 35,
+    "active": true
+}
+""".strip()
+
+
+class RepairedContact(BaseModel):
+    name: str
+    age: int
+    active: bool
+
+
+def execute_repair_request(
+    executor: RequestExecutor,
+):
+    return executor.execute(
+        prompt="Return contact information.",
+        response_type=RepairedContact,
+    )
+
+
+def test_structured_response_retry_and_repair(
+    benchmark,
+    make_sequence_text_provider,
+    benchmark_logger,
+):
+    def setup():
+        provider = make_sequence_text_provider(
+            [
+                INVALID_RESPONSE,
+                VALID_RESPONSE,
+            ]
+        )
+
+        executor = RequestExecutor(
+            provider=provider,
+            model="benchmark-model",
+            max_retries=1,
+            logger=benchmark_logger,
+        )
+
+        return (executor,), {}
+
+    result = benchmark.pedantic(
+        execute_repair_request,
+        setup=setup,
+        rounds=BENCHMARK_ROUNDS,
+        iterations=1,
+    )
+
+    assert isinstance(result.data, RepairedContact)
+    assert result.data.name == "Recovered User"
+    assert result.data.age == 35
+    assert result.data.active is True
+
+    assert result.original_raw_response == INVALID_RESPONSE
+    assert result.raw_response == VALID_RESPONSE
+    assert result.retries_used == 1
+
+    assert result.token_usage is not None
+    assert result.token_usage.input_tokens == 20
+    assert result.token_usage.output_tokens == 10
+    assert result.token_usage.total_tokens == 30
+
+    assert result.request_id
+    assert result.duration_ms is not None
+    assert result.duration_ms >= 0
+```
+
+### Token-Usage Aggregation
+
+Each fake provider response contains:
+
+```text
+Input tokens:  10
+Output tokens: 5
+Total tokens:  15
+```
+
+One initial request and one retry therefore produce:
+
+```text
+Input tokens:  20
+Output tokens: 10
+Total tokens:  30
+```
+
+The correctness assertions verify this aggregation.
+
+This ensures that the benchmark exercises real retry metadata behavior rather than only parsing the second response.
+
+### Run the Benchmark
+
+Run only the retry and repair benchmark:
+
+```bash
+python -m pytest benchmarks/test_retry_repair.py --benchmark-only
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m pytest benchmarks\test_retry_repair.py --benchmark-only
+```
+
+### Debug Without Timing Statistics
+
+```bash
+python -m pytest benchmarks/test_retry_repair.py --benchmark-disable -v
+```
+
+Use this mode when debugging:
+
+* sequential response order
+* structured parsing failures
+* repair prompt execution
+* retry counts
+* token aggregation
+* returned model values
+* `AIResult` metadata
+
+### Run All Benchmarks
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After BENCH-005, the benchmark table should contain:
+
+```text
+test_benchmark_tooling_is_available
+test_plain_request_lifecycle
+test_structured_response_parsing
+test_structured_response_retry_and_repair
+```
+
+Infrastructure-only tests remain skipped when `--benchmark-only` is used.
+
+### Correctness Verification
+
+After timing, the benchmark confirms:
+
+* the repaired response becomes a `RepairedContact`
+* all structured fields contain the expected values
+* the original invalid response is preserved
+* the final valid response is preserved
+* exactly one retry is recorded
+* token usage from both provider calls is combined
+* a request ID is generated
+* duration metadata is present
+
+These checks ensure that performance results cannot hide broken retry or repair behavior.
+
+### Benchmark Scope
+
+This benchmark measures the successful one-retry recovery path.
+
+It does not measure:
+
+* repeated invalid responses
+* retry exhaustion
+* terminal parsing failures
+* provider exceptions
+* exponential backoff
+* network retry behavior
+
+Failure paths remain covered by normal correctness tests.
+
+The benchmark suite focuses on stable successful operations rather than using timing results as assertions for exceptional behavior.
+
+### Timing Policy
+
+The benchmark has no fixed maximum-duration assertion.
+
+Its results should be used to:
+
+* compare changes on the same machine
+* identify performance regressions
+* support profiling
+* understand the cost of response repair relative to successful parsing
+
+Results from unrelated machines or environments should not be treated as directly equivalent.
+
+
 ## Save Local Benchmark Results
 
 To save a local benchmark run:

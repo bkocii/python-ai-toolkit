@@ -245,7 +245,7 @@ Create deterministic benchmarks that measure toolkit overhead without depending 
 * [x] BENCH-002 Create reusable fake providers and benchmark fixtures
 * [x] BENCH-003 Benchmark the plain-text request lifecycle
 * [x] BENCH-004 Benchmark structured-output parsing
-* [ ] BENCH-005 Benchmark structured-output retry repair
+* [x] BENCH-005 Benchmark structured-output retry repair
 * [ ] BENCH-006 Benchmark in-memory vector search
 * [ ] BENCH-007 Benchmark RAG pipeline orchestration
 * [ ] BENCH-008 Benchmark workflow execution overhead
