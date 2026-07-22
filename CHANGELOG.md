@@ -44,7 +44,9 @@ The format loosely follows Keep a Changelog.
 * Shared benchmark token-usage and provider-response fixtures 
 * Isolated no-output logger for direct executor benchmarks 
 * Structured JSON response parsing and Pydantic validation benchmark 
-* Structured-response retry and JSON repair lifecycle benchmark
+* Structured-response retry and JSON repair lifecycle benchmark 
+* In-memory vector similarity search benchmark 
+* Metadata-filtered vector search benchmark
 
 
 ### Improved
@@ -72,8 +74,8 @@ The format loosely follows Keep a Changelog.
 * Detection of unexpected additional provider calls in retry benchmarks 
 * Separation between benchmark infrastructure correctness tests and timing measurements
 * Performance visibility for structured-response parsing independent of provider and request lifecycle overhead 
-* Performance visibility for response repair, retry handling, and token-usage aggregation
-
+* Performance visibility for response repair, retry handling, and token-usage aggregation 
+* Performance visibility for cosine similarity ranking and metadata filtering
 
 
 ## [0.7.0] - In Development

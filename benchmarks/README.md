@@ -1244,6 +1244,391 @@ Its results should be used to:
 
 Results from unrelated machines or environments should not be treated as directly equivalent.
 
+## Vector Search Benchmarks
+
+The vector search benchmarks measure similarity search performance in `InMemoryVectorStore`.
+
+Benchmark file:
+
+```text
+benchmarks/test_vector_search.py
+```
+
+Two search paths are measured:
+
+* similarity search across all stored records
+* similarity search with a metadata filter
+
+### Benchmark Dataset
+
+The benchmark uses:
+
+```text
+Records:          1,000
+Vector dimensions:   64
+Returned results:     5
+```
+
+The records are created before benchmark timing begins.
+
+Every record contains:
+
+* a stable ID
+* deterministic text
+* a deterministic 64-dimensional vector
+* source metadata
+* group metadata
+
+Example metadata:
+
+```python
+{
+    "source": "even",
+    "group": "0",
+}
+```
+
+The benchmark performs no embedding requests and does not require an embedding model.
+
+### Deterministic Vectors
+
+Vectors are generated using deterministic arithmetic:
+
+```python
+def build_deterministic_vector(
+    record_index: int,
+) -> list[float]:
+    vector = []
+
+    for dimension_index in range(VECTOR_DIMENSIONS):
+        value = (
+            ((record_index + 1) * (dimension_index + 3)) % 101
+        ) / 100.0
+
+        if dimension_index == record_index % VECTOR_DIMENSIONS:
+            value += 1.0
+
+        vector.append(value)
+
+    return vector
+```
+
+This approach provides stable benchmark data without:
+
+* randomness
+* external embedding providers
+* API credentials
+* network access
+* stored fixture files
+
+The same vectors are generated on every benchmark run.
+
+### Dataset Construction
+
+The benchmark dataset is created through a module-scoped fixture:
+
+```python
+@pytest.fixture(scope="module")
+def vector_search_dataset():
+    records = [
+        VectorRecord(
+            id=f"record-{record_index}",
+            text=f"Benchmark document {record_index}",
+            vector=build_deterministic_vector(record_index),
+            metadata={
+                "source": (
+                    "even"
+                    if record_index % 2 == 0
+                    else "odd"
+                ),
+                "group": str(record_index % 10),
+            },
+        )
+        for record_index in range(RECORD_COUNT)
+    ]
+
+    store = InMemoryVectorStore()
+    store.add(records)
+
+    query_vector = list(records[TARGET_INDEX].vector)
+
+    return store, query_vector
+```
+
+The following operations happen before timing begins:
+
+* deterministic vector generation
+* `VectorRecord` construction
+* metadata construction
+* vector-store construction
+* insertion of records into the store
+* selection of the query vector
+
+The benchmark therefore measures search, not dataset preparation.
+
+### Unfiltered Similarity Search
+
+The unfiltered benchmark searches across all 1,000 records.
+
+Measured operations include:
+
+* candidate collection
+* cosine similarity calculation
+* vector dot-product calculation
+* vector norm calculation
+* `VectorSearchResult` construction
+* score sorting
+* result limiting
+
+The measured execution path is:
+
+```text
+Query vector
+        │
+        ▼
+InMemoryVectorStore.similarity_search()
+        │
+        ▼
+Collect all 1,000 records
+        │
+        ▼
+Calculate cosine similarity for every record
+        │
+        ▼
+Construct VectorSearchResult objects
+        │
+        ▼
+Sort by descending score
+        │
+        ▼
+Return the best five results
+```
+
+Benchmark implementation:
+
+```python
+def test_vector_similarity_search(
+    benchmark,
+    vector_search_dataset,
+):
+    store, query_vector = vector_search_dataset
+
+    results = benchmark(
+        store.similarity_search,
+        query_vector=query_vector,
+        limit=RESULT_LIMIT,
+    )
+
+    assert len(results) == RESULT_LIMIT
+    assert results[0].id == f"record-{TARGET_INDEX}"
+    assert results[0].score == pytest.approx(1.0)
+    assert results[0].vector == query_vector
+
+    assert all(
+        results[index].score >= results[index + 1].score
+        for index in range(len(results) - 1)
+    )
+```
+
+### Metadata-Filtered Search
+
+The metadata-filtered benchmark searches using:
+
+```python
+metadata_filter={"source": "even"}
+```
+
+The target record uses the matching `even` source value.
+
+Measured operations include:
+
+* metadata comparison for all stored records
+* candidate selection
+* cosine similarity calculation for matching records
+* `VectorSearchResult` construction
+* score sorting
+* result limiting
+
+The measured execution path is:
+
+```text
+Query vector and metadata filter
+        │
+        ▼
+Check metadata on every stored record
+        │
+        ▼
+Keep records with source="even"
+        │
+        ▼
+Calculate cosine similarity
+        │
+        ▼
+Sort matching results
+        │
+        ▼
+Return the best five results
+```
+
+Benchmark implementation:
+
+```python
+def test_vector_similarity_search_with_metadata_filter(
+    benchmark,
+    vector_search_dataset,
+):
+    store, query_vector = vector_search_dataset
+
+    results = benchmark(
+        store.similarity_search,
+        query_vector=query_vector,
+        limit=RESULT_LIMIT,
+        metadata_filter={"source": "even"},
+    )
+
+    assert len(results) == RESULT_LIMIT
+    assert results[0].id == f"record-{TARGET_INDEX}"
+    assert results[0].score == pytest.approx(1.0)
+
+    assert all(
+        result.metadata["source"] == "even"
+        for result in results
+    )
+
+    assert all(
+        results[index].score >= results[index + 1].score
+        for index in range(len(results) - 1)
+    )
+```
+
+### What the Benchmarks Exclude
+
+The vector search benchmarks intentionally exclude:
+
+* embedding generation
+* provider calls
+* API authentication
+* network latency
+* vector-store construction
+* record construction
+* adding records to the store
+* disk persistence
+* database queries
+* external vector databases
+* file logging
+* benchmark result storage
+
+These benchmarks measure only the current in-memory reference implementation.
+
+They should not be interpreted as performance measurements for services such as:
+
+* Pinecone
+* Weaviate
+* Qdrant
+* Chroma
+* PostgreSQL with pgvector
+* managed cloud vector databases
+
+### Correctness Verification
+
+The unfiltered benchmark verifies:
+
+* exactly five results are returned
+* the exact query record ranks first
+* the top score is approximately `1.0`
+* the returned vector matches the query
+* results are ordered by descending score
+
+The metadata-filtered benchmark additionally verifies:
+
+* every returned record matches the requested metadata
+* the target record remains ranked first
+
+These assertions ensure that performance measurements cannot hide incorrect ranking or filtering behavior.
+
+### Run Both Vector Search Benchmarks
+
+```bash
+python -m pytest benchmarks/test_vector_search.py --benchmark-only
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m pytest benchmarks\test_vector_search.py --benchmark-only
+```
+
+### Debug Without Timing Statistics
+
+```bash
+python -m pytest benchmarks/test_vector_search.py --benchmark-disable -v
+```
+
+This mode is useful when debugging:
+
+* deterministic vector generation
+* record construction
+* query-vector selection
+* cosine similarity behavior
+* result ranking
+* metadata filtering
+* correctness assertions
+
+### Run All Benchmarks
+
+```bash
+python -m pytest benchmarks --benchmark-only
+```
+
+After BENCH-006, the benchmark table should contain:
+
+```text
+test_benchmark_tooling_is_available
+test_plain_request_lifecycle
+test_structured_response_parsing
+test_structured_response_retry_and_repair
+test_vector_similarity_search
+test_vector_similarity_search_with_metadata_filter
+```
+
+Infrastructure tests that do not use the `benchmark` fixture remain skipped when `--benchmark-only` is used.
+
+### Benchmark Interpretation
+
+The in-memory implementation performs a linear scan.
+
+For an unfiltered search, every stored record is inspected and scored.
+
+As the number of stored records grows, search work also grows because the current implementation does not use an approximate-nearest-neighbor index.
+
+The benchmark provides a Version 1.0 baseline for the reference implementation.
+
+It can later help identify:
+
+* accidental performance regressions
+* slower result construction
+* slower metadata filtering
+* changes in cosine similarity calculations
+* changes in sorting overhead
+
+It is not intended to establish a universal maximum search time.
+
+### Timing Policy
+
+No fixed timing threshold is enforced.
+
+Results vary based on:
+
+* processor performance
+* Python version
+* Pydantic version
+* operating system
+* memory availability
+* continuous integration hardware
+* background system activity
+
+Use benchmark results for comparison under similar conditions rather than machine-specific pass or fail rules.
+
 
 ## Save Local Benchmark Results
 
