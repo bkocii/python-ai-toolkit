@@ -35,6 +35,8 @@ class AsyncAIClient:
             model=self.model,
             max_retries=resolved_config.max_retries,
             logger=logger,
+            input_cost_per_1m_tokens=(resolved_config.input_cost_per_1m_tokens),
+            output_cost_per_1m_tokens=(resolved_config.output_cost_per_1m_tokens),
         )
 
     @overload

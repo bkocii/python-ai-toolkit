@@ -1,7 +1,7 @@
 from time import perf_counter
 from uuid import uuid4
 from pydantic import BaseModel
-from ai.cost import estimate_cost_usd
+from ai.cost import calculate_cost_usd, resolve_cost_rates
 from ai.exceptions import AIError, AIJSONParseError, AISchemaValidationError
 from ai.logger import get_ai_logger
 from ai.schemas import AIResult, TokenUsage
@@ -34,11 +34,18 @@ class RequestExecutor:
         model: str,
         max_retries: int = 1,
         logger: logging.Logger | None = None,
+        input_cost_per_1m_tokens: str | None = None,
+        output_cost_per_1m_tokens: str | None = None,
     ):
         self.provider = provider
         self.model = model
         self.logger = logger if logger is not None else get_ai_logger()
         self.max_retries = max_retries
+        self._cost_rates = resolve_cost_rates(
+            model=model,
+            input_cost_per_1m_tokens=(input_cost_per_1m_tokens),
+            output_cost_per_1m_tokens=(output_cost_per_1m_tokens),
+        )
 
     def _log_success(
         self,
@@ -53,6 +60,10 @@ class RequestExecutor:
 
         Prompt and response content are intentionally not logged.
         """
+
+        if not self.logger.isEnabledFor(logging.INFO):
+            return
+
         self.logger.info(
             "AI request succeeded | request_id=%s | model=%s | duration_ms=%.2f | retries_used=%s | tokens=%s | estimated_cost_usd=%s",
             request_id,
@@ -110,7 +121,10 @@ class RequestExecutor:
 
             if response_type is None:
                 duration_ms = (perf_counter() - start) * 1000
-                estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
+                estimated_cost_usd = calculate_cost_usd(
+                    token_usage=token_usage,
+                    prices=self._cost_rates,
+                )
 
                 self._log_success(
                     request_id=request_id,
@@ -158,7 +172,10 @@ class RequestExecutor:
                     )
 
             duration_ms = (perf_counter() - start) * 1000
-            estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
+            estimated_cost_usd = calculate_cost_usd(
+                token_usage=token_usage,
+                prices=self._cost_rates,
+            )
 
             self._log_success(
                 request_id=request_id,
@@ -297,7 +314,10 @@ class RequestExecutor:
 
             if response_type is None:
                 duration_ms = (perf_counter() - start) * 1000
-                estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
+                estimated_cost_usd = calculate_cost_usd(
+                    token_usage=token_usage,
+                    prices=self._cost_rates,
+                )
 
                 self._log_success(
                     request_id=request_id,
@@ -343,7 +363,10 @@ class RequestExecutor:
                     )
 
             duration_ms = (perf_counter() - start) * 1000
-            estimated_cost_usd = estimate_cost_usd(self.model, token_usage)
+            estimated_cost_usd = calculate_cost_usd(
+                token_usage=token_usage,
+                prices=self._cost_rates,
+            )
 
             self._log_success(
                 request_id=request_id,

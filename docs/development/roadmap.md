@@ -422,13 +422,128 @@ The baseline must be repeated from a clean Git working tree before final before-
 
 #### PROF-002 — Profile Plain Request Execution
 
-* [ ] Profile synchronous plain request execution
-* [ ] Measure request ID generation
-* [ ] Measure cost estimation
-* [ ] Measure metadata logging calls
-* [ ] Measure `AIResult` construction
-* [ ] Document meaningful call-time contributors
-* [ ] Avoid changing provider-independent behavior
+* [x] Profile the plain request lifecycle
+* [x] Measure request ID generation
+* [x] Measure provider-call overhead
+* [x] Measure cost estimation
+* [x] Measure success-logging overhead
+* [x] Measure `AIResult` construction
+* [x] Identify repeated configuration loading
+* [x] Implement pre-resolved request pricing
+* [x] Avoid unnecessary logging metadata serialization
+* [x] Verify synchronous and asynchronous behavior
+* [x] Verify performance with repeated benchmarks
+
+Profiling environment:
+
+* deterministic local provider
+* no network requests
+* fixed provider response
+* fixed token usage
+* 100,000 repeated plain requests
+* executor, provider, logger, and response created before profiling
+* INFO-level logger with `NullHandler` used to retain logging overhead without console or file output
+
+Initial profile:
+
+* approximately `19.1 million` function calls
+* approximately `11.443 seconds` total profile time
+* approximately `11.583 seconds` cumulative time inside `RequestExecutor.execute()`
+* approximately `5.808 seconds` inside cost estimation
+* approximately `5.384 seconds` repeatedly resolving `AIConfig`
+* approximately `4.093 seconds` inside success logging
+* approximately `0.531 seconds` constructing `AIResult`
+* approximately `0.404 seconds` generating request UUIDs
+
+Primary finding:
+
+The plain request lifecycle repeatedly loaded and validated the complete toolkit configuration while estimating request cost.
+
+For 100,000 requests, this caused:
+
+* 100,000 complete configuration resolutions
+* repeated logging-configuration resolution
+* repeated configuration validation
+* approximately 1.1 million environment-variable lookups
+* unnecessary request-time API-key and model resolution
+
+Accepted cost optimization:
+
+* separate pricing resolution from cost arithmetic
+* resolve model or custom token prices when an executor is constructed
+* store resolved prices on `RequestExecutor` and `AsyncRequestExecutor`
+* perform only token-cost arithmetic during request execution
+* pass custom pricing from `AIClient` and `AsyncAIClient`
+* retain `estimate_cost_usd()` as a compatibility wrapper for direct callers
+* preserve model-price fallback for directly constructed executors
+* avoid requiring API configuration for direct executor construction
+
+Accepted logging optimization:
+
+* check `logger.isEnabledFor(logging.INFO)` before creating logging metadata
+* avoid calling `TokenUsage.model_dump()` when INFO logging is disabled
+* apply the same behavior to synchronous and asynchronous executors
+* retain complete success metadata when INFO logging is enabled
+
+Post-optimization profile:
+
+* function calls reduced from approximately `19.1 million` to `8.1 million`
+* total profile time reduced from approximately `11.443 seconds` to `4.153 seconds`
+* reduction in total profile time: approximately `63.7%`
+* configuration loading and environment lookup disappeared from the request hot path
+* INFO logging became the largest remaining contributor
+* `AIResult` construction, UUID generation, and cost arithmetic remained comparatively small
+
+Benchmark verification:
+
+The benchmark logger uses a CRITICAL level, which exercises the early logging guard and measures the normal low-overhead request path.
+
+Before optimization:
+
+* mean: approximately `27.292 µs`
+* median: approximately `25.800 µs`
+* throughput: approximately `36,640` operations per second
+
+After optimization:
+
+* mean: approximately `4.551 µs`
+* median: approximately `4.400 µs`
+* throughput: approximately `219,756` operations per second
+
+Measured improvement:
+
+* mean request overhead reduced by approximately `83.3%`
+* median request overhead reduced by approximately `82.9%`
+* throughput increased by approximately six times
+
+Correctness coverage added:
+
+* explicit pricing resolution
+* unknown-model pricing
+* cost arithmetic using pre-resolved prices
+* missing token usage
+* missing pricing
+* compatibility configuration-based pricing
+* synchronous executor custom pricing
+* asynchronous executor custom pricing
+* synchronous disabled-INFO logging guard
+* asynchronous disabled-INFO logging guard
+
+Conclusion:
+
+The optimization removed configuration and environment access from the request hot path while preserving request IDs, cost tracking, logging, token metadata, synchronous execution, asynchronous execution, and the existing public cost-estimation function.
+
+No additional plain-request optimization is currently justified.
+
+Remaining INFO-level logging cost is intentional observability overhead. Applications that disable INFO logging now avoid log-record creation and token-metadata serialization.
+
+Rejected optimization candidates:
+
+* removing request UUID generation, because request IDs are valuable observability metadata and represent a small portion of total execution time
+* bypassing Pydantic `AIResult` validation, because its cost is small and it protects the public result contract
+* disabling success logging globally, because logging behavior should remain configurable
+* caching complete `AIConfig` inside the cost compatibility wrapper, because executors already avoid that path and global caching could create stale environment-dependent behavior
+
 
 #### PROF-003 — Profile Structured Responses and Repair
 
