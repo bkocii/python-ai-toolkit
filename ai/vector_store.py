@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import math
+
 from pydantic import BaseModel, Field
 
 
@@ -117,15 +118,24 @@ class InMemoryVectorStore(BaseVectorStore):
         candidates = [
             record
             for record in self._records.values()
-            if self._matches_metadata_filter(record, metadata_filter)
+            if self._matches_metadata_filter(
+                record,
+                metadata_filter,
+            )
         ]
+
+        query_norm = self._vector_norm(query_vector)
 
         results = [
             VectorSearchResult(
                 id=record.id,
                 text=record.text,
                 vector=record.vector,
-                score=self._cosine_similarity(query_vector, record.vector),
+                score=self._cosine_similarity_with_first_norm(
+                    first=query_vector,
+                    first_norm=query_norm,
+                    second=record.vector,
+                ),
                 metadata=record.metadata,
             )
             for record in candidates
@@ -161,21 +171,62 @@ class InMemoryVectorStore(BaseVectorStore):
             record.metadata.get(key) == value for key, value in metadata_filter.items()
         )
 
+    def _vector_norm(
+        self,
+        vector: list[float],
+    ) -> float:
+        squared_norm = sum(value * value for value in vector)
+
+        return math.sqrt(squared_norm)
+
     def _cosine_similarity(
         self,
         first: list[float],
         second: list[float],
     ) -> float:
+        """
+        Calculate cosine similarity between two vectors.
+
+        This method retains the original two-vector helper interface.
+        Similarity searches use the precomputed-query-norm helper to avoid
+        recalculating the same query norm for every stored record.
+        """
+        first_norm = self._vector_norm(first)
+
+        return self._cosine_similarity_with_first_norm(
+            first=first,
+            first_norm=first_norm,
+            second=second,
+        )
+
+    def _cosine_similarity_with_first_norm(
+        self,
+        first: list[float],
+        first_norm: float,
+        second: list[float],
+    ) -> float:
+        """
+        Calculate cosine similarity using a precomputed first-vector norm.
+        """
         if len(first) != len(second):
             raise ValueError(
                 "Vectors must have the same dimensions for similarity search."
             )
 
-        dot_product = sum(a * b for a, b in zip(first, second, strict=True))
-        first_norm = math.sqrt(sum(a * a for a in first))
-        second_norm = math.sqrt(sum(b * b for b in second))
+        dot_product = 0.0
+        second_squared_norm = 0.0
 
-        if first_norm == 0 or second_norm == 0:
+        for first_value, second_value in zip(
+            first,
+            second,
+            strict=True,
+        ):
+            dot_product += first_value * second_value
+            second_squared_norm += second_value * second_value
+
+        if first_norm == 0 or second_squared_norm == 0:
             return 0.0
+
+        second_norm = math.sqrt(second_squared_norm)
 
         return dot_product / (first_norm * second_norm)

@@ -369,53 +369,285 @@ Result:
 
 Python AI Toolkit now has a deterministic internal performance baseline covering request execution, structured parsing, response repair, vector search, RAG orchestration, and workflow execution.
 
-## PROD-002 — Performance Profiling
+### PROD-002 — Performance Profiling
 
-### Goal
+Status: In Progress
 
-Profile measured benchmark hotspots and improve performance only where evidence justifies changes.
+Goal:
 
-### Tasks
+Profile the toolkit's benchmarked execution paths, identify meaningful internal bottlenecks, and document evidence before making performance-related implementation changes.
 
-* [ ] PERF-001 Review benchmark results
-* [ ] PERF-002 Select the highest-impact toolkit hotspots
-* [ ] PERF-003 Profile selected paths with `cProfile`
-* [ ] PERF-004 Document time and allocation hotspots
-* [ ] PERF-005 Implement focused optimizations
-* [ ] PERF-006 Compare before-and-after benchmark results
-* [ ] PERF-007 Confirm no public API regressions
+Performance work must remain evidence-driven.
 
-### Profiling Rules
+Implementation code should not be changed merely because a function appears complex. A bottleneck must first be measured, reproduced, profiled, and reviewed against correctness and architectural tradeoffs.
 
-* Do not optimize based on assumptions.
-* Do not refactor unrelated modules.
-* Do not optimize provider network latency.
-* Preserve provider independence.
-* Preserve public APIs unless a release-blocking reason is documented.
-* Every optimization must have benchmark evidence.
+#### PROF-001 — Capture the Performance Baseline
 
-### Likely Profiling Candidates
+* [x] Run the complete benchmark suite
+* [x] Save a local pre-optimization benchmark baseline
+* [x] Record the Python version and operating environment
+* [x] Confirm that benchmarks require no API keys
+* [x] Confirm that benchmark execution creates no toolkit log files
+* [x] Identify the slowest benchmarked execution paths
+* [x] Keep machine-specific benchmark files out of Git
 
-Potential candidates include:
+Baseline environment:
 
-* structured-response parsing
-* repeated prompt construction
-* vector similarity calculations
-* metadata filtering
-* workflow state copying
-* conversation-memory formatting
+* Operating system: Windows 11, 64-bit
+* Python implementation: CPython
+* Python version: 3.14.4
+* Processor: 11th Gen Intel Core i5-1135G7
+* Logical processors: 8
+* Benchmark commit: `91fed29585de55836b640798c754434d3c7f8733`
+* Working tree during capture: dirty
 
-These are candidates only. Benchmark evidence determines the actual work.
+Slowest measured paths:
 
-### Exit Criteria
+1. Unfiltered in-memory vector similarity search — approximately `19.407 ms`
+2. Metadata-filtered vector similarity search — approximately `8.889 ms`
+3. Structured-response retry and repair — approximately `0.304 ms`
 
-* [ ] Important hotspots are identified with evidence
-* [ ] Optimizations have before-and-after measurements
-* [ ] Functional tests still pass
-* [ ] Public API behavior remains stable
-* [ ] Performance findings are documented
+Logging verification:
 
----
+* the `logs/` directory was removed before isolated benchmark execution
+* the complete benchmark suite was executed with `--benchmark-only`
+* `Test-Path logs` returned `False`
+* toolkit-managed file logging remained disabled
+
+Decision:
+
+Begin detailed profiling with `InMemoryVectorStore.similarity_search()` because vector search dominates the deterministic benchmark suite.
+
+The baseline must be repeated from a clean Git working tree before final before-and-after comparisons are accepted.
+
+#### PROF-002 — Profile Plain Request Execution
+
+* [ ] Profile synchronous plain request execution
+* [ ] Measure request ID generation
+* [ ] Measure cost estimation
+* [ ] Measure metadata logging calls
+* [ ] Measure `AIResult` construction
+* [ ] Document meaningful call-time contributors
+* [ ] Avoid changing provider-independent behavior
+
+#### PROF-003 — Profile Structured Responses and Repair
+
+* [ ] Profile successful structured-response parsing
+* [ ] Profile JSON decoding
+* [ ] Profile Pydantic validation
+* [ ] Profile failed parsing and repair prompt construction
+* [ ] Profile token-usage aggregation
+* [ ] Compare successful parsing with one-retry repair
+* [ ] Document meaningful call-time contributors
+
+#### PROF-004 — Profile Vector Search
+
+* [x] Profile unfiltered vector similarity search
+* [x] Profile metadata-filtered vector search
+* [x] Measure candidate collection and metadata-filter contribution
+* [x] Measure cosine similarity calculations
+* [x] Measure `VectorSearchResult` construction
+* [x] Measure result sorting and limiting
+* [x] Confirm scaling behavior of the linear scan
+* [x] Document meaningful call-time contributors
+* [x] Implement and verify an approved optimization
+
+Profiling environment:
+
+* 1,000 vector records
+* 64 dimensions per vector
+* result limit of 5
+* 100 repeated searches per profile
+* dataset construction excluded from profiling
+
+Initial unfiltered profile:
+
+* approximately `20.7 million` function calls
+* approximately `6.309 seconds` inside `similarity_search()`
+* approximately `5.729 seconds` inside `_cosine_similarity()`
+* approximately `5.342 seconds` inside the three generator-based `sum()` operations
+* approximately `0.320 seconds` constructing Pydantic search-result models
+* approximately `0.045 seconds` sorting results
+
+Initial metadata-filtered profile:
+
+* approximately `10.8 million` function calls
+* approximately `3.681 seconds` inside `similarity_search()`
+* approximately `3.113 seconds` inside `_cosine_similarity()`
+* approximately `2.902 seconds` inside the three generator-based `sum()` operations
+* approximately `0.233 seconds` applying metadata filters
+* approximately `0.175 seconds` constructing Pydantic search-result models
+* approximately `0.025 seconds` sorting results
+
+Primary finding:
+
+Cosine similarity calculation was the dominant vector-search cost.
+
+The original implementation recalculated the following values for every candidate:
+
+* query-vector magnitude
+* stored-vector magnitude
+* dot product
+
+Each value was calculated through a separate generator expression and `sum()` pass.
+
+Accepted optimization:
+
+* calculate the query-vector norm once per search
+* calculate the candidate dot product and squared norm in one direct loop
+* preserve the existing public vector-store API
+* retain the original private two-vector cosine helper interface
+* avoid persistent stored-vector norm caching while `VectorRecord.vector` remains mutable
+
+Post-optimization profile:
+
+Unfiltered search:
+
+* function calls reduced from approximately `20.7 million` to `807,102`
+* total profile time reduced from approximately `6.356 seconds` to `1.453 seconds`
+* cosine calculation time reduced from approximately `5.729 seconds` to `0.819 seconds`
+
+Metadata-filtered search:
+
+* function calls reduced from approximately `10.8 million` to `857,102`
+* total profile time reduced from approximately `3.707 seconds` to `0.982 seconds`
+* cosine calculation time reduced from approximately `3.113 seconds` to `0.424 seconds`
+
+Benchmark verification:
+
+The optimized implementation was benchmarked twice against the original `prod-002-before` baseline.
+
+Unfiltered vector search:
+
+* baseline mean: approximately `18.984 ms`
+* optimized run 1 mean: approximately `11.690 ms`
+* optimized run 2 mean: approximately `13.037 ms`
+* improvement range: approximately `31.3%` to `38.4%`
+* average optimized mean: approximately `12.363 ms`
+* average improvement: approximately `34.9%`
+
+Metadata-filtered vector search:
+
+* baseline mean: approximately `10.875 ms`
+* optimized run 1 mean: approximately `6.852 ms`
+* optimized run 2 mean: approximately `6.296 ms`
+* improvement range: approximately `37.0%` to `42.1%`
+* average optimized mean: approximately `6.574 ms`
+* average improvement: approximately `39.5%`
+
+Throughput improvement:
+
+* unfiltered search increased from approximately `52.68` operations per second to between `76.71` and `85.54`
+* filtered search increased from approximately `91.95` operations per second to between `145.94` and `158.84`
+
+Scaling verification:
+
+Unfiltered search:
+
+* tested from `100` to `5,000` stored records
+* estimated cost: approximately `8.2513 ms` per 1,000 scanned records
+* linear-fit `R²`: `0.999993`
+
+Metadata-filtered search:
+
+* tested from `100` to `5,000` stored records
+* all records were scanned
+* approximately half of the records matched the filter and were scored
+* estimated cost: approximately `4.5470 ms` per 1,000 scanned records
+* linear-fit `R²`: `0.999295`
+
+Conclusion:
+
+Both search paths scale linearly with the number of stored records.
+
+The filtered path has a lower cost per scanned record because nonmatching records do not proceed to cosine calculation, Pydantic result construction, or sorting.
+
+The optimization consistently improved performance while preserving behavior and the public API.
+
+Rejected optimization candidates:
+
+* replacing complete sorting with a top-k heap, because sorting remained a negligible portion of execution time
+* bypassing Pydantic result validation, because construction remained secondary and the change would weaken the public model contract
+* persistent stored-vector norm caching, because mutable stored vectors could make cached magnitudes stale
+* adding an external numeric dependency, because the current reference implementation remains intended for tests, demos, and small local applications
+
+
+
+#### PROF-005 — Profile RAG Orchestration
+
+* [ ] Profile retrieved-context formatting
+* [ ] Profile grounded prompt construction
+* [ ] Profile additional-instruction formatting
+* [ ] Profile `RAGResponse` construction
+* [ ] Keep retrieval and provider execution excluded
+* [ ] Document meaningful call-time contributors
+
+#### PROF-006 — Profile Workflow Execution
+
+* [ ] Profile one-step workflow execution
+* [ ] Profile five-step workflow execution
+* [ ] Measure `WorkflowContext` construction
+* [ ] Measure workflow step-result construction
+* [ ] Measure state propagation
+* [ ] Measure final workflow-result construction
+* [ ] Compare one-step and five-step overhead
+* [ ] Document meaningful call-time contributors
+
+#### PROF-007 — Review Optimization Candidates
+
+* [ ] Rank identified bottlenecks by measurable impact
+* [ ] Separate implementation overhead from dependency overhead
+* [ ] Identify changes that preserve public APIs
+* [ ] Reject premature or low-value optimizations
+* [ ] Document architectural tradeoffs
+* [ ] Select only justified optimization candidates
+* [ ] Record cases where no change is recommended
+
+#### PROF-008 — Implement Approved Optimizations
+
+* [ ] Make one optimization at a time
+* [ ] Preserve correctness behavior
+* [ ] Preserve provider-independent interfaces
+* [ ] Run normal tests after every change
+* [ ] Compare benchmarks before and after every change
+* [ ] Revert changes that provide no meaningful benefit
+* [ ] Add or update correctness tests when behavior is touched
+
+This task may be completed without implementation changes if profiling shows that current overhead is acceptable or dominated by dependencies.
+
+#### PROF-009 — Document Profiling Results
+
+* [ ] Document the profiling method
+* [ ] Document the local environment
+* [ ] Document measured bottlenecks
+* [ ] Document approved optimizations
+* [ ] Document rejected optimizations
+* [ ] Document benchmark comparisons
+* [ ] Document remaining performance risks
+* [ ] Update project state and changelog
+
+#### Exit Criteria
+
+* [ ] A local benchmark baseline has been captured
+* [ ] Main benchmarked execution paths have been profiled
+* [ ] Profiling results are based on deterministic scenarios
+* [ ] Provider and network latency remain excluded
+* [ ] Machine-specific profile artifacts are ignored by Git
+* [ ] Meaningful bottlenecks are documented
+* [ ] Optimization candidates are ranked by evidence
+* [ ] Public API compatibility is preserved
+* [ ] Every accepted optimization has before-and-after measurements
+* [ ] Low-value optimizations are explicitly rejected
+* [ ] Normal tests pass
+* [ ] Benchmark correctness checks pass
+* [ ] Performance benchmarks pass
+* [ ] Black passes
+* [ ] Ruff passes
+
+Result:
+
+Python AI Toolkit has an evidence-based understanding of its internal performance characteristics and documented optimization decisions before Version 1.0.
+
 
 ## PROD-003 — Complete Documentation
 

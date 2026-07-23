@@ -288,3 +288,58 @@ def test_in_memory_vector_store_zero_vector_scores_zero():
     )
 
     assert results[0].score == 0.0
+
+
+def test_in_memory_vector_store_recalculates_norm_for_each_query():
+    store = InMemoryVectorStore()
+
+    store.add(
+        [
+            VectorRecord(
+                id="horizontal",
+                text="Horizontal vector.",
+                vector=[1.0, 0.0],
+            ),
+            VectorRecord(
+                id="vertical",
+                text="Vertical vector.",
+                vector=[0.0, 2.0],
+            ),
+        ]
+    )
+
+    horizontal_results = store.similarity_search(
+        query_vector=[3.0, 0.0],
+        limit=1,
+    )
+
+    vertical_results = store.similarity_search(
+        query_vector=[0.0, 4.0],
+        limit=1,
+    )
+
+    assert horizontal_results[0].id == "horizontal"
+    assert horizontal_results[0].score == pytest.approx(1.0)
+
+    assert vertical_results[0].id == "vertical"
+    assert vertical_results[0].score == pytest.approx(1.0)
+
+
+def test_in_memory_vector_store_zero_query_vector_scores_zero():
+    store = InMemoryVectorStore()
+
+    store.add(
+        [
+            VectorRecord(
+                id="doc-1",
+                text="Some text.",
+                vector=[1.0, 1.0],
+            )
+        ]
+    )
+
+    results = store.similarity_search(
+        query_vector=[0.0, 0.0],
+    )
+
+    assert results[0].score == 0.0
