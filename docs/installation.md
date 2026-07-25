@@ -60,8 +60,8 @@ ai-toolkit --help
 ```
 
 Configuration and provider credentials are covered separately in the
-[README](../README.md#configuration). The import and help checks above do not
-need an API key or network request.
+[configuration guide](configuration.md). The import and help checks above do
+not need an API key or network request.
 
 ## Optional extras
 

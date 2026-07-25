@@ -54,11 +54,13 @@ The format loosely follows Keep a Changelog.
 * Version 1.0 internal performance baseline documentation
 * Deterministic profiling instruments for request, structured-response, vector-search, RAG, and workflow execution paths
 * Consolidated performance-profiling report with optimization decisions and remaining risks
+* Focused configuration guide covering environment and explicit configuration
 
 
 ### Improved
 * Installation guidance for local users, optional integrations, contributors,
   and benchmark environments
+* Configuration reference for defaults, precedence, validation, and CLI checks
 * Framework integration architecture
 * Configuration flexibility for applications and tests
 * Django configuration without process-wide environment mutation

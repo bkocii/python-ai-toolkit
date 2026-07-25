@@ -113,15 +113,16 @@ OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 
 Never commit `.env` or real API keys.
 
-The toolkit validates configuration before sending a request. Configuration can
-also be supplied explicitly with `AIConfig`, which is useful for application
-factories, framework integrations, and tests:
+`AIClient()` loads and structurally validates environment-based configuration.
+Configuration can instead be supplied explicitly with `AIConfig`, which is
+useful for application factories, framework integrations, and tests:
 
 ```python
 import os
 
 from ai.client import AIClient
 from ai.config import AIConfig
+from ai.config_validator import ConfigValidator
 
 config = AIConfig(
     provider="openai",
@@ -131,8 +132,14 @@ config = AIConfig(
     file_logging_enabled=False,
 )
 
+ConfigValidator.validate(config)
 client = AIClient(config=config)
 ```
+
+An explicit `AIConfig` completely replaces environment loading; omitted fields
+use dataclass defaults rather than `.env` values. See the
+[configuration guide](docs/configuration.md) for the complete variable
+reference, defaults, precedence rules, validation boundary, and CLI checks.
 
 The placeholder above is illustrative. Production credentials should come from
 environment variables or a secret manager.
@@ -413,6 +420,7 @@ concerns in focused documents:
 | Document | Purpose |
 | --- | --- |
 | [Installation guide](docs/installation.md) | Local installation, optional extras, and contributor setup |
+| [Configuration guide](docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |

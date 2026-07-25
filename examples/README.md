@@ -317,7 +317,8 @@ Example:
 ai-toolkit ask "Explain dependency injection simply."
 ```
 
-The initial CLI supports plain-text requests only. Configuration management is handled separately by the Configuration CLI roadmap task.
+The initial CLI supports plain-text requests only. Read-only configuration
+inspection and structural validation are handled by the commands below.
 
 
 ## 22 – Configuration CLI

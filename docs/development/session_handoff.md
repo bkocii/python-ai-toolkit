@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-003 — Document environment and explicit configuration`
+**Next task:** `DOC-004 — Document provider registration`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-003`.
+The next task is `DOC-004`.
 
 ---
 
@@ -717,37 +717,77 @@ combined dev and benchmark installation passed
 
 ---
 
-# Exact Next Task — DOC-003
+# DOC-003 — Environment and Explicit Configuration
 
-Document environment-based and explicit configuration without expanding into
-the separate provider-registration, feature, integration, security, or
-compatibility tasks that follow it.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect `ai/config.py`, `ai/config_validator.py`, `.env.example`, CLI
-   configuration commands, and relevant tests
-2. inventory every supported environment variable and current default
-3. document provider-specific values and generic fallback behavior accurately
-4. document explicit `AIConfig` construction and precedence over environment
-   loading
-5. distinguish structural validation from live provider verification
-6. update README configuration guidance and add or update a focused
-   configuration document when the evidence supports it
-7. leave detailed provider registration, integration, security, and
-   compatibility guidance to their assigned tasks
-8. verify every documented configuration example
-9. keep the change limited to `DOC-003`
+1. reviewed `ai/config.py`, `ai/config_validator.py`, both client constructors,
+   provider creation, CLI configuration commands, `.env.example`, and relevant
+   tests
+2. added `docs/configuration.md`
+3. inventoried every supported environment variable and default
+4. documented provider-specific lookup and generic fallback precedence
+5. documented process-environment precedence over `.env`
+6. documented explicit `AIConfig` construction for `AIClient` and
+   `AsyncAIClient`
+7. made explicit that supplied configuration replaces environment loading and
+   that omitted fields use dataclass defaults
+8. documented manual `ConfigValidator.validate()` use for directly constructed
+   configurations
+9. separated structural validation, provider availability, and live
+   credential/model verification
+10. documented the read-only, non-network Configuration CLI boundary
+11. expanded `.env.example` comments and corrected related README,
+    installation, and example-gallery guidance
+12. changed no runtime implementation, public API, dependency, provider
+    registration, or architecture
+
+Completion verification:
+
+```text
+provider-specific and generic fallback precedence passed
+process-environment precedence over .env passed
+explicit AIConfig environment-bypass behavior passed
+4 configuration Python examples executed
+15 Python blocks in the changed guides parsed
+repository-relative documentation links passed
+45 focused configuration and CLI tests passed
+269 normal tests passed
+```
 
 ---
 
-# DOC-002 Verification and Repository State
+# Exact Next Task — DOC-004
+
+Document provider registration without expanding into the separate request,
+advanced-feature, integration, security, or compatibility tasks that follow it.
+
+Required work:
+
+1. inspect `BaseAIProvider`, `OpenAIProvider`, `ProviderFactory`, provider tests,
+   architecture, and existing provider examples
+2. document the built-in provider and available-provider inspection
+3. document custom provider registration and naming behavior accurately
+4. document the constructor contract used by `ProviderFactory`
+5. distinguish required base behavior from optional advanced capabilities
+6. document duplicate-registration and unsupported-provider errors
+7. add or update focused provider guidance when the evidence supports it
+8. verify every documented provider example
+9. keep the change limited to `DOC-004`
+
+---
+
+# DOC-003 Verification and Repository State
 
 Changed project files:
 
 ```text
+.env.example
 README.md
 CHANGELOG.md
+docs/configuration.md
 docs/installation.md
 examples/README.md
 docs/development/roadmap.md
@@ -763,6 +803,8 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
+    .env.example `
+    docs\configuration.md `
     docs\installation.md `
     examples\README.md `
     docs\development\roadmap.md `
@@ -770,7 +812,7 @@ git add `
     docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document installation and optional extras"
+git commit -m "docs: document configuration sources and precedence"
 ```
 
 ---
@@ -1173,13 +1215,13 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `.env.example`
-8. `ai/config.py`
-9. `ai/config_validator.py`
-10. `ai/cli/config_commands.py`
-11. relevant configuration and CLI tests
+7. `docs/configuration.md`
+8. `ai/providers/base.py`
+9. `ai/providers/factory.py`
+10. `ai/providers/openai_provider.py`
+11. relevant provider-factory and provider tests
 
-Profiling evidence is not required for `DOC-003`.
+Profiling evidence is not required for `DOC-004`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1193,7 +1235,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-003 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-004 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

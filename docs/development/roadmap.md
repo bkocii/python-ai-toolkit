@@ -1146,7 +1146,7 @@ Make the toolkit understandable and usable without reading its implementation.
 
 * [x] DOC-001 Review README structure and remove duplication
 * [x] DOC-002 Document installation and optional extras
-* [ ] DOC-003 Document environment and explicit configuration
+* [x] DOC-003 Document environment and explicit configuration
 * [ ] DOC-004 Document provider registration
 * [ ] DOC-005 Document plain and structured requests
 * [ ] DOC-006 Document streaming, async, tools, and image inputs
@@ -1224,6 +1224,59 @@ Next task:
 
 ```text
 DOC-003 — Document environment and explicit configuration
+```
+
+#### DOC-003 — Environment and Explicit Configuration
+
+Status: Completed
+
+Configuration behavior was reviewed against `ai/config.py`,
+`ai/config_validator.py`, the client constructors, provider factory, CLI
+configuration commands, `.env.example`, and configuration tests.
+
+Completed work:
+
+* added `docs/configuration.md` as the focused configuration guide
+* documented every supported environment variable and current default
+* documented dynamic provider-specific variable names and generic fallback
+  behavior
+* documented `.env`, process-environment, provider-specific, and generic-value
+  precedence
+* documented explicit `AIConfig` construction for synchronous and asynchronous
+  clients
+* made clear that explicit configuration replaces rather than merges with
+  environment configuration
+* documented that omitted explicit fields use dataclass defaults
+* distinguished automatic environment-config validation from validation of a
+  manually constructed `AIConfig`
+* distinguished structural validation, provider registration, and live
+  credential/model verification
+* documented CLI configuration inspection and its non-network boundary
+* expanded `.env.example` comments without adding real credentials
+* corrected stale README, installation, and CLI-example guidance
+* verified environment resolution, explicit precedence, examples, links, and
+  the complete normal test suite
+
+Completion verification:
+
+```text
+provider-specific and generic fallback precedence passed
+process-environment precedence over .env passed
+explicit AIConfig environment-bypass behavior passed
+4 configuration Python examples executed
+15 Python blocks in the changed guides parsed
+repository-relative documentation links passed
+45 focused configuration and CLI tests passed
+269 normal tests passed
+```
+
+No runtime API, implementation, package dependency, provider registration, or
+architectural contract changed.
+
+Next task:
+
+```text
+DOC-004 — Document provider registration
 ```
 
 ### Documentation Rules
