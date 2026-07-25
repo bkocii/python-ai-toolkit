@@ -1,70 +1,549 @@
-# Python AI Toolkit - Session Handoff
+# Python AI Toolkit — Session Handoff
 
 ## Project
 
-Python AI Toolkit
-
-Current Version: 0.7.0-dev
+**Project:** Python AI Toolkit  
+**Current version:** `0.7.0-dev`  
+**Current milestone:** Sprint 9 — Production Readiness  
+**Active roadmap item:** `PROD-002 — Performance Profiling`  
+**Next task:** `PROF-005 — Profile RAG orchestration`
 
 ---
 
-# Goal
+## Goal
 
-Continue developing this project following the existing architecture, roadmap, decisions, and workflow.
+Continue developing the project according to the existing architecture, roadmap, architectural decisions, and engineering workflow.
 
-Do NOT redesign or skip ahead unless there is a strong architectural reason.
+Do not redesign the project, skip roadmap steps, or introduce unrelated backlog work unless there is a strong architectural reason.
+
+Before changing code:
+
+1. Read the relevant current implementation.
+2. Read the applicable roadmap and architecture sections.
+3. Confirm that the proposed task is still the correct next task.
+4. Explain the design before implementation.
+
+Do not rely only on conversation memory. The project files are the source of truth.
+
+---
+
+## Authoritative Documents
+
+The following documents are the source of truth:
+
+1. `docs/development/project_state.md`
+2. `docs/development/roadmap.md`
+3. `docs/architecture/architecture.md` or the project's current architecture document
+4. `docs/development/future_backlog.md`, or the Future Backlog section inside `roadmap.md`
+
+Reference documents, only when needed:
+
+- `README.md`
+- `CHANGELOG.md`
+- Architecture Decision Records:
+  - `0001-airesult.md`
+  - `0002-provider-response.md`
+  - `0003-request-executor.md`
+  - `0004-retry-repair.md`
+  - `0005-provider-factory.md`
+  - `0006-provider-configuration.md`
+  - `0007-provider-registration-api.md`
+  - `0008-separate-async-client.md`
+  - `0009-tool-calling-without-auto-execution.md`
+  - `0010-provider-independent-rag-abstractions.md`
+  - `0011-document-loaders-separate-from-embedding.md`
+  - `0012-memory-agent-workflow-separation.md`
+  - `0013-explicit-multi-agent-orchestration.md`
+  - `0014-explicit-configuration-injection-for-framework-integrations.md`
+  - `0015-command-line-interface-architecture.md`
+
+When document content conflicts with old conversation context, the current repository document wins.
+
+---
+
+## Completed Sprints
 
 The project has completed:
 
-* Sprint 4 – Developer Experience
-* Sprint 5 – Advanced Requests
-* Sprint 6 – Retrieval & Knowledge
-* Sprint 7 – Agents & Workflows
-* Sprint 8 – Framework Integrations
+- Sprint 2 — Core Architecture
+- Sprint 3 — Provider Infrastructure
+- Sprint 4 — Developer Experience
+- Sprint 5 — Advanced Requests
+- Sprint 6 — Retrieval & Knowledge
+- Sprint 7 — Agents & Workflows
+- Sprint 8 — Framework Integrations
 
-The next roadmap milestone is Sprint 9 – Production Readiness.
-
-Before implementation, inspect the current roadmap and architecture, then design the correct scope for `PROD-001 Benchmark suite`.
+Sprint 9 — Production Readiness is active.
 
 ---
 
-# Documents Included
+## Current Architecture Summary
 
-The following documents are the source of truth.
+Primary request flow:
 
-1. `project_state.md`
-2. `roadmap.md`
-3. `architecture.md`
-4. `future_backlog.md` or the Future Backlog section inside `roadmap.md`
+```text
+Application
+    ↓
+AIClient / AsyncAIClient
+    ↓
+RequestExecutor / AsyncRequestExecutor
+    ↓
+ProviderFactory
+    ↓
+BaseAIProvider implementation
+    ↓
+LLM provider
+```
 
-Reference documents, only if needed:
+Major implemented capabilities:
 
-* `README.md`
-* `CHANGELOG.md`
-* Architecture Decision Records:
+- Synchronous and asynchronous AI clients
+- Provider factory, registry, and custom provider registration
+- Environment-based and explicitly injected configuration
+- Plain text and structured Pydantic responses
+- Structured response repair and retry handling
+- Request IDs, token usage, estimated cost, duration, and retry metadata
+- Streaming responses
+- Tool calling without automatic application-side execution
+- Image inputs
+- Fluent request builder and prompt templates
+- Embeddings, in-memory vector storage, retrieval, and RAG
+- Text, Markdown, and directory document loaders
+- Conversation memory
+- Agents
+- Workflow engine
+- Explicit multi-agent orchestration
+- Django and FastAPI integrations
+- Command-line interface
+- Configurable logging with test- and benchmark-safe behavior
 
-  * `0001-airesult.md`
-  * `0002-provider-response.md`
-  * `0003-request-executor.md`
-  * `0004-retry-repair.md`
-  * `0005-provider-factory.md`
-  * `0006-provider-configuration.md`
-  * `0007-provider-registration-api.md`
-  * `0008-separate-async-client.md`
-  * `0009-tool-calling-without-auto-execution.md`
-  * `0010-provider-independent-rag-abstractions.md`
-  * `0011-document-loaders-separate-from-embedding.md`
-  * `0012-memory-agent-workflow-separation.md`
-  * `0013-explicit-multi-agent-orchestration.md`
-  * `0014-explicit-configuration-injection-for-framework-integrations.md`
-  * `0015-command-line-interface-architecture.md`
+Important existing design decisions:
 
+- `AIClient.ask()` is the simple public API.
+- `AIClient.request()` is the fluent advanced-request API.
+- `AsyncAIClient` is a separate explicit async client.
+- Tool calls are exposed to the application and are not automatically executed.
+- Structured response handling remains provider-independent.
+- The in-memory vector store is a reference implementation for tests, examples, and small local applications.
+- Public API stability is preferred over small performance gains.
+
+---
+
+# Sprint 9 — Production Readiness
+
+## PROD-001 — Benchmark Suite
+
+**Status:** Completed
+
+Benchmark source directory:
+
+```text
+benchmarks/
+```
+
+Generated benchmark results:
+
+```text
+.benchmarks/
+```
+
+`.benchmarks/` should remain ignored by Git.
+
+Expected benchmark verification:
+
+```powershell
+python -m pytest benchmarks --benchmark-only
+```
+
+Expected result:
+
+```text
+9 passed, 4 skipped
+```
+
+Correctness-only benchmark run:
+
+```powershell
+python -m pytest benchmarks --benchmark-disable -v
+```
+
+Expected result:
+
+```text
+13 passed
+```
+
+The benchmark suite covers:
+
+1. smoke execution
+2. plain request lifecycle
+3. structured parsing
+4. retry repair
+5. vector search
+6. vector search with metadata filtering
+7. RAG orchestration
+8. one-step workflow
+9. five-step workflow
+
+Benchmark rules:
+
+- deterministic
+- no network calls
+- no API keys
+- no file logging
+- no fixed machine-performance thresholds
+
+---
+
+## PROD-002 — Performance Profiling
+
+**Status:** Active
+
+Roadmap tasks:
+
+- [x] `PROF-001` — Establish baseline
+- [x] `PROF-002` — Profile plain request execution
+- [x] `PROF-003` — Profile structured parsing and repair
+- [x] `PROF-004` — Profile vector search
+- [ ] `PROF-005` — Profile RAG orchestration
+- [ ] `PROF-006` — Profile workflow execution
+- [ ] `PROF-007` — Review optimization candidates
+- [ ] `PROF-008` — Implement approved optimizations
+- [ ] `PROF-009` — Complete profiling documentation
+
+The next task is `PROF-005`.
+
+---
+
+## PROF-001 — Baseline
+
+**Status:** Completed
+
+Baseline environment:
+
+- Windows 11 64-bit
+- CPython 3.14.4
+- Intel i5-1135G7
+- 8 logical processors
+- baseline commit: `91fed29585de55836b640798c754434d3c7f8733`
+
+Baseline benchmark file previously used:
+
+```text
+benchmarks/prod-002-before.json
+```
+
+The original baseline reported a dirty working tree. Preserve that fact in final profiling documentation rather than silently presenting it as a clean baseline.
+
+Logging-isolation verification:
+
+```powershell
+Remove-Item logs -Recurse -Force -ErrorAction SilentlyContinue
+python -m pytest benchmarks --benchmark-only -q
+Test-Path logs
+```
+
+Expected result:
+
+```text
+False
+```
+
+---
+
+## PROF-004 — Vector Search
+
+**Status:** Completed
+
+Relevant files:
+
+```text
+ai/vector_store.py
+tests/test_vector_store.py
+profiling/profile_vector_search.py
+profiling/profile_vector_scaling.py
+```
+
+### Initial finding
+
+Cosine similarity dominated vector-search execution.
+
+The original implementation recalculated the query-vector magnitude for every candidate and used three generator-based `sum()` passes per similarity calculation.
+
+### Accepted optimization
+
+- calculate the query-vector norm once per search
+- calculate candidate dot product and candidate squared norm in one direct loop
+- preserve the public vector-store API
+- retain the existing private two-vector cosine helper interface
+- do not persistently cache stored-vector norms while vectors remain mutable
+
+### Benchmark result
+
+Unfiltered vector search:
+
+- baseline mean: approximately `18.984 ms`
+- optimized mean average: approximately `12.363 ms`
+- average improvement: approximately `34.9%`
+
+Metadata-filtered vector search:
+
+- baseline mean: approximately `10.875 ms`
+- optimized mean average: approximately `6.574 ms`
+- average improvement: approximately `39.5%`
+
+### Scaling result
+
+Unfiltered:
+
+- approximately `8.2513 ms` per 1,000 scanned records
+- linear-fit `R² = 0.999993`
+
+Metadata-filtered:
+
+- approximately `4.5470 ms` per 1,000 scanned records
+- linear-fit `R² = 0.999295`
+
+Both paths scale approximately linearly with the number of stored records.
+
+The filtered path is cheaper per scanned record because nonmatching records do not proceed to cosine calculation, result-model construction, or sorting.
+
+Rejected changes:
+
+- top-k heap, because sorting was negligible
+- bypassing Pydantic validation, because it would weaken the result contract
+- persistent norm caching, because mutable vectors could make cached norms stale
+- introducing an external numerical dependency for the current reference implementation
+
+---
+
+## PROF-002 — Plain Request Execution
+
+**Status:** Completed from a design, implementation, targeted-test, profile, and benchmark perspective.
+
+Before treating the task as fully closed in Git, verify the full project checks and commit status listed below.
+
+Relevant files:
+
+```text
+ai/cost.py
+ai/executor.py
+ai/async_executor.py
+ai/client.py
+ai/async_client.py
+tests/test_cost.py
+profiling/profile_request_lifecycle.py
+benchmarks/test_request_lifecycle.py
+```
+
+### Initial finding
+
+`estimate_cost_usd()` called `get_ai_config()` for every completed request.
+
+For 100,000 local requests, this caused:
+
+- 100,000 full configuration resolutions
+- repeated configuration validation
+- repeated logging-configuration resolution
+- approximately 1.1 million environment-variable lookups
+
+Initial profile:
+
+- approximately `19.1 million` function calls
+- approximately `11.443 seconds` total profile time
+- cost estimation: approximately `5.808 seconds`
+- repeated configuration resolution: approximately `5.384 seconds`
+- success logging: approximately `4.093 seconds`
+
+### Accepted cost optimization
+
+`ai/cost.py` now separates:
+
+- pricing resolution
+- pure request-time cost arithmetic
+- compatibility behavior for direct callers
+
+Intended interfaces:
+
+```python
+resolve_cost_rates(...)
+calculate_cost_usd(...)
+estimate_cost_usd(...)
+```
+
+Executors resolve model/custom pricing once during construction and store it for request-time arithmetic.
+
+`AIClient` and `AsyncAIClient` pass configured custom pricing to their executors.
+
+Directly constructed executors continue using built-in model pricing and do not require API configuration merely to calculate cost.
+
+### Accepted logging optimization
+
+`RequestExecutor._log_success()` and `AsyncRequestExecutor._log_success()` check:
+
+```python
+logger.isEnabledFor(logging.INFO)
+```
+
+before serializing token metadata or creating an INFO log record.
+
+This preserves complete INFO logging while avoiding unnecessary work when INFO logging is disabled.
+
+### Tests added
+
+`tests/test_cost.py` covers:
+
+- explicit pricing resolution
+- unknown-model pricing
+- pre-resolved cost arithmetic
+- missing usage
+- missing pricing
+- compatibility configuration-based pricing
+- synchronous executor custom pricing
+- asynchronous executor custom pricing
+- synchronous disabled-INFO logging guard
+- asynchronous disabled-INFO logging guard
+
+Because the project does not use a native async pytest plugin for these tests, the async cost test uses `asyncio.run()`.
+
+### Results
+
+Post-optimization profile with INFO logging enabled:
+
+- function calls reduced from approximately `19.1 million` to `8.1 million`
+- profile time reduced from approximately `11.443 seconds` to `4.153 seconds`
+- profile-time reduction: approximately `63.7%`
+- configuration and environment access disappeared from the request hot path
+- INFO logging became the largest remaining contributor
+
+Benchmark with the benchmark logger set to CRITICAL:
+
+Before:
+
+- mean: approximately `27.292 µs`
+- median: approximately `25.800 µs`
+- throughput: approximately `36,640 operations/second`
+
+After:
+
+- mean: approximately `4.551 µs`
+- median: approximately `4.400 µs`
+- throughput: approximately `219,756 operations/second`
+
+Measured improvement:
+
+- mean overhead reduced by approximately `83.3%`
+- median overhead reduced by approximately `82.9%`
+- throughput increased by approximately six times
+
+No additional plain-request optimization is currently justified.
+
+Rejected changes:
+
+- removing request IDs
+- bypassing Pydantic `AIResult` validation
+- disabling success logging globally
+- globally caching complete environment-derived `AIConfig`
+
+---
+
+# Exact Next Task — PROF-005
+
+Profile RAG orchestration overhead while keeping retrieval and provider
+execution outside the measured path.
+
+Before proposing changes, inspect the current contents of:
+
+```text
+ai/rag.py
+benchmarks/test_rag_orchestration.py
+```
+
+Inspect retriever interfaces, response schemas, or related tests only when
+required by the actual implementation.
+
+The next profiling work should distinguish:
+
+1. retrieved-context formatting
+2. grounded-prompt construction
+3. additional-instruction formatting
+4. `RAGResponse` construction
+5. orchestration overhead outside retrieval and provider execution
+
+Do not optimize before collecting evidence.
+
+Likely profiling outputs should remain under:
+
+```text
+.benchmarks/
+```
+
+Suggested source file location:
+
+```text
+profiling/profile_rag_orchestration.py
+```
+
+---
+
+# PROF-003 Verification and Repository State
+
+Completed verification in the transferred project:
+
+```text
+269 normal tests passed
+13 benchmark correctness checks passed
+2 focused structured benchmarks passed
+focused Black check passed
+focused Ruff check passed
+```
+
+Focused profiling artifacts:
+
+```text
+profiling/profile_structured_execution.py
+.benchmarks/profile-structured-execution.txt
+.benchmarks/prof-003-baseline.json
+```
+
+The transferred ZIP did not include `.git`, so Git status, history, and commit
+creation could not be completed in this session.
+
+The full repository was not Black- or Ruff-clean before `PROF-003`. Those
+unrelated existing findings were not changed. Recheck them in the original
+repository with its normal tool versions and configuration.
+
+Suggested focused commit after restoring the changes to the Git repository:
+
+```powershell
+git add `
+    profiling\profile_structured_execution.py `
+    docs\development\roadmap.md `
+    docs\development\session_handoff.md
+
+git commit -m "perf: profile structured response execution"
+```
+
+---
+
+# Minor Issue Discovered
+
+`ai/config_validator.py` contains the same `embedding_dimensions` validation block twice.
+
+This is not a blocker for `PROF-005` and should not derail the active roadmap.
+
+Handle it as one of the following:
+
+- a tiny cleanup in a separately scoped commit, or
+- a Future Backlog / maintenance note
+
+Do not silently combine it with unrelated performance work unless the roadmap explicitly allows that cleanup.
 
 ---
 
 # Workflow
 
-Every roadmap task follows this order:
+Every roadmap task follows this sequence:
 
 1. Design
 2. Code
@@ -73,29 +552,39 @@ Every roadmap task follows this order:
 5. Review
 6. Git
 7. Roadmap update
-8. Project state update, only if milestone changes
+8. Project-state update, only when the milestone changes
 
-A task is NOT complete until every applicable step is complete.
+A task is not complete until every applicable step is complete.
+
+After each completed roadmap task, perform:
+
+- Design review
+- Code review
+- Test review
+- Documentation review
+- Git commit suggestion
+- Roadmap update
+- Sprint-status check
+
+Only then continue to the next roadmap item.
 
 ---
 
 # Roadmap Rules
 
-* Only one sprint is active.
-* Before starting the next task, verify it is still the correct next task.
-* If a better architectural decision exists:
-
-  * explain why
-  * update the roadmap
-  * then continue
-* Never silently change the roadmap.
-* New ideas go into Future Backlog.
-* Future Backlog items should not interrupt the active roadmap unless they:
-
-  * block the current sprint
-  * fix a design issue
-  * prevent important technical debt
-  * are required by the next roadmap task
+- Only one sprint is active.
+- Verify the next task before starting it.
+- Do not silently change roadmap order or scope.
+- If a better architectural decision is required:
+  1. explain the reason
+  2. update the roadmap
+  3. continue with the corrected plan
+- New ideas belong in Future Backlog.
+- Future Backlog items should not interrupt active work unless they:
+  - block the current sprint
+  - correct an architecture or safety issue
+  - prevent important technical debt
+  - are required by the next roadmap task
 
 ---
 
@@ -103,64 +592,68 @@ A task is NOT complete until every applicable step is complete.
 
 Before changing existing code:
 
-* Read the current implementation.
-* Never assume the current implementation.
-* Verify the file first.
-* Minimize unnecessary refactoring.
-* Preserve existing public APIs unless there is a documented architectural reason.
-* If changing public APIs, create an ADR.
+- Read the current implementation.
+- Never assume a file still matches an older conversation excerpt.
+- Verify interfaces and callers first.
+- Minimize unrelated refactoring.
+- Preserve public APIs unless there is a documented architectural reason.
+- Create an ADR when a public or architectural contract changes.
+- Keep each roadmap task in a focused commit.
 
-When suggesting changes:
+When suggesting code:
 
-* Prefer showing only the changed lines.
-* Do not rewrite entire files unless necessary.
-* Keep each roadmap task as a separate commit.
+- Prefer changed sections over complete files when the change is small.
+- Provide complete files only when partial edits would be error-prone.
+- Include formatting, linting, focused tests, full tests, and Git commands at the appropriate stage.
+- Do not claim commands were run by the assistant; the user runs them locally.
 
 ---
 
 # Documentation Rules
 
-Architecture changes:
+Architecture change:
 
-→ Add ADR.
+- add an ADR
 
-Public API changes:
+Public API change:
 
-→ Update README.
+- update README
 
 Completed roadmap task:
 
-→ Update ROADMAP immediately.
+- update ROADMAP immediately
 
 Completed sprint or version-level feature set:
 
-→ Update CHANGELOG.
+- update CHANGELOG
 
-Project milestone changes:
+Project milestone change:
 
-→ Update PROJECT_STATE.
+- update PROJECT_STATE
 
-Important future ideas:
+Important future idea:
 
-→ Add to Future Backlog.
+- add it to Future Backlog
 
-Do not create ADRs for every small feature. Create ADRs only when the decision affects architecture, public API, provider independence, safety, extensibility, or many files.
+Do not create ADRs for small local implementation details. ADRs are for decisions affecting architecture, public APIs, provider independence, safety, extensibility, or many files.
 
 ---
 
 # Engineering Principles
 
-Follow these principles:
+Apply:
 
-* Single Responsibility Principle
-* Dependency Inversion
-* Composition over inheritance
-* Strong typing
-* Explicit interfaces
-* Small public API
-* Provider independence
+- Single Responsibility Principle
+- Dependency Inversion
+- Composition over inheritance
+- Strong typing
+- Explicit interfaces
+- Small public API
+- Provider independence
 
 Business logic belongs in applications, not in the toolkit.
+
+Performance changes must be evidence-driven and must not weaken contracts for minor gains.
 
 ---
 
@@ -168,137 +661,129 @@ Business logic belongs in applications, not in the toolkit.
 
 Act as a senior software architect and mentor.
 
-Always explain:
+Explain:
 
-* What we are building
-* Why we are building it
-* Why this approach was chosen
-* Why alternatives were rejected, when relevant
+- what is being built
+- why it is being built
+- why the approach fits the architecture
+- why meaningful alternatives were rejected
 
-Do not simply provide code.
+Proceed in small, explicit steps.
 
-Teach the engineering decisions behind the code.
+Do not skip directly to a large implementation without first inspecting the relevant files.
 
----
-
-# Review Process
-
-After every completed roadmap task, perform:
-
-✓ Design Review
-
-✓ Code Review
-
-✓ Test Review
-
-✓ Documentation Review
-
-✓ Git Commit Suggestion
-
-✓ Roadmap Update
-
-✓ Sprint Status
-
-Only after this continue to the next roadmap item.
+For complete Markdown sections intended for the repository, return the entire reusable section in one block so it can be pasted safely.
 
 ---
 
-# Current State
+# Environment Notes
 
-Read the attached `project_state.md`.
+Known local environment:
 
-Do not rely only on memory. The current project state file is the source of truth.
+- Windows
+- PowerShell
+- PyCharm
+- CPython 3.14.4 for the current profiling session
+- project supports Python `>=3.11`
+
+`ripgrep` (`rg`) is not installed in the current environment.
+
+Use PowerShell search when needed:
+
+```powershell
+Get-ChildItem -Recurse -File -Filter *.py |
+    Select-String -Pattern "SEARCH_PATTERN" |
+    ForEach-Object {
+        "$($_.Path):$($_.LineNumber): $($_.Line.Trim())"
+    }
+```
 
 ---
 
-# Current Roadmap
-
-Read the attached `roadmap.md`.
-
-Verify the next sprint/task before continuing.
-
----
-
-# Current Architecture
-
-Read the attached `architecture.md`.
-
-Check architecture consistency before adding new features.
-
----
-
-# Current Future Backlog Notes
+# Future Backlog Rules
 
 The Future Backlog is a parking lot, not the active implementation plan.
 
-Known backlog ideas include:
+Known categories include:
 
-* Local LLM support
-* Metrics dashboard
-* Plugin system
-* Web dashboard
-* Automatic model benchmarking
-* AI evaluation framework
-* MCP support
-* Additional providers
-* Automatic provider discovery
-* Immutable / reusable request builders
-* DX-006 Add local image file helper
-* Persistent conversation memory
-* Database-backed conversation memory
-* Token-aware memory trimming
-* Conversation summarization memory
-* Vector-based long-term memory
-* PDF document loader
-* DOCX document loader
-* HTML document loader
-* Database document loader
-* Automatic document chunking
-* Markdown section-aware loader
-* File watching and re-indexing
-* Configurable document loader registry by file extension
-* High-level document indexing helper
-* RAG streaming responses
-* Async RAG pipeline
-* Structured RAG responses
-* RAG citations formatter
-* RAG reranking
-* RAG evaluation framework
-* Hybrid keyword + vector retrieval
-* Agent prompt template customization
-* Streaming agent responses
-* Async agent
-* RAG-aware agent
-* Tool-using agent
-* Branching workflow engine
-* Parallel workflow execution
-* Workflow step retries
-* Async workflow engine
-* Durable workflow persistence
-* Visual workflow builder
-* AI-based agent routing
-* Parallel multi-agent execution
-* Agent-to-agent debate
-* Shared multi-agent memory
-* Recursive agent loops
-* Tool-using multi-agent workflows
-* Autonomous multi-agent planning
-* Test-safe logging configuration
-* Configurable log file path and log level
-* Option to disable file logging during tests
+- local LLM support
+- additional providers and provider discovery
+- plugin system and MCP
+- metrics and web dashboards
+- model benchmarking and evaluation
+- immutable or reusable request builders
+- local image-file helper
+- persistent and database-backed memory
+- token-aware memory trimming and summarization
+- PDF, DOCX, HTML, and database loaders
+- automatic chunking and indexing helpers
+- streaming, async, structured, cited, reranked, evaluated, and hybrid RAG
+- configurable agent prompts
+- streaming, async, RAG-aware, and tool-using agents
+- branching, parallel, retryable, async, durable, and visual workflows
+- AI-based routing, debate, shared memory, recursive loops, and tool-using multi-agent systems
+- CLI diagnostics and provider health checks
 
-Do not implement Future Backlog items unless they become part of the active roadmap or are required to unblock the current task.
+Read the actual Future Backlog document for the complete current list.
+
+Do not implement backlog items unless they are promoted into the active roadmap or are required to unblock the current task.
 
 ---
 
-# Important
+# Recommended New-Chat File Package
 
-If anything is unclear:
+Upload or paste these first:
 
-Read the project files first.
+Required:
+
+1. `session_handoff.md`
+2. `project_state.md`
+3. `roadmap.md`
+4. `architecture.md`
+5. `future_backlog.md`, if separate
+
+For the immediate next task, also provide:
+
+6. `ai/rag.py`
+7. `benchmarks/test_rag_orchestration.py`
+
+Useful profiling evidence, if the new session needs to audit prior conclusions:
+
+- `.benchmarks/profile-request-lifecycle-before.txt`
+- `.benchmarks/profile-request-lifecycle-after.txt`
+- `.benchmarks/profile-vector-scaling.txt`
+- `.benchmarks/profile-structured-execution.txt`
+- `.benchmarks/prof-003-baseline.json`
+- original baseline benchmark JSON
+- optimized plain-request benchmark JSON
+
+Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
+
+---
+
+# Suggested First Message in the New Chat
+
+```text
+Continue the Python AI Toolkit project using the attached session handoff and source-of-truth documents.
+
+First:
+1. Read session_handoff.md.
+2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
+3. Verify the repository's current state and confirm that PROF-005 is still the correct next task.
+4. Inspect the supplied RAG orchestration files before proposing changes.
+
+Do not redesign the project, skip roadmap order, or assume older file contents.
+Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
+```
+
+---
+
+# Final Instruction
+
+If anything is unclear, inspect the project files first.
 
 Do not guess.
 
-If a previous implementation might have changed, inspect it before proposing modifications.
+If a previous implementation might have changed, request or inspect the current file before proposing modifications.
 
-Architecture consistency is more important than adding new features quickly.
+Architecture consistency, correctness, and evidence-driven decisions are more important than adding features quickly.

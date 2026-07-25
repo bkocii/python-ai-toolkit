@@ -547,13 +547,111 @@ Rejected optimization candidates:
 
 #### PROF-003 — Profile Structured Responses and Repair
 
-* [ ] Profile successful structured-response parsing
-* [ ] Profile JSON decoding
-* [ ] Profile Pydantic validation
-* [ ] Profile failed parsing and repair prompt construction
-* [ ] Profile token-usage aggregation
-* [ ] Compare successful parsing with one-retry repair
-* [ ] Document meaningful call-time contributors
+* [x] Profile successful structured-response parsing
+* [x] Profile JSON decoding
+* [x] Profile Pydantic validation
+* [x] Profile failed parsing and repair prompt construction
+* [x] Profile token-usage aggregation
+* [x] Compare successful parsing with one-retry repair
+* [x] Document meaningful call-time contributors
+
+Profiling environment:
+
+* Linux 64-bit
+* CPython 3.12.13
+* Pydantic 2.13.4
+* deterministic local providers
+* no network requests
+* INFO-level logger with `NullHandler`
+* explicit token pricing to retain cost-calculation work
+* 50,000 repeated component operations
+* 25,000 repeated successful structured requests
+* 25,000 repeated one-retry repair requests
+* providers, responses, executors, logger, and input data created before profiling
+
+Profiling artifacts:
+
+* `profiling/profile_structured_execution.py`
+* `.benchmarks/profile-structured-execution.txt`
+* `.benchmarks/prof-003-baseline.json`
+
+Component profile:
+
+* structured-prompt construction: approximately `20.125 seconds` cumulative
+  for 50,000 operations
+* Pydantic `model_json_schema()`: approximately `19.9 seconds` cumulative
+  inside prompt construction
+* JSON decoding: approximately `0.129 seconds` cumulative for 50,000
+  operations
+* Pydantic model validation: approximately `0.051 seconds` cumulative for
+  50,000 operations
+* combined JSON decoding and Pydantic validation: approximately `0.236 seconds`
+  cumulative for 50,000 operations
+* repair-prompt construction: approximately `0.005 seconds` cumulative for
+  50,000 operations
+* token-usage aggregation: approximately `0.053 seconds` cumulative for
+  50,000 operations
+* `AIResult` model construction: approximately `0.054 seconds` cumulative for
+  50,000 operations
+
+Successful structured lifecycle:
+
+* approximately `11.824 seconds` cumulative inside `RequestExecutor.execute()`
+  for 25,000 requests
+* approximately `10.536 seconds` in structured-prompt construction
+* structured-prompt construction represented approximately `89.1%` of
+  executor time
+* success logging represented approximately `5.1%`
+* combined structured parsing represented approximately `2.1%`
+* result construction and cost calculation were each below `1%`
+* the deterministic provider call was negligible
+
+One-retry repair lifecycle:
+
+* approximately `12.195 seconds` cumulative inside `RequestExecutor.execute()`
+  for 25,000 requests
+* approximately `10.576 seconds` in structured-prompt construction
+* structured-prompt construction represented approximately `86.7%` of
+  executor time
+* success logging represented approximately `5.1%`
+* two parse attempts represented approximately `3.4%`
+* token aggregation represented approximately `0.6%`
+* result construction, retry-provider calls, repair-prompt construction, and
+  cost calculation were each below `1%`
+
+Focused benchmark verification:
+
+* successful structured parsing median: approximately `2.544 µs`
+* one-retry repair median: approximately `99.838 µs`
+* benchmark results were captured on the profiling environment and are not
+  directly comparable with the earlier Windows baseline
+
+Primary finding:
+
+`build_structured_prompt()` regenerates the complete Pydantic JSON schema for
+the same response model on every request. This dependency work dominates both
+the normal structured path and the one-retry repair path.
+
+JSON decoding is the largest part of successful response parsing, but complete
+parsing remains small compared with repeated JSON-schema generation.
+
+The additional repair work is measurable but secondary. Repair-prompt string
+construction itself is negligible; the extra parse attempt, exception path,
+provider call, and token aggregation account for most of the difference.
+
+Optimization candidate for `PROF-007`:
+
+* review safe caching of the response model's serialized schema instruction
+* preserve `build_structured_prompt()` and all public request APIs
+* define cache invalidation behavior for dynamically rebuilt Pydantic models
+  before approving implementation
+* benchmark the candidate separately before and after any runtime change
+
+Conclusion:
+
+No runtime implementation was changed during `PROF-003`. The profiling task
+collected and documented evidence, while optimization approval remains deferred
+to `PROF-007` and implementation remains deferred to `PROF-008`.
 
 #### PROF-004 — Profile Vector Search
 
