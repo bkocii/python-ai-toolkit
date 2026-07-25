@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-002 — Performance Profiling`  
-**Next task:** `PROF-005 — Profile RAG orchestration`
+**Next task:** `PROF-006 — Profile workflow execution`
 
 ---
 
@@ -205,13 +205,13 @@ Roadmap tasks:
 - [x] `PROF-002` — Profile plain request execution
 - [x] `PROF-003` — Profile structured parsing and repair
 - [x] `PROF-004` — Profile vector search
-- [ ] `PROF-005` — Profile RAG orchestration
+- [x] `PROF-005` — Profile RAG orchestration
 - [ ] `PROF-006` — Profile workflow execution
 - [ ] `PROF-007` — Review optimization candidates
 - [ ] `PROF-008` — Implement approved optimizations
 - [ ] `PROF-009` — Complete profiling documentation
 
-The next task is `PROF-005`.
+The next task is `PROF-006`.
 
 ---
 
@@ -447,28 +447,72 @@ Rejected changes:
 
 ---
 
-# Exact Next Task — PROF-005
+# PROF-005 — RAG Orchestration
 
-Profile RAG orchestration overhead while keeping retrieval and provider
-execution outside the measured path.
+**Status:** Completed
+
+Relevant files:
+
+```text
+ai/rag.py
+ai/retriever.py
+benchmarks/test_rag_orchestration.py
+profiling/profile_rag_orchestration.py
+```
+
+Profile method:
+
+- five prebuilt retrieved contexts
+- one prebuilt `AIResult`
+- 100,000 repeated component operations
+- 50,000 repeated complete orchestration calls
+- retrieval, embedding, vector search, provider execution, network access,
+  logging, and file I/O excluded
+
+Primary finding:
+
+- retrieved-context formatting accounted for approximately `64%` of complete
+  orchestration profile time
+- `RAGResponse` construction accounted for approximately `12%`
+- grounded-prompt construction accounted for approximately `3%`
+- adding instructions changed prompt-building cost only negligibly
+
+Complete `RAGPipeline.ask()` execution took approximately `8.16 µs` per call
+under `cProfile`. The focused benchmark median was approximately `5.268 µs`.
+
+Decision:
+
+No RAG-specific runtime optimization is recommended. The orchestration overhead
+is already very small and will normally be dominated by retrieval and provider
+execution. Context formatting remains a contributor for `PROF-007` review, but
+its current absolute cost does not justify extra caching, less readable output,
+or bypassing Pydantic validation.
+
+No runtime file changed during `PROF-005`.
+
+---
+
+# Exact Next Task — PROF-006
+
+Profile workflow execution overhead while keeping application work outside the
+measured path.
 
 Before proposing changes, inspect the current contents of:
 
 ```text
-ai/rag.py
-benchmarks/test_rag_orchestration.py
+ai/workflow.py
+benchmarks/test_workflow_execution.py
+tests/test_workflow.py
 ```
-
-Inspect retriever interfaces, response schemas, or related tests only when
-required by the actual implementation.
 
 The next profiling work should distinguish:
 
-1. retrieved-context formatting
-2. grounded-prompt construction
-3. additional-instruction formatting
-4. `RAGResponse` construction
-5. orchestration overhead outside retrieval and provider execution
+1. one-step workflow execution
+2. five-step workflow execution
+3. `WorkflowContext` construction
+4. workflow step-result construction
+5. state propagation
+6. final workflow-result construction
 
 Do not optimize before collecting evidence.
 
@@ -481,7 +525,7 @@ Likely profiling outputs should remain under:
 Suggested source file location:
 
 ```text
-profiling/profile_rag_orchestration.py
+profiling/profile_workflow_execution.py
 ```
 
 ---
@@ -526,11 +570,52 @@ git commit -m "perf: profile structured response execution"
 
 ---
 
+# PROF-005 Verification and Repository State
+
+Completed verification in the transferred project:
+
+```text
+269 normal tests passed
+13 benchmark correctness checks passed
+9 timed benchmarks passed
+4 fixture-only benchmarks skipped
+focused RAG benchmark passed
+focused Black check passed
+focused Ruff check passed
+```
+
+Focused profiling artifacts:
+
+```text
+profiling/profile_rag_orchestration.py
+.benchmarks/profile-rag-orchestration.txt
+.benchmarks/prof-005-baseline.json
+```
+
+The `.benchmarks/` results are local machine evidence and remain ignored by
+Git. They should not be staged.
+
+The transferred project still contains no `.git` directory, so Git status,
+history, and commit creation must be completed in the original repository.
+
+Suggested focused commit after restoring the changes to the Git repository:
+
+```powershell
+git add `
+    profiling\profile_rag_orchestration.py `
+    docs\development\roadmap.md `
+    docs\development\session_handoff.md
+
+git commit -m "perf: profile RAG orchestration"
+```
+
+---
+
 # Minor Issue Discovered
 
 `ai/config_validator.py` contains the same `embedding_dimensions` validation block twice.
 
-This is not a blocker for `PROF-005` and should not derail the active roadmap.
+This is not a blocker for `PROF-006` and should not derail the active roadmap.
 
 Handle it as one of the following:
 
@@ -769,8 +854,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PROF-005 is still the correct next task.
-4. Inspect the supplied RAG orchestration files before proposing changes.
+3. Verify the repository's current state and confirm that PROF-006 is still the correct next task.
+4. Inspect the supplied workflow execution files before proposing changes.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

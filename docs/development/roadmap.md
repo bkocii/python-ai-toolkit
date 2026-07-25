@@ -788,12 +788,73 @@ Rejected optimization candidates:
 
 #### PROF-005 — Profile RAG Orchestration
 
-* [ ] Profile retrieved-context formatting
-* [ ] Profile grounded prompt construction
-* [ ] Profile additional-instruction formatting
-* [ ] Profile `RAGResponse` construction
-* [ ] Keep retrieval and provider execution excluded
-* [ ] Document meaningful call-time contributors
+* [x] Profile retrieved-context formatting
+* [x] Profile grounded prompt construction
+* [x] Profile additional-instruction formatting
+* [x] Profile `RAGResponse` construction
+* [x] Keep retrieval and provider execution excluded
+* [x] Document meaningful call-time contributors
+
+Profiling environment:
+
+* deterministic local retriever returning five prebuilt contexts
+* deterministic local AI client returning one prebuilt `AIResult`
+* no embeddings, vector search, network requests, provider execution, logging,
+  or file I/O inside the measured operations
+* 100,000 repeated component operations
+* 50,000 repeated complete RAG orchestration calls
+* contexts, results, clients, and pipeline created before profiling
+
+Component profile:
+
+* retrieved-context formatting: approximately `0.452 seconds` for 100,000
+  operations, or `4.52 µs` per operation under `cProfile`
+* grounded-prompt construction without instructions: approximately
+  `0.013 seconds` for 100,000 operations, or `0.13 µs` per operation
+* grounded-prompt construction with instructions: approximately `0.016 seconds`
+  for 100,000 operations, or `0.16 µs` per operation
+* `RAGResponse` construction: approximately `0.078 seconds` for 100,000
+  operations, or `0.78 µs` per operation
+* Pydantic validation inside response construction: approximately
+  `0.061 seconds` for 100,000 operations
+
+Complete orchestration profile:
+
+* approximately `0.408 seconds` inside `RAGPipeline.ask()` for 50,000 calls
+* approximately `8.16 µs` per call under `cProfile`
+* retrieved-context formatting accounted for approximately `64%` of cumulative
+  orchestration time
+* `RAGResponse` construction accounted for approximately `12%`
+* grounded-prompt construction accounted for approximately `3%`
+* deterministic retriever and AI-client stubs together accounted for less than
+  `2%`
+
+Focused benchmark verification:
+
+* median RAG orchestration time: approximately `5.268 µs`
+* mean RAG orchestration time: approximately `5.424 µs`
+* approximately `184,373` operations per second
+* benchmark measurements were captured on the profiling environment and are not
+  directly comparable with the earlier Windows baseline
+
+Primary finding:
+
+Retrieved-context formatting is the largest internal contributor because it
+formats the ID, score, optional metadata, and text for every returned context.
+`RAGResponse` validation is secondary. Grounded-prompt construction and
+additional-instruction formatting are negligible.
+
+Conclusion:
+
+No RAG-specific runtime optimization is recommended from this profile. Complete
+toolkit orchestration takes only a few microseconds in the deterministic
+benchmark and will normally be dominated by embedding, retrieval, network, and
+provider execution.
+
+Context formatting should remain visible during `PROF-007`, but its current
+absolute cost does not justify weakening formatting clarity, bypassing Pydantic
+validation, or adding caching complexity. No runtime implementation changed
+during `PROF-005`.
 
 #### PROF-006 — Profile Workflow Execution
 
