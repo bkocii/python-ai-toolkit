@@ -858,14 +858,99 @@ during `PROF-005`.
 
 #### PROF-006 — Profile Workflow Execution
 
-* [ ] Profile one-step workflow execution
-* [ ] Profile five-step workflow execution
-* [ ] Measure `WorkflowContext` construction
-* [ ] Measure workflow step-result construction
-* [ ] Measure state propagation
-* [ ] Measure final workflow-result construction
-* [ ] Compare one-step and five-step overhead
-* [ ] Document meaningful call-time contributors
+* [x] Profile one-step workflow execution
+* [x] Profile five-step workflow execution
+* [x] Measure `WorkflowContext` construction
+* [x] Measure workflow step-result construction
+* [x] Measure state propagation
+* [x] Measure final workflow-result construction
+* [x] Compare one-step and five-step overhead
+* [x] Document meaningful call-time contributors
+
+Profiling environment:
+
+* Linux 64-bit
+* CPython 3.12.13
+* Pydantic 2.13.4
+* deterministic local workflow steps performing only small arithmetic operations
+* no provider execution, network requests, logging, or file I/O inside the
+  measured operations
+* 100,000 repeated component operations
+* 50,000 repeated complete one-step workflow executions
+* 50,000 repeated complete five-step workflow executions
+* workflows, inputs, metadata, contexts, and reusable result fixtures created
+  before profiling where applicable
+
+Profiling artifacts:
+
+* `profiling/profile_workflow_execution.py`
+* `.benchmarks/profile-workflow-execution.txt`
+* `.benchmarks/prof-006-baseline.json`
+
+Component profile:
+
+* `WorkflowContext` construction: approximately `0.136 seconds` for 100,000
+  operations, or `1.36 µs` per operation under `cProfile`
+* `WorkflowStepResult` construction: approximately `0.162 seconds` for 100,000
+  operations, or `1.62 µs` per operation
+* state propagation through `dict.update()`: approximately `0.009 seconds` for
+  100,000 updates, or `0.09 µs` per update
+* `WorkflowRunResult` construction with one prebuilt step result:
+  approximately `0.118 seconds` for 100,000 operations, or `1.18 µs` per
+  operation
+* `WorkflowRunResult` construction with five prebuilt step results:
+  approximately `0.121 seconds` for 100,000 operations, or `1.21 µs` per
+  operation
+
+Complete execution profile:
+
+* one-step `WorkflowEngine.run()`: approximately `0.260 seconds` for 50,000
+  executions, or `5.20 µs` per execution under `cProfile`
+* five-step `WorkflowEngine.run()`: approximately `0.754 seconds` for 50,000
+  executions, or `15.08 µs` per execution
+* five-step execution took approximately `2.9` times the one-step profile time,
+  rather than five times, because context and final-result construction occur
+  once per workflow
+* Pydantic model initialization accounted for approximately `54%` of one-step
+  engine time and `46%` of five-step engine time
+* Pydantic core validation alone accounted for approximately `41%` of one-step
+  engine time and `35%` of five-step engine time
+* state updates accounted for approximately `2%` of one-step engine time and
+  `4%` of five-step engine time
+* list appends accounted for approximately `2%` of one-step engine time and
+  `4%` of five-step engine time
+
+Focused benchmark verification:
+
+* one-step workflow median: approximately `2.839 µs`
+* five-step workflow median: approximately `7.367 µs`
+* five-step median was approximately `2.60` times the one-step median
+* the four additional workflow steps added approximately `4.528 µs` in total,
+  or approximately `1.132 µs` per additional step in this deterministic
+  scenario
+* benchmark measurements were captured on the profiling environment and are
+  not directly comparable with the earlier Windows baseline
+
+Primary finding:
+
+Pydantic construction and validation of the workflow context, individual step
+results, and final workflow result are the largest reusable contributors.
+State propagation and executed-step list maintenance are negligible.
+
+Final-result construction changes very little between one and five prebuilt
+step results because the nested items are already validated Pydantic model
+instances.
+
+Conclusion:
+
+No workflow-specific runtime optimization is recommended. The deterministic
+one-step and five-step overhead is already measured in microseconds, and real
+workflow application work will normally dominate it.
+
+Pydantic construction should remain visible during `PROF-007`, but bypassing
+validation, replacing the public result models, or adding specialized internal
+construction paths would weaken clear typed contracts for a very small
+absolute gain. No runtime implementation changed during `PROF-006`.
 
 #### PROF-007 — Review Optimization Candidates
 

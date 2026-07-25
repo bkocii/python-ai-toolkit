@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-002 — Performance Profiling`  
-**Next task:** `PROF-006 — Profile workflow execution`
+**Next task:** `PROF-007 — Review optimization candidates`
 
 ---
 
@@ -206,12 +206,12 @@ Roadmap tasks:
 - [x] `PROF-003` — Profile structured parsing and repair
 - [x] `PROF-004` — Profile vector search
 - [x] `PROF-005` — Profile RAG orchestration
-- [ ] `PROF-006` — Profile workflow execution
+- [x] `PROF-006` — Profile workflow execution
 - [ ] `PROF-007` — Review optimization candidates
 - [ ] `PROF-008` — Implement approved optimizations
 - [ ] `PROF-009` — Complete profiling documentation
 
-The next task is `PROF-006`.
+The next task is `PROF-007`.
 
 ---
 
@@ -492,41 +492,96 @@ No runtime file changed during `PROF-005`.
 
 ---
 
-# Exact Next Task — PROF-006
+# PROF-006 — Workflow Execution
 
-Profile workflow execution overhead while keeping application work outside the
-measured path.
+**Status:** Completed
 
-Before proposing changes, inspect the current contents of:
+Relevant files:
 
 ```text
 ai/workflow.py
 benchmarks/test_workflow_execution.py
+profiling/profile_workflow_execution.py
 tests/test_workflow.py
 ```
 
-The next profiling work should distinguish:
+Profile method:
 
-1. one-step workflow execution
-2. five-step workflow execution
-3. `WorkflowContext` construction
-4. workflow step-result construction
-5. state propagation
-6. final workflow-result construction
+- deterministic one-step and five-step workflows
+- step functions performing only small arithmetic operations
+- 100,000 repeated component operations
+- 50,000 repeated complete executions for each workflow size
+- workflow construction, reusable inputs, metadata, contexts, and result
+  fixtures excluded from measured operations where applicable
+- provider execution, network access, logging, and file I/O excluded
 
-Do not optimize before collecting evidence.
+Component findings:
 
-Likely profiling outputs should remain under:
+- `WorkflowContext` construction: approximately `1.36 µs` per operation under
+  `cProfile`
+- `WorkflowStepResult` construction: approximately `1.62 µs`
+- state propagation through `dict.update()`: approximately `0.09 µs`
+- final-result construction with one prebuilt step: approximately `1.18 µs`
+- final-result construction with five prebuilt steps: approximately `1.21 µs`
 
-```text
-.benchmarks/
-```
+Complete `WorkflowEngine.run()` profile:
 
-Suggested source file location:
+- one-step workflow: approximately `5.20 µs` per execution
+- five-step workflow: approximately `15.08 µs` per execution
+- five steps took approximately `2.9` times the one-step profile time because
+  context and final-result construction occur once per workflow
 
-```text
-profiling/profile_workflow_execution.py
-```
+Focused benchmark:
+
+- one-step median: approximately `2.839 µs`
+- five-step median: approximately `7.367 µs`
+- four added steps increased the median by approximately `4.528 µs`, or
+  approximately `1.132 µs` per additional step
+
+Primary finding:
+
+Pydantic model construction and validation are the largest reusable
+contributors. State propagation and step-list maintenance are negligible.
+Final-result construction changes very little between one and five prebuilt
+step results because those nested models are already validated.
+
+Decision:
+
+No workflow-specific runtime optimization is recommended. The absolute
+orchestration cost is already only a few microseconds and preserves clear,
+typed workflow contracts. Pydantic construction remains visible for the
+cross-path review in `PROF-007`, but bypassing validation or adding specialized
+construction paths is not justified by this evidence.
+
+No runtime file changed during `PROF-006`.
+
+---
+
+# Exact Next Task — PROF-007
+
+Review all measured optimization candidates before approving any additional
+runtime implementation.
+
+The review should:
+
+1. rank bottlenecks by measurable absolute impact
+2. separate toolkit implementation overhead from dependency overhead
+3. identify candidates that preserve public APIs and typed contracts
+4. reject premature or low-value changes explicitly
+5. document architectural tradeoffs
+6. select only candidates justified for `PROF-008`
+7. record paths where no runtime change is recommended
+
+At minimum, compare:
+
+- repeated structured-schema generation from `PROF-003`
+- remaining vector-search costs after the `PROF-004` optimization
+- retrieved-context formatting from `PROF-005`
+- workflow Pydantic model construction from `PROF-006`
+- intentional observability overhead remaining after `PROF-002`
+
+Do not implement candidates during `PROF-007`. Approved runtime changes, if
+any, belong to `PROF-008`.
 
 ---
 
@@ -611,11 +666,52 @@ git commit -m "perf: profile RAG orchestration"
 
 ---
 
+# PROF-006 Verification and Repository State
+
+Completed verification in the transferred project:
+
+```text
+269 normal tests passed
+13 benchmark correctness checks passed
+9 timed benchmarks passed
+4 fixture-only benchmarks skipped
+2 focused workflow benchmarks passed
+focused Black check passed
+focused Ruff check passed
+```
+
+Focused profiling artifacts:
+
+```text
+profiling/profile_workflow_execution.py
+.benchmarks/profile-workflow-execution.txt
+.benchmarks/prof-006-baseline.json
+```
+
+The `.benchmarks/` results are local machine evidence and remain ignored by
+Git. They should not be staged.
+
+The transferred project still contains no `.git` directory, so Git status,
+history, and commit creation must be completed in the original repository.
+
+Suggested focused commit after restoring the changes to the Git repository:
+
+```powershell
+git add `
+    profiling\profile_workflow_execution.py `
+    docs\development\roadmap.md `
+    docs\development\session_handoff.md
+
+git commit -m "perf: profile workflow execution"
+```
+
+---
+
 # Minor Issue Discovered
 
 `ai/config_validator.py` contains the same `embedding_dimensions` validation block twice.
 
-This is not a blocker for `PROF-006` and should not derail the active roadmap.
+This is not a blocker for `PROF-007` and should not derail the active roadmap.
 
 Handle it as one of the following:
 
@@ -829,8 +925,11 @@ Required:
 
 For the immediate next task, also provide:
 
-6. `ai/rag.py`
-7. `benchmarks/test_rag_orchestration.py`
+6. `profiling/profile_request_lifecycle.py`
+7. `profiling/profile_structured_execution.py`
+8. `profiling/profile_vector_search.py`
+9. `profiling/profile_rag_orchestration.py`
+10. `profiling/profile_workflow_execution.py`
 
 Useful profiling evidence, if the new session needs to audit prior conclusions:
 
@@ -838,7 +937,11 @@ Useful profiling evidence, if the new session needs to audit prior conclusions:
 - `.benchmarks/profile-request-lifecycle-after.txt`
 - `.benchmarks/profile-vector-scaling.txt`
 - `.benchmarks/profile-structured-execution.txt`
+- `.benchmarks/profile-rag-orchestration.txt`
+- `.benchmarks/profile-workflow-execution.txt`
 - `.benchmarks/prof-003-baseline.json`
+- `.benchmarks/prof-005-baseline.json`
+- `.benchmarks/prof-006-baseline.json`
 - original baseline benchmark JSON
 - optimized plain-request benchmark JSON
 
@@ -854,8 +957,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PROF-006 is still the correct next task.
-4. Inspect the supplied workflow execution files before proposing changes.
+3. Verify the repository's current state and confirm that PROF-007 is still the correct next task.
+4. Review the completed profiling evidence before ranking optimization candidates.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
