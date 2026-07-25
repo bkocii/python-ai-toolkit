@@ -56,6 +56,9 @@ Completed PROD-003 documentation tasks:
 * DOC-002 Document installation and optional extras
 * DOC-003 Document environment and explicit configuration
 * DOC-004 Document provider registration
+* DOC-005 Document plain and structured requests
+* DOC-006 Document streaming, async, tools, and image inputs
+* DOC-007 Document embeddings, retrieval, and RAG
 
 Next active task:
 
@@ -66,7 +69,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-005 — Document plain and structured requests
+DOC-008 — Document memory, agents, workflows, and orchestration
 ```
 
 ---
@@ -694,13 +697,12 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-005 — Document plain and structured requests`.
+Begin `DOC-008 — Document memory, agents, workflows, and orchestration`.
 
-Provider registration, constructor requirements, capability boundaries, and
-expected errors are now verified and documented. The next review should
-document plain and structured request behavior, result metadata, parsing,
-validation, and repair without expanding into the advanced streaming, async,
-tools, or image-input task.
+Embeddings, vector storage, retrieval, document loading, and RAG are now
+verified and documented, including their distinct return contracts, reference
+implementation limits, and grounding boundaries. The next review should
+document memory, agents, workflows, and multi-agent orchestration.
 
 ---
 
@@ -711,7 +713,7 @@ tools, or image-input task.
 * `AsyncAIClient` remains separate from `AIClient`.
 * `AIClient` and `AsyncAIClient` accept optional explicit `AIConfig`.
 * Environment configuration remains the default when explicit configuration is not supplied.
-* Tool calling does not automatically execute tools yet.
+* Tool calling intentionally leaves tool execution to the application.
 * Image inputs support URLs and Base64 data URLs, not local paths directly.
 * Structured output remains provider-independent.
 * Provider-native strict structured output is deferred.

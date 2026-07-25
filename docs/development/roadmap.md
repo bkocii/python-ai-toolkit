@@ -1148,9 +1148,9 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-002 Document installation and optional extras
 * [x] DOC-003 Document environment and explicit configuration
 * [x] DOC-004 Document provider registration
-* [ ] DOC-005 Document plain and structured requests
-* [ ] DOC-006 Document streaming, async, tools, and image inputs
-* [ ] DOC-007 Document embeddings, retrieval, and RAG
+* [x] DOC-005 Document plain and structured requests
+* [x] DOC-006 Document streaming, async, tools, and image inputs
+* [x] DOC-007 Document embeddings, retrieval, and RAG
 * [ ] DOC-008 Document memory, agents, workflows, and orchestration
 * [ ] DOC-009 Document Django, FastAPI, and CLI integrations
 * [ ] DOC-010 Document exceptions and error handling
@@ -1326,6 +1326,148 @@ Next task:
 
 ```text
 DOC-005 — Document plain and structured requests
+```
+
+#### DOC-005 — Plain and Structured Requests
+
+Status: Completed
+
+Request behavior was reviewed against `AIClient`, `RequestExecutor`,
+`AIResult`, structured prompt construction, JSON parsing, Pydantic validation,
+repair prompting, configuration, tests, and the first two examples.
+
+Completed work:
+
+* added `docs/requests.md` as the focused synchronous request guide
+* documented the return-value difference between `ask()` and `ask_text()`
+* documented plain `AIResult[str]` and structured `AIResult[T]` behavior
+* documented the `response_type` model-class contract and provider-independent
+  schema-prompting path
+* documented every current `AIResult` field and the first-versus-final raw
+  response distinction
+* documented strict JSON parsing and Pydantic schema validation
+* documented provider-backed repair attempts and `max_retries` semantics
+* distinguished structured repair retries from provider transport retries
+* distinguished toolkit schema validation from application factual,
+  authorization, policy, and business validation
+* linked the focused guide from the README and example gallery
+* verified the exact guide examples with a deterministic in-memory provider
+* verified the plain and structured example scripts and focused lifecycle tests
+
+Completion verification:
+
+```text
+4 request-guide Python examples executed
+2 existing plain and structured example scripts executed
+16 focused client, executor, parser, retry, and structured tests passed
+repository-relative documentation links passed
+269 normal tests passed
+```
+
+No runtime API, implementation, dependency, test, or architectural contract
+changed.
+
+Next task:
+
+```text
+DOC-006 — Document streaming, async, tools, and image inputs
+```
+
+#### DOC-006 — Streaming, Async, Tools, and Image Inputs
+
+Status: Completed
+
+Advanced request behavior was reviewed against the synchronous and asynchronous
+clients and executors, provider capability methods, tool and image models,
+OpenAI adapters, tests, examples 05 through 09, and the accepted async-client
+and tool-execution ADRs.
+
+Completed work:
+
+* added `docs/advanced_requests.md` as the focused advanced-request guide
+* documented synchronous streaming iteration, lazy execution, partial-output
+  errors, chunk semantics, and the non-`AIResult` metadata boundary
+* documented async plain and structured requests, `ask_text()`, repair
+  consistency, event-loop usage, and the current async capability limits
+* documented `ToolDefinition`, `ToolResponse`, and `ToolCall`
+* documented allow-listing, argument validation, authorization, and
+  application-owned tool execution
+* documented image URL and Base64 data-URL inputs, optional detail, multiple
+  images, and plain or structured responses
+* documented that local image reading and encoding remain application helpers
+* documented the text-only formatting-repair boundary after an invalid
+  structured image response
+* distinguished provider registration, provider method support, and selected
+  model/account capability support
+* linked the guide from the README, request guide, and example gallery
+* verified the guide examples, examples 05 through 09, focused tests, links,
+  and the complete normal test suite
+
+Completion verification:
+
+```text
+31 Python documentation blocks parsed
+40 repository-relative documentation links passed
+6 advanced-request example scripts executed offline
+26 focused streaming, async, tool, and image tests passed
+269 normal tests passed
+```
+
+No runtime API, implementation, dependency, test, or architectural contract
+changed.
+
+Next task:
+
+```text
+DOC-007 — Document embeddings, retrieval, and RAG
+```
+
+#### DOC-007 — Embeddings, Retrieval, and RAG
+
+Status: Completed
+
+Retrieval behavior was reviewed against the embedding models and client
+methods, provider capability contract, vector-store abstraction, retriever,
+RAG pipeline, document loaders, accepted retrieval ADRs, tests, and examples
+10 through 14.
+
+Completed work:
+
+* added `docs/retrieval.md` as the focused retrieval and RAG guide
+* documented single and batch embeddings, configuration, metadata, provider
+  ordering, and the non-`AIResult` return boundary
+* documented vector records, replacement by ID, cosine-similarity scores,
+  exact metadata filtering, dimension errors, and zero-vector behavior
+* documented the volatile linear-scan boundary of `InMemoryVectorStore`
+* documented retriever composition, `RetrievedContext`, and prompt formatting
+* documented text, Markdown, and directory loaders plus the explicit
+  loading/chunking/embedding/indexing separation
+* documented RAG prompt construction, response fields, omitted `AIResult`
+  metadata, synchronous plain-text limits, and returned-context behavior
+* distinguished ranking scores from probabilities, returned contexts from
+  verified citations, and prompt grounding from factual guarantees
+* linked the guide from the README and example gallery
+* verified the guide examples, examples 10 through 14, focused tests, links,
+  and the complete normal test suite
+
+Completion verification:
+
+```text
+5 retrieval-guide workflows executed offline
+5 retrieval example scripts executed with a deterministic offline client
+56 focused embedding, vector-store, retriever, RAG, and document tests passed
+38 Python blocks in the affected documents parsed
+58 repository-relative Markdown links passed
+269 normal tests passed
+```
+
+No runtime API, implementation, dependency, test, or architectural contract
+changed.
+
+Next task:
+
+```text
+DOC-008 — Document memory, agents, workflows, and orchestration
 ```
 
 ### Documentation Rules
@@ -1515,6 +1657,10 @@ Before release, explicitly review:
 * CLI commands
 * whether client constructors should automatically validate explicitly supplied
   `AIConfig` objects
+* advanced-request return contracts and their current request-metadata
+  boundaries
+* whether capability discovery or preflight checks belong in the stable
+  provider interface
 
 ### Release Verification
 
@@ -1570,8 +1716,20 @@ They should be reconsidered after Sprint 9 and the Version 1.0 release unless an
 * MCP support
 * Additional providers
 * Automatic provider discovery
+* Provider/model capability discovery and preflight validation separate from
+  provider registration
 * Immutable / reusable request builders
 * DX-006 Add local image file helper
+
+## Advanced Requests
+
+* Metadata-bearing streaming API that preserves the existing simple iterator
+  use case
+* Request metadata for tool responses
+* Async streaming, tool-calling, image-input, and embedding APIs
+* Opt-in structured-image re-analysis that explicitly resends image inputs
+* Application-controlled tool-loop helpers that preserve allow-listing,
+  validation, authorization, and application-owned execution
 
 ## Observability, Benchmarking, and Evaluation
 

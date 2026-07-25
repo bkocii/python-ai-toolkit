@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-005 — Document plain and structured requests`
+**Next task:** `DOC-008 — Document memory, agents, workflows, and orchestration`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-005`.
+The next task is `DOC-008`.
 
 ---
 
@@ -790,34 +790,146 @@ repository-relative Markdown links passed
 
 ---
 
-# Exact Next Task — DOC-005
+# DOC-005 — Plain and Structured Requests
 
-Document plain and structured requests without expanding into streaming, async,
-tool-calling, image-input, integration, security, or compatibility tasks.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect `AIClient`, `RequestExecutor`, prompt construction, structured
-   parsing, retry repair, result schemas, tests, and current examples
-2. document `ask()`, `ask_text()`, and their return-value difference
-3. document Pydantic `response_type` behavior
-4. document `AIResult` data and request metadata accurately
-5. explain parsing, validation, repair, and configured retry boundaries
-6. distinguish toolkit validation from application business validation
-7. verify every documented plain and structured request example
-8. keep the change limited to `DOC-005`
+1. reviewed `AIClient`, `RequestExecutor`, `AIResult`, prompt construction,
+   parsing, Pydantic validation, repair behavior, tests, and examples
+2. added `docs/requests.md`
+3. documented `ask()`, `ask_text()`, and their return-value difference
+4. documented plain and Pydantic-structured request behavior
+5. documented all `AIResult` metadata and raw-response semantics
+6. documented strict parsing, schema validation, provider-backed repair, and
+   configured retry boundaries
+7. distinguished toolkit validation from application factual, authorization,
+   policy, and business validation
+8. linked the guide from the README and example gallery
+9. changed no runtime implementation, public API, dependency, test, or ADR
+
+Completion verification:
+
+```text
+4 request-guide Python examples executed
+2 existing plain and structured example scripts executed
+16 focused request-lifecycle tests passed
+repository-relative documentation links passed
+269 normal tests passed
+```
 
 ---
 
-# DOC-004 Verification and Repository State
+# DOC-006 — Streaming, Async, Tools, and Image Inputs
+
+**Status:** Completed
+
+Completed work:
+
+1. reviewed both clients and executors, provider capability methods, tool and
+   image models, OpenAI adapters, tests, and examples 05 through 09
+2. added `docs/advanced_requests.md`
+3. documented streaming iteration, chunk and partial-output behavior, and its
+   non-`AIResult` metadata boundary
+4. documented async plain and structured requests and the current absence of
+   async streaming, tools, images, and embeddings
+5. documented tool definitions and responses plus application-owned
+   allow-listing, validation, authorization, execution, and continuation
+6. documented image URLs, Base64 data URLs, local-file helper boundaries,
+   optional detail, multiple images, and structured responses
+7. documented provider-method versus model/account support and capability
+   errors
+8. changed no runtime implementation, public API, dependency, test, or ADR
+
+Completion verification:
+
+```text
+31 Python documentation blocks parsed
+40 repository-relative documentation links passed
+6 advanced-request example scripts executed with deterministic offline clients
+26 focused streaming, async, tool, and image tests passed
+269 normal tests passed
+```
+
+---
+
+# DOC-007 — Embeddings, Retrieval, and RAG
+
+**Status:** Completed
+
+Completed work:
+
+1. reviewed embedding models and client methods, provider capability behavior,
+   vector-store abstraction, retriever, RAG pipeline, document loaders, tests,
+   examples 10 through 14, and ADRs 0010 and 0011
+2. added `docs/retrieval.md`
+3. documented single and batch embeddings, model/dimension configuration,
+   metadata, provider ordering, and the non-`AIResult` return boundary
+4. documented vector records, ID replacement, cosine-similarity scores, exact
+   metadata filters, dimension errors, zero vectors, and result ordering
+5. documented the volatile linear-scan reference boundary of
+   `InMemoryVectorStore`
+6. documented `VectorStoreRetriever`, `RetrievedContext`, and prompt-ready
+   context formatting
+7. documented text, Markdown, and directory loaders plus the explicit
+   loading/chunking/embedding/indexing separation
+8. documented RAG prompt construction, returned contexts, response metadata,
+   omitted `AIResult` fields, and current sync/plain-text limits
+9. documented that similarity is not factual confidence, returned contexts are
+   not verified citations, and grounding instructions cannot guarantee a
+   grounded answer
+10. recorded advanced-request metadata, image-aware repair, safe tool-loop, and
+    provider/model capability discovery as explicit release-review or Future
+    Backlog candidates
+11. changed no runtime implementation, public API, dependency, test, or ADR
+
+Completion verification:
+
+```text
+5 retrieval-guide workflows executed offline
+5 retrieval example scripts executed with a deterministic offline client
+56 focused embedding, vector-store, retriever, RAG, and document tests passed
+38 Python blocks in the affected documents parsed
+58 repository-relative Markdown links passed
+269 normal tests passed
+```
+
+---
+
+# Exact Next Task — DOC-008
+
+Document conversation memory, agents, workflows, and multi-agent orchestration
+without expanding into integrations, exceptions, security, compatibility, or
+public API reference work.
+
+Required work:
+
+1. inspect memory, agent, workflow, and orchestrator models and tests
+2. inspect examples 15 through 18 and the accepted orchestration ADRs
+3. document message and memory contracts, recent-message behavior, and
+   formatting
+4. document agent prompt construction, response metadata, and memory updates
+5. document sequential workflow state, step results, failure behavior, and
+   execution history
+6. document named-agent registration, sequential orchestration, result
+   collection, and failure behavior
+7. document application-owned routing, tool execution, and autonomy boundaries
+8. verify every documented orchestration example
+9. keep the change limited to `DOC-008`
+
+---
+
+# DOC-007 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
-docs/configuration.md
-docs/providers.md
+docs/advanced_requests.md
+docs/retrieval.md
+examples/README.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
@@ -831,14 +943,15 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    docs\configuration.md `
-    docs\providers.md `
+    docs\advanced_requests.md `
+    docs\retrieval.md `
+    examples\README.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document provider registration"
+git commit -m "docs: document retrieval and RAG"
 ```
 
 ---
@@ -1241,16 +1354,17 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `docs/providers.md`
-8. `ai/client.py`
-9. `ai/executor.py`
-10. `ai/schemas.py`
-11. `ai/structured.py`
-12. `ai/parser.py`
-13. `ai/retry.py`
-14. relevant request, executor, parser, retry, and structured-response tests
+7. `docs/retrieval.md`
+8. `ai/memory.py`
+9. `ai/agent.py`
+10. `ai/workflow.py`
+11. `ai/orchestrator.py`
+12. `ai/client.py`
+13. `ai/schemas.py`
+14. examples 15 through 18 and relevant memory, agent, workflow, and
+    orchestrator tests
 
-Profiling evidence is not required for `DOC-005`.
+Profiling evidence is not required for `DOC-008`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1264,7 +1378,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-005 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-008 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

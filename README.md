@@ -190,6 +190,10 @@ print(result.token_usage)
 print(result.estimated_cost_usd)
 ```
 
+Use `client.ask_text(prompt)` only when the response string is all you need.
+See the [request guide](docs/requests.md) for the return-value difference,
+metadata semantics, and retry boundaries.
+
 ## Structured responses
 
 Pass a Pydantic model as `response_type` to receive validated application data:
@@ -217,7 +221,9 @@ print(result.data.reason)
 
 The toolkit builds a schema-aware prompt, parses the provider response, validates
 it with Pydantic, and can request a repaired response when parsing or validation
-fails.
+fails. The [request guide](docs/requests.md) explains the complete structured
+lifecycle and the boundary between schema validation and application business
+rules.
 
 ## Major capabilities
 
@@ -272,6 +278,11 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+Streaming returns chunks rather than `AIResult`, while `AsyncAIClient` currently
+supports async plain and structured requests but not async streaming, tools, or
+images. See the [advanced request guide](docs/advanced_requests.md) for the
+return contracts and capability boundaries.
+
 ### Tool calling
 
 Tools are declared with provider-independent schemas. Requested tool calls are
@@ -300,7 +311,9 @@ response = client.ask_with_tools(
 ```
 
 The toolkit does not automatically execute requested tools. Application code
-must authorize and perform any external action.
+must allow-list the tool, validate its arguments, authorize the operation, and
+perform any external action. See the
+[advanced request guide](docs/advanced_requests.md#tool-calling).
 
 ### Image inputs
 
@@ -316,6 +329,9 @@ result = client.ask_with_images(
 ```
 
 Plain-text and structured Pydantic responses are supported for image requests.
+The source must already be a URL or Base64 data URL; `ImageInput` does not read
+local paths. See the
+[advanced request guide](docs/advanced_requests.md#image-inputs).
 
 ### Embeddings, retrieval, and RAG
 
@@ -347,6 +363,10 @@ Main public components include:
 `InMemoryVectorStore` is a reference implementation for tests, examples, demos,
 and small local workflows. Production applications can implement persistent
 storage behind `BaseVectorStore`.
+
+See the [retrieval and RAG guide](docs/retrieval.md) for embedding return
+contracts, batch ordering, vector scores and filters, document-loading
+boundaries, RAG metadata, and grounding limitations.
 
 See examples
 [10 through 14](examples/README.md#10--embeddings) for the complete progression
@@ -442,6 +462,9 @@ concerns in focused documents:
 | [Installation guide](docs/installation.md) | Local installation, optional extras, and contributor setup |
 | [Configuration guide](docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
 | [Provider guide](docs/providers.md) | Built-in provider, custom registration, constructor contract, capabilities, and errors |
+| [Request guide](docs/requests.md) | Plain and structured requests, `AIResult`, parsing, validation, and repair |
+| [Advanced request guide](docs/advanced_requests.md) | Streaming, async requests, tool calling, image inputs, and capability limits |
+| [Retrieval and RAG guide](docs/retrieval.md) | Embeddings, vector storage, retrieval, document loading, RAG responses, and grounding limits |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |

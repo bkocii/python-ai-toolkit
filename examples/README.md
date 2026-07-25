@@ -3,14 +3,22 @@
 This directory contains small, self-contained examples demonstrating how to use the Python AI Toolkit.
 
 ## 01 – Summarize Text
+
+- file: `01_plain_text.py`
 - creating an AIClient
 - simple AI request
 - AIResult metadata
 
 ## 02 – Extract Structured Data
+
+- file: `02_extract_structured_data.py`
 - Pydantic models
 - response_type
 - validated output
+
+The [request guide](../docs/requests.md) explains the difference between
+`ask()` and `ask_text()`, all `AIResult` fields, and the structured-response
+repair lifecycle used by these examples.
 
 ## 03 – Builder Usage
 - fluent builder
@@ -30,6 +38,11 @@ Demonstrates:
 - streaming plain text responses
 - consuming response chunks
 - printing streamed output immediately
+
+Examples 05 through 09 are supported by the
+[advanced request guide](../docs/advanced_requests.md), which documents their
+different return values, metadata boundaries, provider requirements, and
+current sync/async limits.
 
 ---
 
@@ -75,7 +88,7 @@ Demonstrates:
 
 ## 09 – Structured Image Input
 
-**FIle**
+**File**
 ```text
 09_structured_image_input.py
 ```
@@ -84,6 +97,16 @@ Demonstrates:
 - sending image input
 - using response_type
 - validating structured image analysis with Pydantic
+
+The local-file variant is:
+
+```text
+09_1_structured_image_with_helper.py
+```
+
+It demonstrates converting a local JPEG, PNG, or WebP file into a Base64 data
+URL before constructing `ImageInput`. Local-path reading is example application
+code, not a built-in `ImageInput` feature.
 
 ---
 
@@ -102,6 +125,10 @@ Demonstrates:
 - reading vector length
 - using embeddings as preparation for RAG
 
+Examples 10 through 14 are supported by the
+[retrieval and RAG guide](../docs/retrieval.md), which documents embedding
+ordering and metadata, vector-score semantics, the in-memory storage boundary,
+document preparation, RAG response metadata, and grounding limits.
 
 ---
 

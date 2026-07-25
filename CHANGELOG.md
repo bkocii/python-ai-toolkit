@@ -57,6 +57,12 @@ The format loosely follows Keep a Changelog.
 * Focused configuration guide covering environment and explicit configuration
 * Focused provider guide covering registration, constructor contracts,
   capabilities, lifecycle, and errors
+* Focused request guide covering plain and structured requests, `AIResult`
+  metadata, Pydantic validation, and response repair
+* Focused advanced-request guide covering streaming, asynchronous requests,
+  tool calling, image inputs, return contracts, and provider capability limits
+* Focused retrieval and RAG guide covering embeddings, vector search,
+  retrievers, document loading, response contracts, and grounding boundaries
 
 
 ### Improved
@@ -76,6 +82,12 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between structural validation and live credential verification
 * Clear distinction between configuration validation, provider registration,
   and live provider verification
+* Clear distinction between structured response validation and application
+  business validation
+* Clear distinction between advanced-request return values, application-owned
+  tool execution, and provider/model capability support
+* Clear distinction between similarity ranking, factual confidence, returned
+  contexts, and verified citations
 * Command-line secret-handling safeguards
 * Reuse of the existing configuration loader and validator from the CLI
 * Logging behavior in tests, benchmarks, and continuous integration
