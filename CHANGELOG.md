@@ -57,6 +57,8 @@ The format loosely follows Keep a Changelog.
 
 
 ### Improved
+* Installation guidance for local users, optional integrations, contributors,
+  and benchmark environments
 * Framework integration architecture
 * Configuration flexibility for applications and tests
 * Django configuration without process-wide environment mutation

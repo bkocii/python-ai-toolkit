@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-001 — Review README structure and remove duplication`
+**Next task:** `DOC-003 — Document environment and explicit configuration`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-001`.
+The next task is `DOC-003`.
 
 ---
 
@@ -659,20 +659,119 @@ text outputs remain ignored under `.benchmarks/`.
 
 ---
 
-# Exact Next Task — DOC-001
+# DOC-001 — README Structure Review
 
-Review the structure of the current `README.md` and remove duplication without
-changing the implemented public API or introducing new feature work.
+**Status:** Completed
+
+The root README now serves as the onboarding and repository-navigation page
+rather than duplicating every feature guide and development document.
+
+Completed work:
+
+1. mapped the original 2,922-line README before editing
+2. moved installation, configuration, and quick-start guidance near the top
+3. grouped capabilities into requests, retrieval, orchestration, integrations,
+   logging, and errors
+4. retained concise examples for the main public entry points
+5. removed duplicated summaries, the stale project tree, and the copied roadmap
+6. removed stale forward-looking lists that contradicted implemented features
+7. added direct navigation to examples and authoritative documentation
+8. changed no runtime API, implementation, dependency, or executable behavior
+
+The detailed content audits remain assigned to `DOC-002` through `DOC-014`.
+
+---
+
+# DOC-002 — Installation and Optional Extras
+
+**Status:** Completed
+
+Completed work:
+
+1. reviewed `pyproject.toml`, `requirements.txt`, package metadata, integration
+   imports, and the CLI entry point
+2. corrected the README so virtual-environment activation precedes installation
+3. documented the current local-source boundary without implying a PyPI release
+4. added `docs/installation.md`
+5. separated normal non-editable use from editable contributor installation
+6. documented the core, `django`, `fastapi`, `dev`, and `benchmark` paths
+7. updated stale Django and FastAPI example installation commands
+8. confirmed that `httpx2` is the intended current FastAPI test-client
+   dependency and is distinct from OpenAI's `httpx` dependency
+9. changed no runtime implementation, public API, package dependency, or
+   architecture
+
+Clean-environment verification:
+
+```text
+normal source installation passed
+core AIClient import passed
+CLI help passed
+core installation excluded Django and FastAPI
+django extra installation and import passed
+fastapi extra installation and import passed
+benchmark extra installation and import passed
+combined dev and benchmark installation passed
+269 normal tests passed
+```
+
+---
+
+# Exact Next Task — DOC-003
+
+Document environment-based and explicit configuration without expanding into
+the separate provider-registration, feature, integration, security, or
+compatibility tasks that follow it.
 
 Required work:
 
-1. map the current README sections before editing
-2. identify duplicated, outdated, or misplaced guidance
-3. design a clearer documentation hierarchy
-4. preserve accurate installation, configuration, API, integration, and
-   security guidance
-5. verify every modified example against the current implementation
-6. keep the change limited to `DOC-001`
+1. inspect `ai/config.py`, `ai/config_validator.py`, `.env.example`, CLI
+   configuration commands, and relevant tests
+2. inventory every supported environment variable and current default
+3. document provider-specific values and generic fallback behavior accurately
+4. document explicit `AIConfig` construction and precedence over environment
+   loading
+5. distinguish structural validation from live provider verification
+6. update README configuration guidance and add or update a focused
+   configuration document when the evidence supports it
+7. leave detailed provider registration, integration, security, and
+   compatibility guidance to their assigned tasks
+8. verify every documented configuration example
+9. keep the change limited to `DOC-003`
+
+---
+
+# DOC-002 Verification and Repository State
+
+Changed project files:
+
+```text
+README.md
+CHANGELOG.md
+docs/installation.md
+examples/README.md
+docs/development/roadmap.md
+docs/development/project_state.md
+docs/development/session_handoff.md
+```
+
+No runtime Python file, test file, package dependency, or ADR changed.
+
+Suggested focused commit:
+
+```powershell
+git add `
+    README.md `
+    CHANGELOG.md `
+    docs\installation.md `
+    examples\README.md `
+    docs\development\roadmap.md `
+    docs\development\project_state.md `
+    docs\development\session_handoff.md
+
+git diff --cached
+git commit -m "docs: document installation and optional extras"
+```
 
 ---
 
@@ -1074,21 +1173,13 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `docs/development/performance_profiling.md`
+7. `.env.example`
+8. `ai/config.py`
+9. `ai/config_validator.py`
+10. `ai/cli/config_commands.py`
+11. relevant configuration and CLI tests
 
-Useful profiling evidence, if the new session needs to audit prior conclusions:
-
-- `.benchmarks/profile-request-lifecycle-before.txt`
-- `.benchmarks/profile-request-lifecycle-after.txt`
-- `.benchmarks/profile-vector-scaling.txt`
-- `.benchmarks/profile-structured-execution.txt`
-- `.benchmarks/profile-rag-orchestration.txt`
-- `.benchmarks/profile-workflow-execution.txt`
-- `.benchmarks/prof-003-baseline.json`
-- `.benchmarks/prof-005-baseline.json`
-- `.benchmarks/prof-006-baseline.json`
-- original baseline benchmark JSON
-- optimized plain-request benchmark JSON
+Profiling evidence is not required for `DOC-003`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1102,7 +1193,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-001 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-003 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

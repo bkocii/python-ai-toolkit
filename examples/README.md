@@ -263,7 +263,7 @@ Demonstrates:
 Install the optional Django integration:
 
 ```bash
-pip install python-ai-toolkit[django]
+python -m pip install ".[django]"
 ```
 
 ---
@@ -289,7 +289,7 @@ Demonstrates:
 Install the optional FastAPI integration:
 
 ```bash
-pip install python-ai-toolkit[fastapi]
+python -m pip install ".[fastapi]"
 ```
 
 ---

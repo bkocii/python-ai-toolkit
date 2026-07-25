@@ -50,6 +50,11 @@ Completed PROD-002 profiling tasks:
 * PROF-008 Complete the approved-optimization implementation gate
 * PROF-009 Document profiling results
 
+Completed PROD-003 documentation tasks:
+
+* DOC-001 Review README structure and remove duplication
+* DOC-002 Document installation and optional extras
+
 Next active task:
 
 ```text
@@ -59,7 +64,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-001 — Review README structure and remove duplication
+DOC-003 — Document environment and explicit configuration
 ```
 
 ---
@@ -687,11 +692,12 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-001 — Review README structure and remove duplication`.
+Begin `DOC-003 — Document environment and explicit configuration`.
 
-The review should map the existing README sections before editing, identify
-duplicated or misplaced material, preserve all accurate public API guidance,
-and avoid mixing documentation cleanup with new feature work.
+Installation paths and optional extras are now verified and documented. The
+next review should document every supported environment variable, configuration
+default, explicit `AIConfig` path, and precedence rule against the current
+implementation without expanding into provider registration or security tasks.
 
 ---
 

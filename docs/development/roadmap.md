@@ -1144,8 +1144,8 @@ Make the toolkit understandable and usable without reading its implementation.
 
 ### Tasks
 
-* [ ] DOC-001 Review README structure and remove duplication
-* [ ] DOC-002 Document installation and optional extras
+* [x] DOC-001 Review README structure and remove duplication
+* [x] DOC-002 Document installation and optional extras
 * [ ] DOC-003 Document environment and explicit configuration
 * [ ] DOC-004 Document provider registration
 * [ ] DOC-005 Document plain and structured requests
@@ -1158,6 +1158,73 @@ Make the toolkit understandable and usable without reading its implementation.
 * [ ] DOC-012 Document Python-version and provider compatibility
 * [ ] DOC-013 Create a stable public API reference
 * [ ] DOC-014 Verify every documented example
+
+#### DOC-001 — README Structure Review
+
+Status: Completed
+
+The root README was reduced from a duplicated long-form manual to an onboarding
+and navigation document.
+
+Completed work:
+
+* moved installation, configuration, and first-request guidance near the top
+* grouped implemented capabilities by user goal
+* retained concise public-API examples for the major feature areas
+* added a clear path to examples, architecture, benchmarks, profiling, roadmap,
+  project-state, and changelog documents
+* removed the duplicated structured-response, validation, retry, logging,
+  usage, cost, and exception summaries
+* removed the stale copied project tree and copied roadmap
+* removed forward-looking capability lists that contradicted later implemented
+  features
+* preserved detailed topic audits for `DOC-002` through `DOC-014`
+
+No runtime API, implementation, dependency, or executable behavior changed.
+
+Following task at completion:
+
+```text
+DOC-002 — Document installation and optional extras
+```
+
+#### DOC-002 — Installation and Optional Extras
+
+Status: Completed
+
+Installation behavior was reviewed against `pyproject.toml`, the current import
+boundaries, package metadata, and clean temporary environments.
+
+Completed work:
+
+* corrected the README sequence so the virtual environment is activated before
+  package installation
+* removed the placeholder repository URL and documented the current
+  source-installation boundary honestly
+* added `docs/installation.md` as the focused installation guide
+* separated normal non-editable installation from editable contributor setup
+* documented the core, `django`, `fastapi`, `dev`, and `benchmark` installation
+  paths
+* documented `pyproject.toml` as the authoritative dependency source and
+  `requirements.txt` as an environment snapshot
+* updated Django and FastAPI example commands so they no longer imply that the
+  package is already available from PyPI
+* verified that the core package installs and exposes the CLI without installing
+  Django or FastAPI
+* verified each optional group and the combined `dev,benchmark` contributor
+  installation
+* confirmed that `httpx2` is intentional for the current FastAPI test client,
+  while the OpenAI dependency separately installs `httpx`
+* passed the complete 269-test suite from the clean contributor environment
+
+No runtime API, implementation, package dependency, or architectural contract
+changed.
+
+Next task:
+
+```text
+DOC-003 — Document environment and explicit configuration
+```
 
 ### Documentation Rules
 
