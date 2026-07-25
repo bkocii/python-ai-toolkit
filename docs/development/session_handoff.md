@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-002 — Performance Profiling`  
-**Next task:** `PROF-007 — Review optimization candidates`
+**Next task:** `PROF-008 — Implement approved optimizations`
 
 ---
 
@@ -207,11 +207,11 @@ Roadmap tasks:
 - [x] `PROF-004` — Profile vector search
 - [x] `PROF-005` — Profile RAG orchestration
 - [x] `PROF-006` — Profile workflow execution
-- [ ] `PROF-007` — Review optimization candidates
+- [x] `PROF-007` — Review optimization candidates
 - [ ] `PROF-008` — Implement approved optimizations
 - [ ] `PROF-009` — Complete profiling documentation
 
-The next task is `PROF-007`.
+The next task is `PROF-008`.
 
 ---
 
@@ -557,31 +557,57 @@ No runtime file changed during `PROF-006`.
 
 ---
 
-# Exact Next Task — PROF-007
+# PROF-007 — Optimization Candidate Review
 
-Review all measured optimization candidates before approving any additional
-runtime implementation.
+**Status:** Completed
 
-The review should:
+The review ranked remaining costs by representative absolute impact while
+keeping measurements from different environments non-comparable:
 
-1. rank bottlenecks by measurable absolute impact
-2. separate toolkit implementation overhead from dependency overhead
-3. identify candidates that preserve public APIs and typed contracts
-4. reject premature or low-value changes explicitly
-5. document architectural tradeoffs
-6. select only candidates justified for `PROF-008`
-7. record paths where no runtime change is recommended
+1. optimized vector search remains the largest internal path at millisecond
+   scale, but its remaining cost is the intentional linear-scan architecture
+2. repeated Pydantic JSON-schema generation is the largest removable repeat at
+   approximately `0.4 ms` per structured prompt under `cProfile`
+3. structured repair is tens of microseconds and represents required retry,
+   parsing, provider, and token-accounting behavior
+4. workflow construction, RAG formatting, request IDs, and typed result
+   construction are microsecond-scale
+5. INFO logging remains intentional and configurable observability overhead
 
-At minimum, compare:
+Decisions:
 
-- repeated structured-schema generation from `PROF-003`
-- remaining vector-search costs after the `PROF-004` optimization
-- retrieved-context formatting from `PROF-005`
-- workflow Pydantic model construction from `PROF-006`
-- intentional observability overhead remaining after `PROF-002`
+- no additional vector optimization, because replacing the linear scan is an
+  architectural storage/indexing change rather than a local hot-path change
+- no structured-schema cache, because model-class caching can become stale
+  after Pydantic `model_rebuild()`; safe invalidation would add dependency
+  coupling or public caller responsibility for a small real-request gain
+- no retry optimization that weakens validation, configured retry behavior, or
+  token accounting
+- no RAG or workflow micro-optimization that weakens formatting clarity or
+  typed Pydantic contracts
+- no removal of request IDs or configurable logging
 
-Do not implement candidates during `PROF-007`. Approved runtime changes, if
-any, belong to `PROF-008`.
+No optimization candidate was approved for runtime implementation.
+
+No runtime file, public API, ADR, README, changelog, or project-state file
+changed during `PROF-007`.
+
+---
+
+# Exact Next Task — PROF-008
+
+Complete the approved-optimization implementation gate.
+
+Because `PROF-007` approved no runtime candidates:
+
+1. do not modify files under `ai/`
+2. confirm that no correctness or performance test requires a change
+3. mark the `PROF-008` checklist complete without implementation
+4. document that the no-change result was intentional and evidence-driven
+5. advance to `PROF-009 — Document Profiling Results`
+
+The roadmap explicitly permits `PROF-008` to complete without implementation
+when current overhead is acceptable or dependency-dominated.
 
 ---
 
@@ -707,11 +733,39 @@ git commit -m "perf: profile workflow execution"
 
 ---
 
+# PROF-007 Verification and Repository State
+
+This was a documentation-only review task. Existing profiling and benchmark
+evidence was inspected; no runtime or test file changed, so rerunning the full
+suite was not required to validate new behavior.
+
+Changed project files:
+
+```text
+docs/development/roadmap.md
+docs/development/session_handoff.md
+```
+
+The transferred project still contains no `.git` directory. Complete the
+focused commit in the original repository:
+
+```powershell
+git add `
+    docs\development\roadmap.md `
+    docs\development\session_handoff.md
+
+git diff --cached --stat
+git diff --cached
+git commit -m "docs: review performance optimization candidates"
+```
+
+---
+
 # Minor Issue Discovered
 
 `ai/config_validator.py` contains the same `embedding_dimensions` validation block twice.
 
-This is not a blocker for `PROF-007` and should not derail the active roadmap.
+This is not a blocker for `PROF-008` and should not derail the active roadmap.
 
 Handle it as one of the following:
 
@@ -957,8 +1011,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PROF-007 is still the correct next task.
-4. Review the completed profiling evidence before ranking optimization candidates.
+3. Verify the repository's current state and confirm that PROF-008 is still the correct next task.
+4. Confirm the PROF-007 decision that no runtime optimization was approved.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

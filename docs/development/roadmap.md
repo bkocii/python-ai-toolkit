@@ -954,13 +954,88 @@ absolute gain. No runtime implementation changed during `PROF-006`.
 
 #### PROF-007 — Review Optimization Candidates
 
-* [ ] Rank identified bottlenecks by measurable impact
-* [ ] Separate implementation overhead from dependency overhead
-* [ ] Identify changes that preserve public APIs
-* [ ] Reject premature or low-value optimizations
-* [ ] Document architectural tradeoffs
-* [ ] Select only justified optimization candidates
-* [ ] Record cases where no change is recommended
+* [x] Rank identified bottlenecks by measurable impact
+* [x] Separate implementation overhead from dependency overhead
+* [x] Identify changes that preserve public APIs
+* [x] Reject premature or low-value optimizations
+* [x] Document architectural tradeoffs
+* [x] Select only justified optimization candidates
+* [x] Record cases where no change is recommended
+
+Review method:
+
+* compare representative absolute timings instead of ranking functions only by
+  their percentage inside one profile
+* treat measurements from different operating systems and Python versions as
+  order-of-magnitude evidence rather than direct benchmark comparisons
+* separate toolkit-controlled repeated work from Pydantic, logging, and
+  application or provider work
+* reject changes that weaken typed contracts, observability, correctness, or
+  provider independence for microsecond-scale gains
+
+Ranked remaining costs:
+
+1. Optimized in-memory vector search remains the largest measured internal
+   path, with representative means of approximately `13.037 ms` unfiltered and
+   `6.296 ms` metadata-filtered for 1,000 64-dimensional records. This is
+   toolkit implementation work, but the remaining cost is primarily the
+   intentional linear scan and per-candidate cosine calculation.
+2. Structured-schema generation costs approximately `0.4 ms` per structured
+   prompt under `cProfile`. This is Pydantic dependency work repeatedly invoked
+   by toolkit prompt construction and is the largest potentially removable
+   repeated cost.
+3. One-retry structured repair has a representative median of approximately
+   `99.838 µs`. This is mixed toolkit and dependency work, but most of the
+   additional work represents required retry behavior: another parse attempt,
+   exception handling, provider call, token aggregation, and result handling.
+4. Five-step workflow orchestration has a representative median of
+   approximately `7.367 µs`; Pydantic construction and validation are the
+   largest contributors.
+5. Complete RAG orchestration has a representative median of approximately
+   `5.268 µs`; retrieved-context formatting is its largest internal contributor.
+6. Plain request overhead has a representative post-optimization median of
+   approximately `4.400 µs` when INFO logging is disabled. Request IDs and typed
+   result construction are small, while enabled INFO logging is intentional,
+   configurable observability overhead.
+
+Candidate decisions:
+
+* **No additional vector-search change approved.** Replacing the reference
+  linear scan requires a different storage or indexing architecture, not a
+  local hot-path optimization. The current in-memory store remains appropriate
+  for tests, examples, and small local datasets.
+* **Structured-schema caching is not approved.** It would remove the largest
+  repeated structured-prompt cost, but a cache keyed only by model class can
+  become stale after Pydantic `model_rebuild()`. Automatic invalidation would
+  couple the toolkit to Pydantic implementation details, while explicit
+  invalidation would add public API and caller responsibility. Approximately
+  `0.4 ms` does not justify that correctness and maintenance risk in request
+  paths normally dominated by provider execution.
+* **No retry-path change approved.** Removing validation, reducing configured
+  retry behavior, or omitting token aggregation would change correctness or
+  result semantics.
+* **No RAG formatting change approved.** Its complete orchestration cost is
+  already a few microseconds and will normally be dominated by embedding,
+  retrieval, and provider execution.
+* **No workflow construction change approved.** Bypassing Pydantic validation
+  or using specialized construction paths would weaken typed workflow
+  contracts for a microsecond-scale gain.
+* **No observability change approved.** Request IDs and configurable logging
+  remain deliberate production features; disabled INFO logging already uses
+  the optimized low-overhead path.
+
+Conclusion:
+
+No candidate is justified for runtime implementation in `PROF-008`. The two
+previously approved changes—pre-resolved request pricing with guarded logging,
+and query-norm reuse in vector search—captured the meaningful low-risk gains.
+The remaining costs are either inherent to the reference architecture,
+dependency-dominated, required for correctness, or negligible in absolute
+terms.
+
+`PROF-008` should therefore be completed without runtime changes, as explicitly
+allowed by its task definition. No public API, ADR, README, changelog, or
+project-state update is required for this review.
 
 #### PROF-008 — Implement Approved Optimizations
 
