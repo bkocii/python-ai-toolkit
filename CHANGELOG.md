@@ -63,6 +63,10 @@ The format loosely follows Keep a Changelog.
   tool calling, image inputs, return contracts, and provider capability limits
 * Focused retrieval and RAG guide covering embeddings, vector search,
   retrievers, document loading, response contracts, and grounding boundaries
+* Focused orchestration guide covering conversation memory, agents, workflows,
+  multi-agent sequencing, result contracts, and failure boundaries
+* Focused integration guide covering Django settings and client helpers,
+  FastAPI dependencies and test overrides, and CLI commands and exit behavior
 
 
 ### Improved
@@ -88,6 +92,14 @@ The format loosely follows Keep a Changelog.
   tool execution, and provider/model capability support
 * Clear distinction between similarity ranking, factual confidence, returned
   contexts, and verified citations
+* Clear distinction between message-count memory limits, agent request
+  metadata, workflow state, partial failures, and application-owned
+  orchestration
+* Clear distinction between framework configuration sources, client
+  lifetimes, dependency overrides, structural CLI checks, and live provider
+  requests
+* Clear ownership boundary between the FastAPI runtime extra, application-chosen
+  ASGI servers, and test-client dependencies
 * Command-line secret-handling safeguards
 * Reuse of the existing configuration loader and validator from the CLI
 * Logging behavior in tests, benchmarks, and continuous integration

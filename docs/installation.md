@@ -86,8 +86,9 @@ test client. The core OpenAI dependency separately installs `httpx`; these are
 different packages and should not be substituted for one another.
 
 Installing an extra makes its dependencies available; it does not configure the
-framework or provider. Framework-specific usage belongs to the later
-integration documentation and the existing
+framework or provider. Framework-specific configuration, client lifetimes,
+testing, and CLI behavior are documented in the
+[framework and CLI integration guide](integrations.md) and the existing
 [Django](../examples/README.md#19--django-integration) and
 [FastAPI](../examples/README.md#20--fastapi-integration) examples.
 

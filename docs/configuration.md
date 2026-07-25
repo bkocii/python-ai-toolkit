@@ -213,6 +213,10 @@ These commands read the environment configuration path. They do not inspect an
 `AIConfig` object created inside application code, modify `.env`, save secrets,
 or perform a live provider health check.
 
+The [framework and CLI integration guide](integrations.md) documents exact CLI
+output, exit codes, the separate Django settings path, and FastAPI dependency
+configuration.
+
 ## Choosing a configuration path
 
 Use environment-based configuration when one process uses one toolkit

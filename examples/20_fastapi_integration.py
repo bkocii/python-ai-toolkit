@@ -8,7 +8,11 @@ OPENAI_MODEL=gpt-5.4-mini
 
 Run with:
 
+python -m pip install uvicorn
 uvicorn examples.20_fastapi_integration:app --reload
+
+The toolkit's FastAPI extra does not choose an ASGI server. Uvicorn is
+installed separately here for local development.
 """
 
 from typing import Literal

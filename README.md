@@ -382,7 +382,10 @@ The orchestration stack remains explicit and composable:
 - `MultiAgentOrchestrator` runs named agents individually or sequentially.
 
 Tool execution, routing, and business decisions remain under application
-control. See examples
+control. See the
+[memory, agents, workflows, and orchestration guide](docs/orchestration.md) for
+message, state, failure, metadata, persistence, and autonomy boundaries. See
+examples
 [15 through 18](examples/README.md#15--conversation-memory).
 
 ### Framework integrations
@@ -403,7 +406,11 @@ from ai.integrations.fastapi import AIClientDependency
 ```
 
 Install the corresponding optional dependency group before using an integration.
-See [the Django and FastAPI examples](examples/README.md#19--django-integration).
+See the [framework and CLI integration guide](docs/integrations.md) for
+configuration sources, client lifetimes, dependency overrides, CLI behavior,
+and failure boundaries. The
+[Django and FastAPI examples](examples/README.md#19--django-integration) provide
+application-focused starting points.
 
 ### Command-line interface
 
@@ -416,7 +423,9 @@ ai-toolkit config validate
 ```
 
 Configuration display masks API keys, and structural validation does not contact
-the configured provider.
+the configured provider. The
+[framework and CLI integration guide](docs/integrations.md#command-line-interface)
+documents command scope, output, and exit codes.
 
 ### Logging and errors
 
@@ -465,6 +474,8 @@ concerns in focused documents:
 | [Request guide](docs/requests.md) | Plain and structured requests, `AIResult`, parsing, validation, and repair |
 | [Advanced request guide](docs/advanced_requests.md) | Streaming, async requests, tool calling, image inputs, and capability limits |
 | [Retrieval and RAG guide](docs/retrieval.md) | Embeddings, vector storage, retrieval, document loading, RAG responses, and grounding limits |
+| [Orchestration guide](docs/orchestration.md) | Memory, agents, workflows, multi-agent sequencing, state, and failure boundaries |
+| [Framework and CLI integration guide](docs/integrations.md) | Django settings, FastAPI dependencies and test overrides, CLI commands, output, and exit codes |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |

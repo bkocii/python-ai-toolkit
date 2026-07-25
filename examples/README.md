@@ -269,6 +269,12 @@ Demonstrates:
 - passing one agent's output to the next agent
 - inspecting multi-agent results
 
+Examples 15 through 18 are supported by the
+[memory, agents, workflows, and orchestration guide](../docs/orchestration.md),
+which documents message and prompt behavior, memory persistence limits,
+workflow state and failure semantics, sequential agent handoffs, result
+contracts, and application-owned control.
+
 
 ## 19 – Django Integration
 
@@ -317,6 +323,13 @@ Install the optional FastAPI integration:
 
 ```bash
 python -m pip install ".[fastapi]"
+```
+
+The example's local `uvicorn` run command requires a separately installed ASGI
+server:
+
+```bash
+python -m pip install uvicorn
 ```
 
 ---
@@ -369,6 +382,12 @@ Demonstrates:
 The commands do not modify `.env`, save secrets, or contact the configured provider.
 
 
+
+Examples 19 through 22 are supported by the
+[Django, FastAPI, and CLI integration guide](../docs/integrations.md), which
+documents configuration sources, synchronous and asynchronous helpers,
+dependency overrides, client lifetimes, CLI output, exit codes, and live
+provider boundaries.
 
 ## Running
 ```bash

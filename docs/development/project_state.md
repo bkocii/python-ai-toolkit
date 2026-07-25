@@ -59,6 +59,8 @@ Completed PROD-003 documentation tasks:
 * DOC-005 Document plain and structured requests
 * DOC-006 Document streaming, async, tools, and image inputs
 * DOC-007 Document embeddings, retrieval, and RAG
+* DOC-008 Document memory, agents, workflows, and orchestration
+* DOC-009 Document Django, FastAPI, and CLI integrations
 
 Next active task:
 
@@ -69,7 +71,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-008 — Document memory, agents, workflows, and orchestration
+DOC-010 — Document exceptions and error handling
 ```
 
 ---
@@ -697,12 +699,14 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-008 — Document memory, agents, workflows, and orchestration`.
+Begin `DOC-010 — Document exceptions and error handling`.
 
-Embeddings, vector storage, retrieval, document loading, and RAG are now
-verified and documented, including their distinct return contracts, reference
-implementation limits, and grounding boundaries. The next review should
-document memory, agents, workflows, and multi-agent orchestration.
+Django, FastAPI, and command-line integrations are now verified and documented,
+including their configuration sources, sync and async helpers, dependency
+overrides, client-construction boundaries, CLI output and exit codes, and the
+distinction between structural checks and live provider requests. The next
+review should consolidate the toolkit exception hierarchy and application
+error-handling guidance.
 
 ---
 

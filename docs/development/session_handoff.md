@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-008 — Document memory, agents, workflows, and orchestration`
+**Next task:** `DOC-010 — Document exceptions and error handling`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-008`.
+The next task is `DOC-010`.
 
 ---
 
@@ -897,38 +897,118 @@ Completion verification:
 
 ---
 
-# Exact Next Task — DOC-008
+# DOC-008 — Memory, Agents, Workflows, and Orchestration
 
-Document conversation memory, agents, workflows, and multi-agent orchestration
-without expanding into integrations, exceptions, security, compatibility, or
-public API reference work.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect memory, agent, workflow, and orchestrator models and tests
-2. inspect examples 15 through 18 and the accepted orchestration ADRs
-3. document message and memory contracts, recent-message behavior, and
-   formatting
-4. document agent prompt construction, response metadata, and memory updates
-5. document sequential workflow state, step results, failure behavior, and
-   execution history
-6. document named-agent registration, sequential orchestration, result
-   collection, and failure behavior
-7. document application-owned routing, tool execution, and autonomy boundaries
-8. verify every documented orchestration example
-9. keep the change limited to `DOC-008`
+1. reviewed memory, agent, workflow, and orchestrator implementations, tests,
+   examples 15 through 18, architecture, and ADRs 0012 and 0013
+2. added `docs/orchestration.md`
+3. documented message roles, metadata and timestamp contracts, memory
+   operations, recent-message counting, formatting, and volatile storage
+4. documented the agent lifecycle, prompt construction, memory updates,
+   selected response metadata, and failure-without-rollback behavior
+5. documented workflow context, shallow state updates, step and run results,
+   execution history, fail-fast behavior, exception conversion, and partial
+   state
+6. documented exact-name agent registration, inventory ordering, individual
+   execution, sequential string handoff, result collection, and failures
+7. documented synchronous, sequential, in-process boundaries and
+   application-owned routing, tools, permissions, transactions, and resource
+   control
+8. recorded agent prompt construction and partial-execution result semantics for
+   the Version 1.0 public API review
+9. changed no runtime implementation, public API, dependency, test, or ADR
+
+Completion verification:
+
+```text
+4 orchestration-guide workflows executed offline
+4 existing example scripts executed with a deterministic offline client
+61 focused memory, agent, workflow, and orchestrator tests passed
+22 Python blocks in the affected documents parsed
+67 repository-relative Markdown links passed
+269 normal tests passed
+```
 
 ---
 
-# DOC-007 Verification and Repository State
+# DOC-009 — Django, FastAPI, and CLI Integrations
+
+**Status:** Completed
+
+Completed work:
+
+1. reviewed the Django and FastAPI adapters, configuration system, CLI
+   implementation, package entry point, ADRs 0014 and 0015, tests, and examples
+   19 through 22
+2. added `docs/integrations.md`
+3. documented optional extras and the separation between installation,
+   configuration, provider creation, and live requests
+4. documented Django's complete `AI_TOOLKIT` mapping, defaults, normalization,
+   validation, custom setting names, and non-merging environment boundary
+5. documented synchronous and asynchronous Django helpers plus new-client-per-
+   call behavior
+6. documented FastAPI dependency factories, `Annotated` aliases, endpoint
+   usage, dependency overrides, and application-owned lifecycle
+7. clarified that the FastAPI extra does not choose an ASGI server or provide
+   application test dependencies, and corrected example 20's Uvicorn setup
+8. documented CLI commands, configuration masking, output streams, exit codes,
+   handled `AIError` failures, and visible unexpected exceptions
+9. documented that framework adapters do not own HTTP exception mapping,
+   authentication, authorization, rate limits, transactions, or business policy
+10. changed no executable runtime implementation, public API, dependency, test,
+    or ADR
+
+Completion verification:
+
+```text
+Django configuration, sync/async helpers, and example 19 executed offline
+FastAPI dependency injection, override, and example 20 executed offline
+Separate Uvicorn installation and example 20 app import target verified
+CLI ask, config show, and config validate workflows executed offline
+66 focused integration, configuration, and CLI tests passed
+27 Python blocks in the affected documents parsed
+50 repository-relative Markdown links passed
+269 normal tests passed
+```
+
+---
+
+# Exact Next Task — DOC-010
+
+Document the toolkit exception hierarchy and practical error-handling behavior
+without expanding into the dedicated security, compatibility, public API
+reference, or final example-audit tasks.
+
+Required work:
+
+1. inspect `ai/exceptions.py` and every production raise/catch boundary
+2. inspect exception-focused tests and existing error-message guidance
+3. map each public exception to the operation and failure that raises it
+4. document application catch boundaries without hiding programming defects
+5. document retry, structured-response, streaming, framework, and CLI error
+   behavior
+6. distinguish toolkit failures from provider, transport, business-validation,
+   and application-policy failures
+7. verify every documented exception example and failure path
+8. keep the change limited to `DOC-010`
+
+---
+
+# DOC-009 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
-docs/advanced_requests.md
-docs/retrieval.md
+docs/configuration.md
+docs/installation.md
+docs/integrations.md
+examples/20_fastapi_integration.py
 examples/README.md
 docs/development/roadmap.md
 docs/development/project_state.md
@@ -943,15 +1023,17 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    docs\advanced_requests.md `
-    docs\retrieval.md `
+    docs\configuration.md `
+    docs\installation.md `
+    docs\integrations.md `
+    examples\20_fastapi_integration.py `
     examples\README.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document retrieval and RAG"
+git commit -m "docs: document framework and CLI integrations"
 ```
 
 ---
@@ -1354,17 +1436,17 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `docs/retrieval.md`
-8. `ai/memory.py`
-9. `ai/agent.py`
-10. `ai/workflow.py`
-11. `ai/orchestrator.py`
-12. `ai/client.py`
-13. `ai/schemas.py`
-14. examples 15 through 18 and relevant memory, agent, workflow, and
-    orchestrator tests
+7. `docs/requests.md`
+8. `docs/advanced_requests.md`
+9. `docs/retrieval.md`
+10. `docs/orchestration.md`
+11. `docs/integrations.md`
+12. `docs/development/error_messages.md`
+13. `ai/exceptions.py`
+14. production modules that raise or catch toolkit exceptions
+15. relevant exception, request, provider, framework, and CLI tests
 
-Profiling evidence is not required for `DOC-008`.
+Profiling evidence is not required for `DOC-010`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1378,7 +1460,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-008 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-010 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

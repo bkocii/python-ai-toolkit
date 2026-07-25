@@ -1151,8 +1151,8 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-005 Document plain and structured requests
 * [x] DOC-006 Document streaming, async, tools, and image inputs
 * [x] DOC-007 Document embeddings, retrieval, and RAG
-* [ ] DOC-008 Document memory, agents, workflows, and orchestration
-* [ ] DOC-009 Document Django, FastAPI, and CLI integrations
+* [x] DOC-008 Document memory, agents, workflows, and orchestration
+* [x] DOC-009 Document Django, FastAPI, and CLI integrations
 * [ ] DOC-010 Document exceptions and error handling
 * [ ] DOC-011 Document security and secret-handling guidance
 * [ ] DOC-012 Document Python-version and provider compatibility
@@ -1470,6 +1470,110 @@ Next task:
 DOC-008 — Document memory, agents, workflows, and orchestration
 ```
 
+#### DOC-008 — Memory, Agents, Workflows, and Orchestration
+
+Status: Completed
+
+Orchestration behavior was reviewed against the conversation-memory, agent,
+workflow, and multi-agent implementations; their tests; examples 15 through
+18; the architecture; and ADRs 0012 and 0013.
+
+Completed work:
+
+* added `docs/orchestration.md` as the focused orchestration guide
+* documented conversation roles, message metadata and timestamps, memory
+  operations, recent-message counting, formatting, and volatile storage limits
+* documented the agent run lifecycle, prompt construction, memory updates,
+  selected response metadata, and partial-memory behavior after request failure
+* documented workflow context, shallow state updates, step and run results,
+  execution history, exception conversion, fail-fast behavior, and lack of
+  rollback
+* documented exact-name agent registration, inventory ordering, individual
+  execution, sequential output handoff, result collection, and failure behavior
+* documented synchronous, sequential, in-process limits and application-owned
+  routing, tool execution, permissions, transactions, and resource control
+* recorded the current agent-prompt duplication and orchestration result
+  boundaries for explicit Version 1.0 API review
+* linked the guide from the README and examples 15 through 18
+* verified the guide examples, examples 15 through 18, focused tests, links,
+  and the complete normal test suite
+
+Completion verification:
+
+```text
+4 orchestration-guide workflows executed offline
+4 existing example scripts executed with a deterministic offline client
+61 focused memory, agent, workflow, and orchestrator tests passed
+22 Python blocks in the affected documents parsed
+67 repository-relative Markdown links passed
+269 normal tests passed
+```
+
+No runtime API, implementation, dependency, test, or architectural contract
+changed.
+
+Next task:
+
+```text
+DOC-009 — Document Django, FastAPI, and CLI integrations
+```
+
+#### DOC-009 — Django, FastAPI, and CLI Integrations
+
+Status: Completed
+
+Integration behavior was reviewed against the Django and FastAPI adapters,
+configuration system, CLI implementation and packaging entry point, ADRs 0014
+and 0015, integration and configuration tests, and examples 19 through 22.
+
+Completed work:
+
+* added `docs/integrations.md` as the focused framework and CLI guide
+* documented optional Django and FastAPI installation boundaries
+* documented the complete Django `AI_TOOLKIT` mapping, normalization,
+  validation, defaults, custom setting names, and non-merging environment
+  boundary
+* documented synchronous and asynchronous Django client helpers, construction
+  lifecycle, and application-owned exception behavior
+* documented synchronous and asynchronous FastAPI dependency factories,
+  reusable `Annotated` aliases, endpoint usage, and dependency overrides
+* documented FastAPI client lifetime, explicit custom-dependency option, and
+  application-owned HTTP concerns
+* clarified that the FastAPI extra does not select an ASGI server or supply
+  application test dependencies, and corrected the example's Uvicorn setup
+* documented CLI request, configuration-display, and structural-validation
+  commands
+* documented CLI standard output, standard error, masking, exit codes, handled
+  toolkit errors, and visible unexpected exceptions
+* distinguished local configuration and client construction from provider
+  registration, credential checks, model access, and live network requests
+* linked the guide from the README, installation and configuration guides, and
+  examples 19 through 22
+* verified guide workflows, examples 19 and 20, focused tests, Python blocks,
+  links, and the complete normal test suite
+
+Completion verification:
+
+```text
+Django configuration, sync/async helpers, and example 19 executed offline
+FastAPI dependency injection, override, and example 20 executed offline
+Separate Uvicorn installation and example 20 app import target verified
+CLI ask, config show, and config validate workflows executed offline
+66 focused integration, configuration, and CLI tests passed
+27 Python blocks in the affected documents parsed
+50 repository-relative Markdown links passed
+269 normal tests passed
+```
+
+No runtime API, executable implementation, dependency, test, or architectural
+contract changed. Example 20 received documentation-only setup guidance.
+
+Next task:
+
+```text
+DOC-010 — Document exceptions and error handling
+```
+
 ### Documentation Rules
 
 * Documentation must match the implemented public API.
@@ -1661,6 +1765,12 @@ Before release, explicitly review:
   boundaries
 * whether capability discovery or preflight checks belong in the stable
   provider interface
+* agent prompt construction, including whether the current message should
+  appear in both recent conversation text and the dedicated current-message
+  section
+* message-count memory limits, agent metadata exposure, workflow state and
+  failed-step semantics, unknown-agent sequence lookup, and partial-execution
+  result contracts
 
 ### Release Verification
 
