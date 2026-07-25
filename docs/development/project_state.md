@@ -55,6 +55,7 @@ Completed PROD-003 documentation tasks:
 * DOC-001 Review README structure and remove duplication
 * DOC-002 Document installation and optional extras
 * DOC-003 Document environment and explicit configuration
+* DOC-004 Document provider registration
 
 Next active task:
 
@@ -65,7 +66,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-004 — Document provider registration
+DOC-005 — Document plain and structured requests
 ```
 
 ---
@@ -693,12 +694,13 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-004 — Document provider registration`.
+Begin `DOC-005 — Document plain and structured requests`.
 
-Environment and explicit configuration are now verified and documented. The
-next review should document the built-in provider, `ProviderFactory` registry,
-custom-provider constructor contract, registration lifecycle, and expected
-errors without expanding into request-feature or compatibility documentation.
+Provider registration, constructor requirements, capability boundaries, and
+expected errors are now verified and documented. The next review should
+document plain and structured request behavior, result metadata, parsing,
+validation, and repair without expanding into the advanced streaming, async,
+tools, or image-input task.
 
 ---
 

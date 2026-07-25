@@ -69,8 +69,9 @@ lowercase. Provider-specific variables take precedence over their generic
 fallbacks even when both are set.
 
 The provider registry is a separate concern: resolving values for a provider
-does not register its implementation. Provider registration is covered by the
-provider documentation task.
+does not register its implementation. See the
+[provider guide](providers.md) for registration and provider-constructor
+requirements.
 
 ## Environment variable reference
 
@@ -189,7 +190,8 @@ Structural validation does not:
 
 Provider availability is checked later by `ProviderFactory` when a client is
 constructed. Credentials and model access are exercised only by a live
-provider request.
+provider request. The [provider guide](providers.md) documents this boundary
+and the errors raised for duplicate or unsupported provider names.
 
 ## Configuration CLI
 

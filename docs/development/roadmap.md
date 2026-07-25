@@ -1147,7 +1147,7 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-001 Review README structure and remove duplication
 * [x] DOC-002 Document installation and optional extras
 * [x] DOC-003 Document environment and explicit configuration
-* [ ] DOC-004 Document provider registration
+* [x] DOC-004 Document provider registration
 * [ ] DOC-005 Document plain and structured requests
 * [ ] DOC-006 Document streaming, async, tools, and image inputs
 * [ ] DOC-007 Document embeddings, retrieval, and RAG
@@ -1277,6 +1277,55 @@ Next task:
 
 ```text
 DOC-004 — Document provider registration
+```
+
+#### DOC-004 — Provider Registration
+
+Status: Completed
+
+Provider registration behavior was reviewed against `BaseAIProvider`,
+`OpenAIProvider`, `ProviderFactory`, provider tests, architecture, and the
+accepted provider ADRs.
+
+Completed work:
+
+* added `docs/providers.md` as the focused provider guide
+* documented the built-in OpenAI provider and registered-provider inspection
+* documented explicit, process-local registration and exact-name matching
+* documented the required `api_key` and `model` constructor keywords
+* documented conditional forwarding of embedding configuration
+* separated required `ask_text()` behavior from optional provider capabilities
+* documented duplicate-registration, unsupported-provider, constructor, and
+  unsupported-capability failures
+* distinguished configuration validation, provider availability, and live
+  credential/model verification
+* linked provider guidance from the README and configuration guide
+* verified provider examples without network access
+
+Completion verification:
+
+```text
+custom provider registration and client execution passed
+22 Python blocks in the affected guides parsed
+repository-relative Markdown links passed
+269 normal tests passed
+```
+
+No runtime API, implementation, dependency, test, or architectural contract
+changed.
+
+Release-review note:
+
+* `AIClient` and `AsyncAIClient` should be reviewed during the Version 1.0 API
+  freeze to decide whether supplied `AIConfig` objects should be structurally
+  validated automatically at client construction
+* until that decision is implemented, applications should call
+  `ConfigValidator.validate(config)` for manually constructed configuration
+
+Next task:
+
+```text
+DOC-005 — Document plain and structured requests
 ```
 
 ### Documentation Rules
@@ -1464,6 +1513,8 @@ Before release, explicitly review:
 * workflow interfaces
 * integration helpers
 * CLI commands
+* whether client constructors should automatically validate explicitly supplied
+  `AIConfig` objects
 
 ### Release Verification
 

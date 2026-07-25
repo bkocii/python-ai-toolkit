@@ -16,6 +16,7 @@ application business logic can remain in Python.
 - [Why use the toolkit?](#why-use-the-toolkit)
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Providers](#providers)
 - [Quick start](#quick-start)
 - [Structured responses](#structured-responses)
 - [Major capabilities](#major-capabilities)
@@ -143,6 +144,25 @@ reference, defaults, precedence rules, validation boundary, and CLI checks.
 
 The placeholder above is illustrative. Production credentials should come from
 environment variables or a secret manager.
+
+## Providers
+
+The built-in provider is OpenAI. Registered providers can be inspected without
+making a network request:
+
+```python
+from ai.providers.factory import ProviderFactory
+
+print(ProviderFactory.available_providers())
+```
+
+Custom providers are registered explicitly before client construction. The
+factory uses an exact provider name and a small constructor contract while
+`BaseAIProvider` separates required plain-text behavior from optional
+capabilities.
+
+See the [provider guide](docs/providers.md) for custom registration, constructor
+requirements, capability methods, registration lifecycle, and expected errors.
 
 ## Quick start
 
@@ -421,6 +441,7 @@ concerns in focused documents:
 | --- | --- |
 | [Installation guide](docs/installation.md) | Local installation, optional extras, and contributor setup |
 | [Configuration guide](docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
+| [Provider guide](docs/providers.md) | Built-in provider, custom registration, constructor contract, capabilities, and errors |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |

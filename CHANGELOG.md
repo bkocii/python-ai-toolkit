@@ -55,6 +55,8 @@ The format loosely follows Keep a Changelog.
 * Deterministic profiling instruments for request, structured-response, vector-search, RAG, and workflow execution paths
 * Consolidated performance-profiling report with optimization decisions and remaining risks
 * Focused configuration guide covering environment and explicit configuration
+* Focused provider guide covering registration, constructor contracts,
+  capabilities, lifecycle, and errors
 
 
 ### Improved
@@ -72,6 +74,8 @@ The format loosely follows Keep a Changelog.
 * Reuse of the existing `AIClient` request lifecycle from the CLI
 * Configuration visibility and troubleshooting
 * Clear distinction between structural validation and live credential verification
+* Clear distinction between configuration validation, provider registration,
+  and live provider verification
 * Command-line secret-handling safeguards
 * Reuse of the existing configuration loader and validator from the CLI
 * Logging behavior in tests, benchmarks, and continuous integration

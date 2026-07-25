@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-004 — Document provider registration`
+**Next task:** `DOC-005 — Document plain and structured requests`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-004`.
+The next task is `DOC-005`.
 
 ---
 
@@ -759,37 +759,65 @@ repository-relative documentation links passed
 
 ---
 
-# Exact Next Task — DOC-004
+# DOC-004 — Provider Registration
 
-Document provider registration without expanding into the separate request,
-advanced-feature, integration, security, or compatibility tasks that follow it.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect `BaseAIProvider`, `OpenAIProvider`, `ProviderFactory`, provider tests,
-   architecture, and existing provider examples
-2. document the built-in provider and available-provider inspection
-3. document custom provider registration and naming behavior accurately
-4. document the constructor contract used by `ProviderFactory`
-5. distinguish required base behavior from optional advanced capabilities
-6. document duplicate-registration and unsupported-provider errors
-7. add or update focused provider guidance when the evidence supports it
-8. verify every documented provider example
-9. keep the change limited to `DOC-004`
+1. reviewed `BaseAIProvider`, `OpenAIProvider`, `ProviderFactory`, provider
+   tests, architecture, and provider ADRs
+2. added `docs/providers.md`
+3. documented the built-in provider and registered-provider inspection
+4. documented exact-name registration and process-local lifecycle
+5. documented the provider constructor contract and conditional embedding
+   configuration
+6. separated required plain-text behavior from optional capabilities
+7. documented duplicate, unsupported, constructor, and capability errors
+8. separated structural validation, provider availability, and live
+   verification
+9. recorded explicit-config auto-validation for the Version 1.0 API review
+10. changed no runtime implementation, public API, dependency, test, or ADR
+
+Completion verification:
+
+```text
+custom provider registration and client execution passed
+22 Python blocks in the affected guides parsed
+repository-relative Markdown links passed
+269 normal tests passed
+```
 
 ---
 
-# DOC-003 Verification and Repository State
+# Exact Next Task — DOC-005
+
+Document plain and structured requests without expanding into streaming, async,
+tool-calling, image-input, integration, security, or compatibility tasks.
+
+Required work:
+
+1. inspect `AIClient`, `RequestExecutor`, prompt construction, structured
+   parsing, retry repair, result schemas, tests, and current examples
+2. document `ask()`, `ask_text()`, and their return-value difference
+3. document Pydantic `response_type` behavior
+4. document `AIResult` data and request metadata accurately
+5. explain parsing, validation, repair, and configured retry boundaries
+6. distinguish toolkit validation from application business validation
+7. verify every documented plain and structured request example
+8. keep the change limited to `DOC-005`
+
+---
+
+# DOC-004 Verification and Repository State
 
 Changed project files:
 
 ```text
-.env.example
 README.md
 CHANGELOG.md
 docs/configuration.md
-docs/installation.md
-examples/README.md
+docs/providers.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
@@ -803,16 +831,14 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    .env.example `
     docs\configuration.md `
-    docs\installation.md `
-    examples\README.md `
+    docs\providers.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document configuration sources and precedence"
+git commit -m "docs: document provider registration"
 ```
 
 ---
@@ -1215,13 +1241,16 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `docs/configuration.md`
-8. `ai/providers/base.py`
-9. `ai/providers/factory.py`
-10. `ai/providers/openai_provider.py`
-11. relevant provider-factory and provider tests
+7. `docs/providers.md`
+8. `ai/client.py`
+9. `ai/executor.py`
+10. `ai/schemas.py`
+11. `ai/structured.py`
+12. `ai/parser.py`
+13. `ai/retry.py`
+14. relevant request, executor, parser, retry, and structured-response tests
 
-Profiling evidence is not required for `DOC-004`.
+Profiling evidence is not required for `DOC-005`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1235,7 +1264,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-004 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-005 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
