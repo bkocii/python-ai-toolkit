@@ -1039,15 +1039,43 @@ project-state update is required for this review.
 
 #### PROF-008 — Implement Approved Optimizations
 
-* [ ] Make one optimization at a time
-* [ ] Preserve correctness behavior
-* [ ] Preserve provider-independent interfaces
-* [ ] Run normal tests after every change
-* [ ] Compare benchmarks before and after every change
-* [ ] Revert changes that provide no meaningful benefit
-* [ ] Add or update correctness tests when behavior is touched
+* [x] Review the candidates approved by `PROF-007`
+* [x] Confirm that no candidate was approved for runtime implementation
+* [x] Complete the implementation gate without runtime changes
+* [x] Preserve correctness behavior
+* [x] Preserve provider-independent interfaces
+* [x] Confirm that no correctness-test change is required
+* [x] Confirm that no before-and-after benchmark is required
+* [x] Document the intentional no-change decision
 
 This task may be completed without implementation changes if profiling shows that current overhead is acceptable or dominated by dependencies.
+
+Implementation decision:
+
+No runtime optimization was implemented. `PROF-007` rejected every remaining
+candidate because the expected benefit did not justify its correctness,
+maintenance, architectural, or public-API cost.
+
+The gate confirmed:
+
+* the current vector-search cost belongs to the intentional linear-scan
+  reference architecture
+* structured-schema caching lacks a safe, simple invalidation contract for
+  dynamically rebuilt Pydantic models
+* structured repair work preserves validation, retries, provider execution,
+  token aggregation, and result semantics
+* RAG and workflow overhead is already measured in microseconds
+* request IDs and configurable logging preserve production observability
+
+Because no executable behavior changed, no new correctness test,
+before-and-after benchmark, ADR, README entry, changelog entry, or project-state
+update was required.
+
+Conclusion:
+
+`PROF-008` is complete without implementation. This is an evidence-based
+decision, not an omitted optimization step. The project proceeds to `PROF-009`
+to consolidate the profiling method, results, decisions, and remaining risks.
 
 #### PROF-009 — Document Profiling Results
 

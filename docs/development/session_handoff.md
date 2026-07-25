@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-002 — Performance Profiling`  
-**Next task:** `PROF-008 — Implement approved optimizations`
+**Next task:** `PROF-009 — Document profiling results`
 
 ---
 
@@ -208,10 +208,10 @@ Roadmap tasks:
 - [x] `PROF-005` — Profile RAG orchestration
 - [x] `PROF-006` — Profile workflow execution
 - [x] `PROF-007` — Review optimization candidates
-- [ ] `PROF-008` — Implement approved optimizations
+- [x] `PROF-008` — Implement approved optimizations
 - [ ] `PROF-009` — Complete profiling documentation
 
-The next task is `PROF-008`.
+The next task is `PROF-009`.
 
 ---
 
@@ -594,20 +594,43 @@ changed during `PROF-007`.
 
 ---
 
-# Exact Next Task — PROF-008
+# PROF-008 — Approved Optimization Implementation Gate
 
-Complete the approved-optimization implementation gate.
+**Status:** Completed without implementation
 
-Because `PROF-007` approved no runtime candidates:
+`PROF-007` approved no remaining candidate for runtime implementation.
+`PROF-008` therefore completed as the roadmap's explicit no-change gate.
 
-1. do not modify files under `ai/`
-2. confirm that no correctness or performance test requires a change
-3. mark the `PROF-008` checklist complete without implementation
-4. document that the no-change result was intentional and evidence-driven
-5. advance to `PROF-009 — Document Profiling Results`
+Confirmed:
 
-The roadmap explicitly permits `PROF-008` to complete without implementation
-when current overhead is acceptable or dependency-dominated.
+1. no file under `ai/` required modification
+2. correctness behavior and provider-independent interfaces remain unchanged
+3. no correctness test required addition or modification
+4. no before-and-after benchmark was applicable because no implementation was
+   attempted
+5. no ADR, README, changelog, or project-state update was required
+
+This decision is evidence-driven. The remaining costs are part of the
+intentional reference architecture, dependency-dominated, required for
+correctness or observability, or negligible in absolute terms.
+
+---
+
+# Exact Next Task — PROF-009
+
+Complete the performance-profiling documentation and close `PROD-002`.
+
+Required work:
+
+1. consolidate the profiling method and deterministic measurement boundaries
+2. document the local environments without treating cross-machine results as
+   directly comparable
+3. summarize measured bottlenecks across every profiled execution path
+4. document accepted and rejected optimizations with benchmark evidence
+5. document remaining performance risks and architectural limits
+6. run the full normal, benchmark, Black, and Ruff verification required by the
+   `PROD-002` exit criteria
+7. update the roadmap, changelog, and project state when `PROD-002` closes
 
 ---
 
@@ -761,11 +784,39 @@ git commit -m "docs: review performance optimization candidates"
 
 ---
 
+# PROF-008 Verification and Repository State
+
+This was a documentation-only implementation gate. `PROF-007` approved no
+runtime optimization, so no executable or test file changed and no additional
+test run was required.
+
+Changed project files:
+
+```text
+docs/development/roadmap.md
+docs/development/session_handoff.md
+```
+
+The transferred project still contains no `.git` directory. Complete the
+focused commit in the original repository:
+
+```powershell
+git add `
+    docs\development\roadmap.md `
+    docs\development\session_handoff.md
+
+git diff --cached --stat
+git diff --cached
+git commit -m "docs: close performance optimization gate"
+```
+
+---
+
 # Minor Issue Discovered
 
 `ai/config_validator.py` contains the same `embedding_dimensions` validation block twice.
 
-This is not a blocker for `PROF-008` and should not derail the active roadmap.
+This is not a blocker for `PROF-009` and should not derail the active roadmap.
 
 Handle it as one of the following:
 
@@ -1011,8 +1062,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PROF-008 is still the correct next task.
-4. Confirm the PROF-007 decision that no runtime optimization was approved.
+3. Verify the repository's current state and confirm that PROF-009 is still the correct next task.
+4. Confirm that PROF-008 closed without implementation because PROF-007 approved no runtime optimization.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
