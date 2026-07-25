@@ -23,6 +23,7 @@ Sprint 9 is in progress.
 Completed Sprint 9 tasks:
 
 * PROD-001 Benchmark Suite
+* PROD-002 Performance Profiling
 
 Completed PROD-001 benchmark tasks:
 
@@ -37,10 +38,28 @@ Completed PROD-001 benchmark tasks:
 * BENCH-008 Workflow execution overhead benchmark
 * BENCH-009 Benchmark documentation and completion review
 
+Completed PROD-002 profiling tasks:
+
+* PROF-001 Capture the performance baseline
+* PROF-002 Profile plain request execution
+* PROF-003 Profile structured responses and repair
+* PROF-004 Profile vector search
+* PROF-005 Profile RAG orchestration
+* PROF-006 Profile workflow execution
+* PROF-007 Review optimization candidates
+* PROF-008 Complete the approved-optimization implementation gate
+* PROF-009 Document profiling results
+
 Next active task:
 
 ```text
-PROD-002 — Performance Profiling
+PROD-003 — Complete Documentation
+```
+
+Next roadmap task:
+
+```text
+DOC-001 — Review README structure and remove duplication
 ```
 
 ---
@@ -220,6 +239,8 @@ PROD-002 — Performance Profiling
 * benchmark stability policy
 * benchmark interpretation guidance
 * local benchmark result comparison support
+* deterministic `cProfile` instruments for benchmarked execution paths
+* consolidated performance-profiling report
 
 Implemented performance benchmarks:
 
@@ -558,10 +579,10 @@ In Progress
 Completed:
 
 * PROD-001 Benchmark Suite
+* PROD-002 Performance Profiling
 
 Remaining:
 
-* PROD-002 Performance Profiling
 * PROD-003 Complete Documentation
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
@@ -621,52 +642,56 @@ It does not yet enforce automatic regression thresholds.
 
 ---
 
-## Next Milestone Task
+## Performance Profiling Status
 
-The next active roadmap task is:
+`PROD-002 — Performance Profiling` is complete.
+
+The profiling work:
+
+* measured plain requests, structured responses, repair, vector search, RAG,
+  and workflows with deterministic local scenarios
+* removed repeated configuration resolution from request-time cost estimation
+* avoided unnecessary INFO logging metadata construction when INFO is disabled
+* reused the query-vector norm and combined candidate-vector calculations
+  during in-memory vector search
+* preserved every public API and typed result contract
+* rejected low-value optimizations that would add correctness, maintenance, or
+  architectural risk
+
+Completion verification passed all functional and benchmark checks. Current
+unpinned Black and Ruff versions still report pre-existing repository-wide
+quality findings; those findings were not mixed into the documentation-only
+`PROF-009` change and remain open before the Sprint 9 full-quality exit.
+
+Representative comparable improvements:
+
+* plain request mean overhead: approximately `27.292 µs` to `4.551 µs`
+* unfiltered vector search mean: approximately `18.984 ms` to `12.363 ms`
+* metadata-filtered vector search mean: approximately `10.875 ms` to `6.574 ms`
+
+The consolidated evidence and remaining risks are documented in:
 
 ```text
-PROD-002 — Performance Profiling
+docs/development/performance_profiling.md
+```
+
+---
+
+## Next Milestone Task
+
+The next active roadmap item is:
+
+```text
+PROD-003 — Complete Documentation
 ```
 
 ### Next Recommended Focus
 
-Use the completed benchmark suite to identify meaningful internal bottlenecks.
+Begin `DOC-001 — Review README structure and remove duplication`.
 
-Performance profiling should:
-
-* begin with measured evidence
-* use repeatable benchmark scenarios
-* profile one operation at a time
-* distinguish real bottlenecks from measurement noise
-* avoid premature optimization
-* preserve public APIs unless a justified architectural change is required
-* keep correctness tests passing
-* compare benchmark results before and after optimization
-
-Likely profiling targets include:
-
-* request lifecycle object construction
-* structured-response parsing
-* repair prompt and retry handling
-* cosine similarity calculations
-* vector result construction
-* vector result sorting
-* retrieved-context formatting
-* RAG prompt construction
-* workflow context creation
-* workflow state updates
-* Pydantic model construction in repeated internal paths
-
-No implementation should be changed solely because it appears complex.
-
-A bottleneck should first be:
-
-1. measured,
-2. reproduced,
-3. profiled,
-4. documented,
-5. and reviewed against architectural tradeoffs.
+The review should map the existing README sections before editing, identify
+duplicated or misplaced material, preserve all accurate public API guidance,
+and avoid mixing documentation cleanup with new feature work.
 
 ---
 

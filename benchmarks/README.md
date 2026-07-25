@@ -6,6 +6,12 @@ The benchmark suite measures toolkit overhead independently from provider latenc
 
 Benchmarks are intentionally separate from the normal unit test suite.
 
+The consolidated findings and optimization decisions are documented in:
+
+```text
+docs/development/performance_profiling.md
+```
+
 ---
 
 ## Directory Structure
@@ -14,13 +20,19 @@ Benchmarks are intentionally separate from the normal unit test suite.
 benchmarks/
 ├── __init__.py
 ├── conftest.py
+├── fakes.py
 ├── README.md
-└── test_benchmark_smoke.py
+├── test_benchmark_fixtures.py
+├── test_benchmark_smoke.py
+├── test_rag_orchestration.py
+├── test_request_lifecycle.py
+├── test_retry_repair.py
+├── test_structured_parsing.py
+├── test_vector_search.py
+└── test_workflow_execution.py
 ```
 
-Additional benchmark files will be added as Sprint 9 progresses.
-
-Planned benchmark areas include:
+The completed initial suite covers:
 
 * plain request lifecycle
 * structured response parsing
@@ -28,6 +40,10 @@ Planned benchmark areas include:
 * vector similarity search
 * RAG orchestration
 * workflow execution overhead
+
+Keep this README current when benchmark commands, fixtures, measured scopes, or
+interpretation rules change. Do not add machine-specific timings here;
+generated results belong under `.benchmarks/`.
 
 ---
 

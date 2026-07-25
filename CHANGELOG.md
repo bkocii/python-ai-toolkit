@@ -52,6 +52,8 @@ The format loosely follows Keep a Changelog.
 * Five-step sequential workflow and state-propagation benchmark 
 * Complete deterministic benchmark suite for request execution, structured parsing, retry repair, vector search, RAG orchestration, and workflow execution 
 * Version 1.0 internal performance baseline documentation
+* Deterministic profiling instruments for request, structured-response, vector-search, RAG, and workflow execution paths
+* Consolidated performance-profiling report with optimization decisions and remaining risks
 
 
 ### Improved
@@ -85,6 +87,9 @@ The format loosely follows Keep a Changelog.
 * Performance visibility for workflow context creation, sequential step execution, state updates, and result assembly 
 * Benchmark execution, interpretation, comparison, and extension guidance
 * Benchmark completion verification without network access, provider credentials, or toolkit-managed file logging
+* Request-time cost estimation through pre-resolved pricing
+* Disabled-INFO request logging by avoiding unnecessary metadata serialization
+* In-memory vector search through query-norm reuse and combined candidate-vector calculations
 
 
 ## [0.7.0] - In Development

@@ -5,8 +5,8 @@
 **Project:** Python AI Toolkit  
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
-**Active roadmap item:** `PROD-002 — Performance Profiling`  
-**Next task:** `PROF-009 — Document profiling results`
+**Active roadmap item:** `PROD-003 — Complete Documentation`  
+**Next task:** `DOC-001 — Review README structure and remove duplication`
 
 ---
 
@@ -40,6 +40,7 @@ Reference documents, only when needed:
 
 - `README.md`
 - `CHANGELOG.md`
+- `docs/development/performance_profiling.md`
 - Architecture Decision Records:
   - `0001-airesult.md`
   - `0002-provider-response.md`
@@ -133,7 +134,7 @@ Important existing design decisions:
 
 ## PROD-001 — Benchmark Suite
 
-**Status:** Completed
+**Status:** Completed with documented pre-existing quality-check exceptions
 
 Benchmark source directory:
 
@@ -197,7 +198,7 @@ Benchmark rules:
 
 ## PROD-002 — Performance Profiling
 
-**Status:** Active
+**Status:** Completed with documented pre-existing quality-check exceptions
 
 Roadmap tasks:
 
@@ -209,9 +210,15 @@ Roadmap tasks:
 - [x] `PROF-006` — Profile workflow execution
 - [x] `PROF-007` — Review optimization candidates
 - [x] `PROF-008` — Implement approved optimizations
-- [ ] `PROF-009` — Complete profiling documentation
+- [x] `PROF-009` — Complete profiling documentation
 
-The next task is `PROF-009`.
+Consolidated report:
+
+```text
+docs/development/performance_profiling.md
+```
+
+The next task is `DOC-001`.
 
 ---
 
@@ -616,21 +623,56 @@ correctness or observability, or negligible in absolute terms.
 
 ---
 
-# Exact Next Task — PROF-009
+# PROF-009 — Profiling Documentation
 
-Complete the performance-profiling documentation and close `PROD-002`.
+**Status:** Completed
+
+The final report documents:
+
+1. deterministic profiling method and measurement boundaries
+2. local environments and cross-machine comparison limits
+3. bottlenecks across every profiled execution path
+4. accepted optimizations with before-and-after evidence
+5. explicitly rejected optimizations
+6. remaining performance risks and architectural limits
+
+Completion verification:
+
+```text
+269 normal tests passed
+13 benchmark correctness checks passed
+9 timed benchmarks passed, 4 infrastructure-only tests skipped
+benchmark execution created no logs/ directory
+```
+
+Repository-wide Black and Ruff checks were run with current unpinned tool
+versions. Black 26.5.1 identified two pre-existing formatting findings, and
+Ruff 0.16.0 identified 62 pre-existing repository-wide findings. `PROF-009`
+changed no Python implementation or test file, so those findings remain
+separate release-quality work rather than being silently combined with this
+documentation task.
+
+`benchmarks/README.md` remains the operational benchmark guide. Stable
+profiling conclusions belong in
+`docs/development/performance_profiling.md`, while machine-specific JSON and
+text outputs remain ignored under `.benchmarks/`.
+
+---
+
+# Exact Next Task — DOC-001
+
+Review the structure of the current `README.md` and remove duplication without
+changing the implemented public API or introducing new feature work.
 
 Required work:
 
-1. consolidate the profiling method and deterministic measurement boundaries
-2. document the local environments without treating cross-machine results as
-   directly comparable
-3. summarize measured bottlenecks across every profiled execution path
-4. document accepted and rejected optimizations with benchmark evidence
-5. document remaining performance risks and architectural limits
-6. run the full normal, benchmark, Black, and Ruff verification required by the
-   `PROD-002` exit criteria
-7. update the roadmap, changelog, and project state when `PROD-002` closes
+1. map the current README sections before editing
+2. identify duplicated, outdated, or misplaced guidance
+3. design a clearer documentation hierarchy
+4. preserve accurate installation, configuration, API, integration, and
+   security guidance
+5. verify every modified example against the current implementation
+6. keep the change limited to `DOC-001`
 
 ---
 
@@ -816,7 +858,8 @@ git commit -m "docs: close performance optimization gate"
 
 `ai/config_validator.py` contains the same `embedding_dimensions` validation block twice.
 
-This is not a blocker for `PROF-009` and should not derail the active roadmap.
+This did not block `PROF-009` and should not derail the active documentation
+roadmap.
 
 Handle it as one of the following:
 
@@ -1030,11 +1073,8 @@ Required:
 
 For the immediate next task, also provide:
 
-6. `profiling/profile_request_lifecycle.py`
-7. `profiling/profile_structured_execution.py`
-8. `profiling/profile_vector_search.py`
-9. `profiling/profile_rag_orchestration.py`
-10. `profiling/profile_workflow_execution.py`
+6. `README.md`
+7. `docs/development/performance_profiling.md`
 
 Useful profiling evidence, if the new session needs to audit prior conclusions:
 
@@ -1062,8 +1102,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PROF-009 is still the correct next task.
-4. Confirm that PROF-008 closed without implementation because PROF-007 approved no runtime optimization.
+3. Verify the repository's current state and confirm that DOC-001 is still the correct next task.
+4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

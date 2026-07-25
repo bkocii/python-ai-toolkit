@@ -371,7 +371,7 @@ Python AI Toolkit now has a deterministic internal performance baseline covering
 
 ### PROD-002 — Performance Profiling
 
-Status: In Progress
+Status: Completed with documented pre-existing quality-check exceptions
 
 Goal:
 
@@ -1074,37 +1074,62 @@ update was required.
 Conclusion:
 
 `PROF-008` is complete without implementation. This is an evidence-based
-decision, not an omitted optimization step. The project proceeds to `PROF-009`
-to consolidate the profiling method, results, decisions, and remaining risks.
+decision, not an omitted optimization step. `PROF-009` subsequently
+consolidated the profiling method, results, decisions, and remaining risks.
 
 #### PROF-009 — Document Profiling Results
 
-* [ ] Document the profiling method
-* [ ] Document the local environment
-* [ ] Document measured bottlenecks
-* [ ] Document approved optimizations
-* [ ] Document rejected optimizations
-* [ ] Document benchmark comparisons
-* [ ] Document remaining performance risks
-* [ ] Update project state and changelog
+* [x] Document the profiling method
+* [x] Document the local environment
+* [x] Document measured bottlenecks
+* [x] Document approved optimizations
+* [x] Document rejected optimizations
+* [x] Document benchmark comparisons
+* [x] Document remaining performance risks
+* [x] Update project state and changelog
+
+Consolidated report:
+
+```text
+docs/development/performance_profiling.md
+```
+
+Documentation decision:
+
+* `benchmarks/README.md` remains the stable guide to benchmark execution,
+  scope, comparison, and interpretation
+* the consolidated report records profiling evidence and engineering decisions
+* generated JSON results and text profiles remain under ignored
+  `.benchmarks/`
+* machine-specific measurements are not presented as universal thresholds
 
 #### Exit Criteria
 
-* [ ] A local benchmark baseline has been captured
-* [ ] Main benchmarked execution paths have been profiled
-* [ ] Profiling results are based on deterministic scenarios
-* [ ] Provider and network latency remain excluded
-* [ ] Machine-specific profile artifacts are ignored by Git
-* [ ] Meaningful bottlenecks are documented
-* [ ] Optimization candidates are ranked by evidence
-* [ ] Public API compatibility is preserved
-* [ ] Every accepted optimization has before-and-after measurements
-* [ ] Low-value optimizations are explicitly rejected
-* [ ] Normal tests pass
-* [ ] Benchmark correctness checks pass
-* [ ] Performance benchmarks pass
+* [x] A local benchmark baseline has been captured
+* [x] Main benchmarked execution paths have been profiled
+* [x] Profiling results are based on deterministic scenarios
+* [x] Provider and network latency remain excluded
+* [x] Machine-specific profile artifacts are ignored by Git
+* [x] Meaningful bottlenecks are documented
+* [x] Optimization candidates are ranked by evidence
+* [x] Public API compatibility is preserved
+* [x] Every accepted optimization has before-and-after measurements
+* [x] Low-value optimizations are explicitly rejected
+* [x] Normal tests pass
+* [x] Benchmark correctness checks pass
+* [x] Performance benchmarks pass
 * [ ] Black passes
 * [ ] Ruff passes
+
+Quality-check exception:
+
+* Black 26.5.1 reports two pre-existing files that require formatting
+* Ruff 0.16.0 reports 62 pre-existing repository-wide findings
+* `PROF-009` changed no Python implementation or test file
+* these findings are recorded rather than silently mixed into the profiling
+  documentation commit
+* repository-wide cleanup and quality-tool version constraints remain required
+  before the Sprint 9 full-quality exit
 
 Result:
 
@@ -1383,6 +1408,8 @@ They should be reconsidered after Sprint 9 and the Version 1.0 release unless an
 * Web dashboard
 * Automatic model benchmarking
 * AI evaluation framework
+* Repository-wide Black and Ruff cleanup
+* Black and Ruff version constraints for reproducible quality checks
 
 ## Retrieval and RAG
 
