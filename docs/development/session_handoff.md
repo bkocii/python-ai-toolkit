@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-004 — Batch embedding and retrieval`
+**Next task:** `EXAMPLE-005 — End-to-end document indexing and RAG`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-004`.
+The next task is `EXAMPLE-005`.
 
 ---
 
@@ -1295,40 +1295,81 @@ changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-004
+# EXAMPLE-004 Completion
 
-Add one focused example for batch embedding and retrieval.
+`EXAMPLE-004 — Batch embedding and retrieval` is complete.
 
-Required work:
+Completed work:
 
-1. inspect the current embedding, vector-store, retriever, deterministic test,
-   and example-numbering contracts before editing
-2. submit multiple texts in one `AIClient.embed_texts()` request
-3. preserve useful per-item metadata and embedding order
-4. add the resulting vectors to `InMemoryVectorStore` and retrieve relevant
-   records for an embedded query
-5. keep the workflow focused on batch embedding and retrieval rather than the
-   end-to-end document-indexing and RAG scope reserved for `EXAMPLE-005`
-6. prove the example deterministically without credentials or network access
-7. update the gallery and learning path
-8. run focused and full tests plus documentation/link checks
-9. update roadmap, project state, session handoff, and changelog
+1. added `examples/26_batch_embedding_and_retrieval.py`
+2. submitted three metadata-bearing knowledge items in one
+   `AIClient.embed_texts()` request
+3. used `EmbeddingVector.index` to restore input order when provider results
+   arrive out of order
+4. preserved stable record IDs, sources, and topics in `VectorRecord`
+5. stored the batch in `InMemoryVectorStore`
+6. embedded a separate query and retrieved filtered contexts with
+   `VectorStoreRetriever`
+7. kept document loading, RAG prompt construction, and answer generation out
+   of the focused workflow
+8. linked example 26 from the gallery, complete learning path, README, and
+   retrieval guide
+9. added deterministic regressions for batching, order, metadata, storage,
+   query embedding, and relevant-context ranking
+
+Completion verification:
+
+```text
+79 focused embedding, vector-store, retriever, example, and documentation tests passed
+317 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+211 fenced documentation blocks inventoried
+81 Python documentation blocks compiled
+144 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or ADR
+changed.
 
 ---
 
-# EXAMPLE-003 Verification and Repository State
+# Exact Next Task — EXAMPLE-005
+
+Add one end-to-end example for document indexing and grounded RAG.
+
+Required work:
+
+1. inspect the current document-loader, embedding, vector-store, retriever,
+   RAG, deterministic test, and example-numbering contracts before editing
+2. load the existing sample documents through the public document-loader API
+3. convert documents into embedding inputs without introducing an automatic
+   chunking or indexing helper
+4. batch embed the prepared documents and create stable, metadata-preserving
+   vector records
+5. store the records, retrieve relevant contexts, and generate one grounded
+   answer through `RAGPipeline`
+6. keep document preparation and application-owned IDs explicit
+7. prove the complete workflow deterministically without credentials or
+   network access
+8. update the gallery, learning path, retrieval guide, and README
+9. run focused and full tests plus documentation/link checks
+10. update roadmap, project state, session handoff, and changelog
+
+---
+
+# EXAMPLE-004 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
-docs/providers.md
+docs/retrieval.md
 docs/development/example_verification.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
-examples/25_testing_with_fake_provider.py
+examples/26_batch_embedding_and_retrieval.py
 examples/README.md
 tests/test_documentation_examples.py
 tests/test_examples.py
@@ -1343,18 +1384,18 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    docs\providers.md `
+    docs\retrieval.md `
     docs\development\example_verification.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md `
-    examples\25_testing_with_fake_provider.py `
+    examples\26_batch_embedding_and_retrieval.py `
     examples\README.md `
     tests\test_documentation_examples.py `
     tests\test_examples.py
 
 git diff --cached
-git commit -m "docs: add fake provider testing example"
+git commit -m "docs: add batch retrieval example"
 ```
 
 ---
@@ -1815,19 +1856,23 @@ For the immediate next task, also provide:
 9. `ai/embeddings.py`
 10. `ai/vector_store.py`
 11. `ai/retriever.py`
-12. `ai/providers/base.py`
-13. `ai/schemas.py`
-14. `docs/retrieval.md`
-15. `docs/api_reference.md`
-16. `docs/development/example_verification.md`
-17. the complete `examples/` directory
-18. `tests/test_embeddings.py`
-19. `tests/test_vector_store.py`
-20. `tests/test_retriever.py`
-21. `tests/test_examples.py`
+12. `ai/documents.py`
+13. `ai/rag.py`
+14. `ai/providers/base.py`
+15. `ai/schemas.py`
+16. `docs/retrieval.md`
+17. `docs/api_reference.md`
+18. `docs/development/example_verification.md`
+19. the complete `examples/` directory, including `sample_docs/`
+20. `tests/test_documents.py`
+21. `tests/test_embeddings.py`
+22. `tests/test_vector_store.py`
+23. `tests/test_retriever.py`
+24. `tests/test_rag.py`
+25. `tests/test_examples.py`
 
-Profiling evidence, benchmark artifacts, and the end-to-end document-indexing
-and RAG scope reserved for `EXAMPLE-005` are not required for `EXAMPLE-004`.
+Profiling evidence, benchmark artifacts, automatic chunking, and a new
+high-level document-indexing helper are not required for `EXAMPLE-005`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1841,8 +1886,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-004 is still the correct next task.
-4. Confirm that EXAMPLE-003 added isolated fake-provider application testing through the real client and structured parsing path.
+3. Verify the repository's current state and confirm that EXAMPLE-005 is still the correct next task.
+4. Confirm that EXAMPLE-004 added one-request batch embedding, index-based ordering, metadata-preserving vector storage, and deterministic retrieval.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

@@ -73,6 +73,7 @@ Completed PROD-004 example tasks:
 * EXAMPLE-001 Explicit `AIConfig` injection
 * EXAMPLE-002 Custom provider registration
 * EXAMPLE-003 Testing application code with a fake provider
+* EXAMPLE-004 Batch embedding and retrieval
 
 Next active task:
 
@@ -83,7 +84,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-004 — Batch embedding and retrieval
+EXAMPLE-005 — End-to-end document indexing and RAG
 ```
 
 ---
@@ -712,14 +713,15 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-004 — Batch embedding and retrieval`.
+Begin `EXAMPLE-005 — End-to-end document indexing and RAG`.
 
-`EXAMPLE-003` added `examples/25_testing_with_fake_provider.py`. Application
-logic remains provider-independent, while test code uses scoped factory
-substitution to exercise the real client, executor, and structured parser with
-a deterministic fake. The next task should demonstrate efficient batch
-embedding, vector storage, and retrieval without expanding into the complete
-document-indexing and RAG workflow reserved for `EXAMPLE-005`.
+`EXAMPLE-004` added `examples/26_batch_embedding_and_retrieval.py`. It submits
+one metadata-bearing embedding batch, restores input order from returned
+indexes, stores stable application records, and retrieves filtered contexts
+through the public retriever contract. The next task should compose document
+loading, explicit indexing, retrieval, and grounded answer generation into one
+end-to-end workflow without introducing an automatic indexing helper or
+chunking API.
 
 ---
 

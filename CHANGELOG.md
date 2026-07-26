@@ -17,6 +17,10 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Batch embedding and retrieval example with input-order restoration, stable
+  record IDs, metadata preservation, vector storage, and filtered retrieval
+* Deterministic regression coverage for one-request batch embedding,
+  out-of-order provider results, query embedding, and relevant-context ranking
 * Fake-provider application testing example with scoped factory substitution
 * Regression coverage for deterministic structured application behavior,
   captured prompts, explicit test configuration, and registry isolation

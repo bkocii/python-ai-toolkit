@@ -106,6 +106,7 @@ def test_numbered_example_modules_exist():
         23: "23_explicit_config.py",
         24: "24_custom_provider.py",
         25: "25_testing_with_fake_provider.py",
+        26: "26_batch_embedding_and_retrieval.py",
     }
 
     for filename in expected_modules.values():

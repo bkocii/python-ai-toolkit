@@ -480,6 +480,7 @@ The [example gallery](examples/README.md) provides a numbered learning path:
 | Explicit application configuration | 23 |
 | Custom provider registration | 24 |
 | Testing application code with a fake provider | 25 |
+| Batch embedding and retrieval | 26 |
 
 Network-dependent examples require valid provider configuration. The examples
 remain application-focused and keep business logic intentionally small.

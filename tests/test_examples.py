@@ -27,6 +27,10 @@ class DeterministicExampleProvider:
         total_tokens=5,
     )
 
+    def __init__(self):
+        self.embedding_requests = []
+        self.reverse_embedding_results = False
+
     def ask_text(self, prompt: str) -> ProviderResponse:
         return ProviderResponse(
             text=self._response_text(prompt),
@@ -73,6 +77,7 @@ class DeterministicExampleProvider:
         )
 
     def embed_texts(self, inputs) -> EmbeddingResponse:
+        self.embedding_requests.append(list(inputs))
         embeddings = []
 
         for index, item in enumerate(inputs):
@@ -93,6 +98,9 @@ class DeterministicExampleProvider:
                     metadata=item.metadata,
                 )
             )
+
+        if self.reverse_embedding_results:
+            embeddings.reverse()
 
         return EmbeddingResponse(
             embeddings=embeddings,
@@ -181,6 +189,7 @@ def deterministic_provider(monkeypatch):
         "examples.17_workflow_engine",
         "examples.18_multi_agent_orchestration",
         "examples.23_explicit_config",
+        "examples.26_batch_embedding_and_retrieval",
         "examples.hello_ai",
         "examples.drink_recommender",
     ],
@@ -380,3 +389,40 @@ def test_fake_provider_example_tests_application_without_state_leaks(
     assert "Return valid JSON only." in fake_provider.prompts[0]
     assert client.provider is fake_provider
     assert ProviderFactory.available_providers() == registry_before
+
+
+def test_batch_embedding_and_retrieval_uses_one_ordered_batch(
+    deterministic_provider,
+):
+    module = importlib.import_module("examples.26_batch_embedding_and_retrieval")
+    deterministic_provider.reverse_embedding_results = True
+    client = module.AIClient()
+    store = module.InMemoryVectorStore()
+
+    response, records = module.index_knowledge(client, store)
+    contexts = module.retrieve_contexts(
+        client,
+        store,
+        question="Which technology can cache frequently used data?",
+    )
+
+    assert len(deterministic_provider.embedding_requests) == 2
+    assert [item.text for item in deterministic_provider.embedding_requests[0]] == [
+        item.text for item in module.build_knowledge_batch()
+    ]
+    assert len(deterministic_provider.embedding_requests[0]) == 3
+    assert len(deterministic_provider.embedding_requests[1]) == 1
+    assert [embedding.index for embedding in response.embeddings] == [2, 1, 0]
+    assert [record.id for record in records] == [
+        "redis-cache",
+        "postgres-database",
+        "django-framework",
+    ]
+    assert records[0].metadata == {
+        "record_id": "redis-cache",
+        "source": "architecture-notes",
+        "topic": "caching",
+    }
+    assert store.count() == 3
+    assert contexts[0].id == "redis-cache"
+    assert contexts[0].metadata["topic"] == "caching"

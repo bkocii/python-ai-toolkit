@@ -159,6 +159,14 @@ uses it to restore the matching text and metadata. It does not sort provider
 results before returning them, so application code should not use result-list
 position as the only correlation key.
 
+The focused [batch embedding and retrieval
+example](../examples/26_batch_embedding_and_retrieval.py) submits one
+metadata-bearing batch, restores input order from each returned `index`,
+creates stable application-owned vector records, and retrieves contexts for an
+embedded query. Running it normally requires configured provider credentials
+and an embedding-capable model; its regression test uses a deterministic
+substitute without credentials or network access.
+
 ### Embedding metadata boundary
 
 `EmbeddingResponse` is not `AIResult`. It does not expose:

@@ -1887,7 +1887,7 @@ Fill important example gaps required for a Version 1.0 release.
 * [x] EXAMPLE-001 Explicit `AIConfig` injection
 * [x] EXAMPLE-002 Custom provider registration
 * [x] EXAMPLE-003 Testing application code with a fake provider
-* [ ] EXAMPLE-004 Batch embedding and retrieval
+* [x] EXAMPLE-004 Batch embedding and retrieval
 * [ ] EXAMPLE-005 End-to-end document indexing and RAG
 * [ ] EXAMPLE-006 Structured application service example
 * [ ] EXAMPLE-007 Review and normalize all example descriptions
@@ -2021,6 +2021,50 @@ Next task:
 
 ```text
 EXAMPLE-004 — Batch embedding and retrieval
+```
+
+#### EXAMPLE-004 — Batch Embedding and Retrieval
+
+Status: Completed
+
+Completed work:
+
+* added `examples/26_batch_embedding_and_retrieval.py` without renaming or
+  reassigning the existing 01 through 25 gallery entries
+* submitted three metadata-bearing knowledge items through one
+  `AIClient.embed_texts()` request
+* restored input order from `EmbeddingVector.index` rather than trusting
+  provider result-list position
+* preserved application-owned record IDs, source metadata, and topics in
+  `VectorRecord`
+* stored the batch in `InMemoryVectorStore` and retrieved filtered,
+  prompt-ready contexts through `VectorStoreRetriever`
+* kept file loading, document preparation, RAG prompt construction, and answer
+  generation reserved for `EXAMPLE-005`
+* linked the example from the gallery, complete learning path, README, and
+  retrieval guide
+* added deterministic regression coverage for one-request batching,
+  out-of-order provider results, query embedding, metadata preservation,
+  vector storage, and relevant-context ranking
+
+Completion verification:
+
+```text
+79 focused embedding, vector-store, retriever, example, and documentation tests passed
+317 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+211 fenced documentation blocks inventoried
+81 Python documentation blocks compiled
+144 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or
+architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-005 — End-to-end document indexing and RAG
 ```
 
 ### Exit Criteria

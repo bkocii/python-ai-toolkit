@@ -495,6 +495,40 @@ is active. The client retains the selected fake after construction.
 See the [provider guide](../docs/providers.md#testing-application-code-with-a-fake-provider)
 for the production-versus-test boundary.
 
+## 26 – Batch Embedding and Retrieval
+
+**File**
+
+```text
+26_batch_embedding_and_retrieval.py
+```
+
+Demonstrates:
+
+* submitting multiple metadata-bearing texts in one `AIClient.embed_texts()`
+  request
+* restoring input order from `EmbeddingVector.index`
+* preserving stable application IDs, source metadata, and topics
+* adding the resulting vectors to `InMemoryVectorStore`
+* embedding a query through `VectorStoreRetriever`
+* filtering and returning relevant prompt-ready contexts
+
+Run with valid provider configuration and an embedding-capable model:
+
+```bash
+python -m examples.26_batch_embedding_and_retrieval
+```
+
+The automated regression substitutes a deterministic provider, deliberately
+returns batch embeddings out of order, and makes no credentialed or network
+request. This example indexes an in-code knowledge batch only; file loading,
+document preparation, and answer generation remain in the following
+end-to-end RAG example.
+
+See the [retrieval and RAG guide](../docs/retrieval.md) for embedding-index
+correlation, vector-store limits, retrieval scores, and provider capability
+boundaries.
+
 ## Running
 ```bash
 python -m examples.01_plain_text
@@ -518,6 +552,15 @@ python -m examples.01_plain_text
 15. Conversation Memory
 16. Agent
 17. Workflow Engine
+18. Multi-Agent Orchestration
+19. Django Integration
+20. FastAPI Integration
+21. Command-Line Interface
+22. Configuration CLI
+23. Explicit Configuration
+24. Custom Provider Registration
+25. Testing with a Fake Provider
+26. Batch Embedding and Retrieval
 18. Multi-Agent Orchestration
 19. Django Integration
 20. FastAPI Integration
