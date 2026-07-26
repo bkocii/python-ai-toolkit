@@ -395,6 +395,44 @@ documents configuration sources, synchronous and asynchronous helpers,
 dependency overrides, client lifetimes, CLI output, exit codes, and live
 provider boundaries.
 
+## 23 – Explicit Configuration
+
+**File**
+
+```text
+23_explicit_config.py
+```
+
+Demonstrates:
+
+* accepting an API key supplied by the application
+* constructing a complete `AIConfig`
+* calling `ConfigValidator.validate(config)` before client construction
+* injecting the validated configuration into `AIClient`
+* avoiding environment-based provider, model, retry, and logging resolution
+* disabling toolkit-managed file logging for this example
+
+Set the example-specific environment variable before running:
+
+```bash
+export EXAMPLE_AI_API_KEY="replace_with_a_development_key"
+python -m examples.23_explicit_config
+```
+
+```powershell
+$env:EXAMPLE_AI_API_KEY = "replace_with_a_development_key"
+python -m examples.23_explicit_config
+```
+
+Use a restricted development credential. Do not commit the value, pass it as a
+command-line argument, or replace the example placeholder with a real key in
+source. A production application can pass a secret-manager value directly to
+`build_ai_client()`.
+
+The [configuration guide](../docs/configuration.md#explicit-aiconfig) explains
+why explicit values are not merged with `.env` and why manual validation is
+currently required.
+
 ## Running
 ```bash
 python -m examples.01_plain_text
@@ -423,3 +461,4 @@ python -m examples.01_plain_text
 20. FastAPI Integration
 21. Command-Line Interface
 22. Configuration CLI
+23. Explicit Configuration

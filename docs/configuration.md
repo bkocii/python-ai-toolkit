@@ -140,6 +140,11 @@ ConfigValidator.validate(config)
 client = AIClient(config=config)
 ```
 
+See
+[example 23](../examples/README.md#23--explicit-configuration) for a complete
+runnable workflow that accepts an application-supplied secret and verifies
+that environment provider and model settings are not merged.
+
 The same object can be passed to the asynchronous client:
 
 ```python

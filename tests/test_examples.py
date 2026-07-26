@@ -7,7 +7,9 @@ from types import SimpleNamespace
 import pytest
 from fastapi.testclient import TestClient
 
+from ai.config import AIConfig
 from ai.embeddings import EmbeddingResponse, EmbeddingVector
+from ai.exceptions import AIConfigurationError
 from ai.integrations.fastapi import get_async_ai_client
 from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse, TokenUsage
@@ -143,6 +145,7 @@ def deterministic_provider(monkeypatch):
     provider = DeterministicExampleProvider()
 
     monkeypatch.setenv("OPENAI_API_KEY", "example-test-key")
+    monkeypatch.setenv("EXAMPLE_AI_API_KEY", "example-test-key")
     monkeypatch.setenv("OPENAI_MODEL", "test-model")
     monkeypatch.setenv("OPENAI_EMBEDDING_MODEL", "test-embedding")
     monkeypatch.setenv("AI_FILE_LOGGING_ENABLED", "false")
@@ -177,6 +180,7 @@ def deterministic_provider(monkeypatch):
         "examples.16_agent",
         "examples.17_workflow_engine",
         "examples.18_multi_agent_orchestration",
+        "examples.23_explicit_config",
         "examples.hello_ai",
         "examples.drink_recommender",
     ],
@@ -254,3 +258,47 @@ def test_fastapi_example_runs_offline(deterministic_provider):
         "priority": "low",
         "summary": "Deterministic support summary.",
     }
+
+
+def test_explicit_config_example_uses_validated_supplied_values(
+    monkeypatch,
+    deterministic_provider,
+):
+    module = importlib.import_module("examples.23_explicit_config")
+    observed_configs = []
+
+    monkeypatch.setenv("AI_PROVIDER", "environment-provider")
+    monkeypatch.setenv("OPENAI_MODEL", "environment-model")
+    monkeypatch.setenv("AI_MODEL", "environment-fallback-model")
+    monkeypatch.setattr(
+        "ai.client.get_ai_config",
+        lambda: pytest.fail("AIClient read environment configuration"),
+    )
+    monkeypatch.setattr(
+        ProviderFactory,
+        "create",
+        classmethod(
+            lambda _cls, config: observed_configs.append(config)
+            or deterministic_provider
+        ),
+    )
+
+    client = module.build_ai_client("runtime-injected-test-key")
+
+    assert observed_configs == [
+        AIConfig(
+            provider="openai",
+            api_key="runtime-injected-test-key",
+            model="gpt-5.4-mini",
+            embedding_model="text-embedding-3-small",
+            max_retries=1,
+            log_level="INFO",
+            file_logging_enabled=False,
+        )
+    ]
+    assert client.model == "gpt-5.4-mini"
+
+    with pytest.raises(AIConfigurationError):
+        module.build_ai_client(" ")
+
+    assert len(observed_configs) == 1

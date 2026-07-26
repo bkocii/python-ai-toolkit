@@ -1852,7 +1852,7 @@ CLI configuration and Uvicorn target checks passed
 No production runtime API, provider adapter, package dependency, public import
 path, benchmark, or architectural decision changed.
 
-Next task:
+Following task at completion:
 
 ```text
 EXAMPLE-001 — Explicit AIConfig injection
@@ -1884,7 +1884,7 @@ Fill important example gaps required for a Version 1.0 release.
 
 ### Tasks
 
-* [ ] EXAMPLE-001 Explicit `AIConfig` injection
+* [x] EXAMPLE-001 Explicit `AIConfig` injection
 * [ ] EXAMPLE-002 Custom provider registration
 * [ ] EXAMPLE-003 Testing application code with a fake provider
 * [ ] EXAMPLE-004 Batch embedding and retrieval
@@ -1900,6 +1900,45 @@ Fill important example gaps required for a Version 1.0 release.
 * Examples must not require undocumented setup.
 * Network-dependent examples must clearly state their requirements.
 * Examples must not contain real credentials.
+
+#### EXAMPLE-001 — Explicit `AIConfig` Injection
+
+Status: Completed
+
+Completed work:
+
+* added `examples/23_explicit_config.py` without renaming or reassigning the
+  existing 01 through 22 gallery entries
+* accepted an application-supplied API key and constructed a complete,
+  immutable `AIConfig`
+* called `ConfigValidator.validate(config)` before constructing `AIClient`
+* kept provider, model, embedding, retry, and logging values independent from
+  environment-based toolkit resolution
+* documented safe development-secret injection and secret-manager ownership
+* linked the example from the gallery, learning path, README, and configuration
+  guide
+* extended deterministic regression coverage for example execution,
+  environment precedence, resolver bypass, and validation before provider
+  construction
+
+Completion verification:
+
+```text
+42 focused example and documentation tests passed
+313 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+80 Python documentation blocks compiled
+138 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or
+architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-002 — Custom provider registration
+```
 
 ### Exit Criteria
 

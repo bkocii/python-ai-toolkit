@@ -68,6 +68,10 @@ Completed PROD-003 documentation tasks:
 * DOC-013 Create a stable public API reference
 * DOC-014 Verify every documented example
 
+Completed PROD-004 example tasks:
+
+* EXAMPLE-001 Explicit `AIConfig` injection
+
 Next active task:
 
 ```text
@@ -77,7 +81,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-001 — Explicit AIConfig injection
+EXAMPLE-002 — Custom provider registration
 ```
 
 ---
@@ -706,14 +710,13 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-001 — Explicit AIConfig injection`.
+Begin `EXAMPLE-002 — Custom provider registration`.
 
-`PROD-003` is complete. Every user-facing code block and current numbered
-example is verified, with deterministic regression coverage and explicit live
-provider boundaries recorded in
-`docs/development/example_verification.md`. The next task should add the first
-missing Version 1.0 example without redesigning the configuration API or
-combining unrelated `PROD-004` items.
+`EXAMPLE-001` added `examples/23_explicit_config.py` with manual structural
+validation, application-owned secret injection, and deterministic proof that a
+supplied `AIConfig` bypasses environment-based provider and model resolution.
+The next task should add one focused custom-provider registration example
+without combining the later fake-provider testing task.
 
 ---
 

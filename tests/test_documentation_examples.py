@@ -103,6 +103,7 @@ def test_numbered_example_modules_exist():
         18: "18_multi_agent_orchestration.py",
         19: "19_django_integration.py",
         20: "20_fastapi_integration.py",
+        23: "23_explicit_config.py",
     }
 
     for filename in expected_modules.values():

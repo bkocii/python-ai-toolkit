@@ -12,7 +12,7 @@ The audit covers:
 - all focused public guides under `docs/`
 - `docs/api_reference.md`
 - `examples/README.md`
-- numbered example files 01 through 20
+- numbered example files 01 through 20 and 23
 - the Base64 image-helper variant
 - the command-line workflows
 
@@ -29,13 +29,14 @@ It does not add the new example topics assigned to `PROD-004`.
 
 ## Documentation Inventory
 
-The 14 user-facing Markdown files contain 201 fenced blocks.
+The 14 user-facing Markdown files contain 204 fenced blocks after
+`EXAMPLE-001`.
 
 | Block type | Count | Verification |
 | --- | ---: | --- |
 | Python | 80 | Executed in document order; intentional failure examples asserted |
-| Shell | 41 | Safe commands executed in isolated Linux environments; provider commands substituted |
-| PowerShell | 4 | Classified as Windows-dependent and inspected against the corresponding Linux workflow |
+| Shell | 42 | Safe commands executed in isolated Linux environments; provider commands substituted |
+| PowerShell | 5 | Classified as Windows-dependent and inspected against the corresponding Linux workflow |
 | Environment configuration | 8 | Parsed and exercised through configuration and CLI tests |
 | TOML | 1 | Matched against `pyproject.toml` |
 | Output, signatures, and diagrams | 67 | Compared with current behavior and public contracts |
@@ -57,6 +58,7 @@ All repository-relative links in the user-facing documentation resolve.
 | 16–18 | Provider-dependent | Agent, workflow, and multi-agent sequences ran with deterministic responses |
 | 19 | Environment- and provider-dependent | Django settings conversion and the service function ran with isolated settings and a fake provider |
 | 20 | Environment- and provider-dependent | FastAPI dependency override and endpoint response validation ran through `TestClient` |
+| 23 | Provider-dependent | Explicit configuration validation and injection ran with conflicting environment settings and a deterministic provider |
 | `hello_ai.py` and `drink_recommender.py` | Provider-dependent | Existing unnumbered examples also ran offline |
 
 The permanent regression tests live in:
@@ -66,6 +68,11 @@ The permanent regression tests live in:
 
 They prevent numbered modules, gallery references, relative links, Python code
 blocks, and deterministic example execution from silently drifting.
+
+Example 23 also has a focused precedence regression: it fails if `AIClient`
+loads environment configuration instead of using the supplied `AIConfig`, or
+if an invalid manually constructed configuration reaches the provider factory
+before `ConfigValidator.validate()` rejects it.
 
 ## Command Workflows
 
@@ -137,6 +144,10 @@ gate was already not clean:
 The Python files added by `DOC-014` pass focused Black and Ruff checks. The
 edited `09_1_structured_image_with_helper.py` content passes Ruff when the
 pre-existing numbered-module `N999` naming rule is excluded.
+
+`EXAMPLE-001` later added `23_explicit_config.py`. Its focused Black and Ruff
+checks pass, with only the repository's intentional numbered-module `N999`
+pattern excluded.
 
 Repository-wide cleanup and example naming normalization remain later roadmap
 work; they were not mixed into this documentation-verification task.

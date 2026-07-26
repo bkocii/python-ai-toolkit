@@ -17,6 +17,9 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Explicit `AIConfig` injection example with application-owned secret lookup
+* Deterministic regression coverage for explicit configuration precedence and
+  pre-client validation
 * Explicit `AIConfig` injection for `AIClient`
 * Explicit `AIConfig` injection for `AsyncAIClient`
 * Optional Django integration

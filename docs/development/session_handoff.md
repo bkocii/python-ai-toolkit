@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-001 — Explicit AIConfig injection`
+**Next task:** `EXAMPLE-002 — Custom provider registration`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-001`.
+The next task is `EXAMPLE-002`.
 
 ---
 
@@ -1183,26 +1183,62 @@ path, benchmark, or ADR changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-001
+# EXAMPLE-001 Completion
 
-Add one focused example for explicit `AIConfig` injection.
+`EXAMPLE-001 — Explicit AIConfig injection` is complete.
+
+Completed work:
+
+1. added `examples/23_explicit_config.py`
+2. preserved the existing gallery numbering: 21 and 22 remain CLI workflows
+3. accepted an application-supplied key and constructed the full configuration
+   explicitly
+4. called `ConfigValidator.validate(config)` before `AIClient(config=config)`
+5. kept provider, model, embedding, retry, and logging values separate from
+   environment-based toolkit resolution
+6. documented development-secret injection and application-owned
+   secret-manager use
+7. linked example 23 from the gallery, learning path, README, and configuration
+   guide
+8. added deterministic regression coverage proving conflicting environment
+   values are not merged and invalid configuration is rejected before provider
+   construction
+
+Completion verification:
+
+```text
+42 focused example and documentation tests passed
+313 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+204 fenced documentation blocks inventoried
+80 Python documentation blocks compiled
+138 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or ADR
+changed.
+
+---
+
+# Exact Next Task — EXAMPLE-002
+
+Add one focused example for custom provider registration.
 
 Required work:
 
-1. inspect the current `AIConfig`, `ConfigValidator`, `AIClient`, configuration
-   guide, API reference, and existing numbered examples
-2. choose the next available example number without renaming the existing
-   gallery during this task
-3. demonstrate application-supplied configuration without reading `.env`
-   values for the client
-4. call `ConfigValidator.validate(config)` before creating the client, matching
-   the current documented contract
-5. keep credentials as placeholders or injected values and preserve the
-   security guide's secret-handling rules
-6. add the example to `examples/README.md` and the learning path
-7. extend deterministic example regression coverage
-8. run the focused and full suites plus documentation/link checks
-9. update roadmap, project state, session handoff, and changelog
+1. inspect `BaseAIProvider`, `ProviderFactory`, `AIConfig`, provider
+   documentation, the API reference, and current example numbering
+2. add the next focused example without renaming existing gallery entries
+3. implement the smallest illustrative custom provider that satisfies the
+   current constructor and abstract-method contracts
+4. register it through `ProviderFactory.register()` before client construction
+5. validate the explicit configuration before passing it to `AIClient`
+6. distinguish process-local registration from live capability support
+7. avoid mixing in `EXAMPLE-003` application testing patterns beyond the
+   deterministic regression coverage needed for this example
+8. update the gallery and learning path
+9. run focused and full tests plus documentation/link checks
+10. update roadmap, project state, session handoff, and changelog
 
 ---
 
@@ -1661,15 +1697,19 @@ For the immediate next task, also provide:
 8. `ai/config.py`
 9. `ai/config_validator.py`
 10. `ai/client.py`
-11. `docs/configuration.md`
-12. `docs/api_reference.md`
-13. `docs/security.md`
-14. `docs/development/example_verification.md`
-15. the complete `examples/` directory
-16. `tests/test_examples.py`
+11. `ai/providers/base.py`
+12. `ai/providers/factory.py`
+13. `ai/schemas.py`
+14. `docs/providers.md`
+15. `docs/api_reference.md`
+16. `docs/security.md`
+17. `docs/development/example_verification.md`
+18. the complete `examples/` directory
+19. `tests/test_examples.py`
+20. `tests/test_provider_factory.py`
 
 Profiling evidence, benchmark artifacts, and unrelated later `PROD-004`
-example ideas are not required for `EXAMPLE-001`.
+example ideas are not required for `EXAMPLE-002`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1683,8 +1723,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-001 is still the correct next task.
-4. Confirm that DOC-014 completed PROD-003 and added deterministic example regression coverage.
+3. Verify the repository's current state and confirm that EXAMPLE-002 is still the correct next task.
+4. Confirm that EXAMPLE-001 added validated explicit configuration injection and deterministic precedence coverage.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
