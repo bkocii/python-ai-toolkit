@@ -1155,7 +1155,7 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-009 Document Django, FastAPI, and CLI integrations
 * [x] DOC-010 Document exceptions and error handling
 * [x] DOC-011 Document security and secret-handling guidance
-* [ ] DOC-012 Document Python-version and provider compatibility
+* [x] DOC-012 Document Python-version and provider compatibility
 * [ ] DOC-013 Create a stable public API reference
 * [ ] DOC-014 Verify every documented example
 
@@ -1685,6 +1685,69 @@ Next task:
 
 ```text
 DOC-012 — Document Python-version and provider compatibility
+```
+
+#### DOC-012 — Python-Version and Provider Compatibility
+
+Status: Completed
+
+Compatibility was reviewed against package metadata, dependency declarations
+and resolved metadata, Python syntax, provider interfaces and adapters,
+framework integrations, tests, installation guidance, and the planned release
+matrix.
+
+Completed work:
+
+* added `docs/compatibility.md` as the focused compatibility guide
+* distinguished the open-ended `requires-python = ">=3.11"` installer metadata
+  from the planned Python 3.11–3.14 Version 1.0 test matrix
+* recorded Python 3.12.13 as the current full-suite verification environment
+* retained Python 3.14.4 as historical deterministic benchmark evidence without
+  presenting it as a current full-suite result
+* parsed production, test, example, benchmark, and profiling sources with the
+  Python 3.11 grammar without labeling that syntax check as runtime verification
+* documented direct dependency constraints, clean resolution behavior, and the
+  non-contract status of `requirements.txt`
+* documented core, Django, FastAPI, development, and benchmark dependency
+  boundaries
+* documented the built-in OpenAI adapter's exact SDK mappings
+* distinguished provider registration and adapter methods from SDK, credential,
+  account, region, quota, and selected-model capability availability
+* documented custom-provider dependency ownership
+* documented optional-framework Python and dependency intersections
+* documented separate clean-environment verification for core, Django, and
+  FastAPI installations
+* documented capability-specific live smoke testing separately from normal
+  deterministic tests
+* documented the application-owned SOCKS proxy transport dependency boundary
+* linked compatibility guidance from the README, installation, provider, and
+  integration guides
+
+Completion verification:
+
+```text
+Python 3.11 grammar parsed 113 Python files
+pip check passed for the clean contributor resolution
+core, CLI, Django, and FastAPI imports passed
+64 focused provider and integration tests passed
+9 timed benchmarks passed and 4 infrastructure-only tests skipped
+30 Python blocks in the affected documents parsed
+57 repository-relative Markdown links passed
+271 normal tests passed on Linux with CPython 3.12.13
+```
+
+The full deterministic suite was run with workspace-injected proxy variables
+removed. The initial run confirmed that a SOCKS proxy needs the HTTP client's
+optional SOCKS transport package; this deployment-specific dependency was
+documented instead of being added to every core installation.
+
+No runtime API, executable implementation, package dependency, test, example,
+benchmark, or architectural contract changed.
+
+Next task:
+
+```text
+DOC-013 — Create a stable public API reference
 ```
 
 ### Documentation Rules

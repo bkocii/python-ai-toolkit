@@ -25,6 +25,11 @@ values from `.env`.
 Install from the project root after activating a Python 3.11-or-newer virtual
 environment.
 
+Framework support is the intersection of the toolkit's Python range, the
+extra's dependency constraint, and the selected framework release's own Python
+support. See the [compatibility guide](compatibility.md) for the declared and
+verified version boundaries.
+
 For Django:
 
 ```bash
@@ -455,6 +460,8 @@ See the [installation guide](installation.md) for extras, the
 [configuration guide](configuration.md) for precedence and validation, the
 [provider guide](providers.md) for registration and capabilities, and the
 [request guide](requests.md) for request and result contracts. The
+[compatibility guide](compatibility.md) documents Python, dependency,
+framework, provider SDK, account, region, and model-capability boundaries. The
 [exception and error-handling guide](error_handling.md) documents framework
 propagation, CLI behavior, retry boundaries, and failures returned as result
 objects. The [security and secret-handling guide](security.md) covers

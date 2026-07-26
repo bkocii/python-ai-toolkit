@@ -63,6 +63,7 @@ Completed PROD-003 documentation tasks:
 * DOC-009 Document Django, FastAPI, and CLI integrations
 * DOC-010 Document exceptions and error handling
 * DOC-011 Document security and secret-handling guidance
+* DOC-012 Document Python-version and provider compatibility
 
 Next active task:
 
@@ -73,7 +74,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-012 — Document Python-version and provider compatibility
+DOC-013 — Create a stable public API reference
 ```
 
 ---
@@ -702,15 +703,14 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-012 — Document Python-version and provider compatibility`.
+Begin `DOC-013 — Create a stable public API reference`.
 
-Security and secret-handling guidance is now consolidated and verified across
-local development, tests, CI, production, repository ignores, logging, CLI
-output, provider-bound data, returned objects, tool authorization,
-multi-tenant access, provider governance, and incident response. The next
-review should document supported Python versions and distinguish toolkit,
-provider-adapter, provider-SDK, model-capability, and framework compatibility
-without changing unrelated runtime behavior.
+Python-version, dependency, provider, model, framework, proxy, and verification
+boundaries are now consolidated in `docs/compatibility.md`. The guide separates
+the declared Python `>=3.11` metadata from the planned 3.11–3.14 release matrix
+and from the current full-suite evidence on CPython 3.12.13. The next review
+should inventory and document the intended stable public API without changing
+runtime behavior or performing the separate final example audit.
 
 ---
 

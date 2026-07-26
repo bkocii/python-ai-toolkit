@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-012 — Document Python-version and provider compatibility`
+**Next task:** `DOC-013 — Create a stable public API reference`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-012`.
+The next task is `DOC-013`.
 
 ---
 
@@ -1053,83 +1053,109 @@ focused Black and Ruff checks passed
 
 ---
 
-# Exact Next Task — DOC-012
+# DOC-012 — Python-Version and Provider Compatibility
 
-Document Python-version and provider compatibility without expanding into the
-separate stable public API reference or final example-audit tasks.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect `pyproject.toml`, dependency metadata, provider adapters,
-   integrations, tests, installation guidance, and supported runtime evidence
-2. document the supported Python-version range without claiming untested
-   versions as verified
-3. distinguish toolkit compatibility from provider SDK, provider account,
-   model, region, and capability availability
-4. document optional Django and FastAPI compatibility boundaries
-5. identify the exact tested environments and explain how contributors should
-   verify additional supported versions
-6. keep provider-specific claims tied to implemented adapters and current
-   dependency constraints
-7. keep the change limited to `DOC-012` unless review finds a release-blocking
-   compatibility defect
+1. reviewed package metadata, dependency declarations and resolved metadata,
+   provider interfaces and adapters, framework integrations, tests,
+   installation guidance, and runtime evidence
+2. added `docs/compatibility.md`
+3. separated the declared Python `>=3.11` installation floor from verified
+   environments and the planned Python 3.11–3.14 release matrix
+4. recorded the current full-suite environment as Linux with CPython 3.12.13
+5. retained the historical Windows CPython 3.14.4 deterministic benchmark
+   result without presenting it as a current full-suite result
+6. verified all 113 maintained Python files against the Python 3.11 grammar
+   while preserving the distinction between syntax and runtime compatibility
+7. documented dependency-resolution and `requirements.txt` snapshot boundaries
+8. documented the built-in OpenAI adapter's SDK mappings and separated them
+   from credentials, accounts, regions, quotas, and model capabilities
+9. documented custom-provider dependency ownership
+10. documented Django and FastAPI version intersections, separate clean
+    installation checks, and application-owned server and testing dependencies
+11. documented capability-specific live provider smoke testing separately from
+    deterministic compatibility tests
+12. documented the application-owned SOCKS proxy transport boundary
+13. linked compatibility guidance from the README, installation, provider, and
+    integration guides
+14. changed no runtime API, implementation, dependency, test, example,
+    benchmark, or ADR
+
+Completion verification:
+
+```text
+Python 3.11 grammar parsed 113 Python files
+pip check passed for the clean contributor resolution
+core, CLI, Django, and FastAPI imports passed
+64 focused provider and integration tests passed
+9 timed benchmarks passed and 4 infrastructure-only tests skipped
+30 Python blocks in the affected documents parsed
+57 repository-relative Markdown links passed
+271 normal tests passed on Linux with CPython 3.12.13
+```
 
 ---
 
-# DOC-011 Verification and Repository State
+# Exact Next Task — DOC-013
+
+Create a stable public API reference without changing the runtime API and
+without expanding into the separate final example-verification task.
+
+Required work:
+
+1. inspect package exports, public classes, functions, methods, typed models,
+   protocols or abstract bases, exceptions, integrations, and CLI entry points
+2. define the intended public surface rather than documenting every internal
+   implementation helper
+3. document signatures, parameters, return types, raised toolkit exceptions,
+   important state and lifecycle behavior, and capability-specific limits
+4. preserve the distinctions already established in the focused guides instead
+   of duplicating their tutorials
+5. identify any ambiguous or accidentally public surface for the Version 1.0
+   API-freeze review rather than silently changing it in a documentation task
+6. link the reference from the README and relevant guides
+7. keep final execution of every documented example for `DOC-014`
+
+---
+
+# DOC-012 Verification and Repository State
 
 Changed project files:
 
 ```text
-.env.example
-.gitignore
 README.md
 CHANGELOG.md
-docs/security.md
-docs/configuration.md
-docs/requests.md
-docs/advanced_requests.md
-docs/retrieval.md
-docs/orchestration.md
+docs/compatibility.md
+docs/installation.md
+docs/providers.md
 docs/integrations.md
-docs/error_handling.md
-docs/development/error_messages.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
-ai/parser.py
-tests/test_parser.py
-tests/test_logging_integration.py
 ```
 
-No provider API, dependency, example, benchmark, or ADR changed.
+No runtime API, executable implementation, dependency, test, example,
+benchmark, or ADR changed.
 
 Suggested focused commit:
 
 ```powershell
 git add `
-    .env.example `
-    .gitignore `
     README.md `
     CHANGELOG.md `
-    docs\security.md `
-    docs\configuration.md `
-    docs\requests.md `
-    docs\advanced_requests.md `
-    docs\retrieval.md `
-    docs\orchestration.md `
+    docs\compatibility.md `
+    docs\installation.md `
+    docs\providers.md `
     docs\integrations.md `
-    docs\error_handling.md `
-    docs\development\error_messages.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
-    docs\development\session_handoff.md `
-    ai\parser.py `
-    tests\test_parser.py `
-    tests\test_logging_integration.py
+    docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document security and secret handling"
+git commit -m "docs: document compatibility"
 ```
 
 ---
@@ -1465,15 +1491,20 @@ For complete Markdown sections intended for the repository, return the entire re
 
 # Environment Notes
 
-Known local environment:
+Recorded user environment:
 
 - Windows
 - PowerShell
 - PyCharm
-- CPython 3.14.4 for the current profiling session
-- project supports Python `>=3.11`
 
-`ripgrep` (`rg`) is not installed in the current environment.
+The historical benchmark baseline used Windows with CPython 3.14.4. The
+transferred project used for `DOC-012` verification ran on Linux with CPython
+3.12.13.
+
+Package metadata accepts Python `>=3.11`; the planned Version 1.0 test matrix is
+Python 3.11 through 3.14.
+
+`ripgrep` (`rg`) is not installed in the recorded Windows environment.
 
 Use PowerShell search when needed:
 
@@ -1533,15 +1564,17 @@ For the immediate next task, also provide:
 
 6. `README.md`
 7. `pyproject.toml`
-8. `requirements.txt`
-9. `docs/installation.md`
-10. `docs/providers.md`
-11. `docs/integrations.md`
-12. provider base class, factory, built-in adapters, and package metadata
-13. integration and provider tests
-14. current environment and supported-version evidence
+8. all focused public guides under `docs/`
+9. `ai/__init__.py`
+10. client, configuration, result, request-builder, and exception modules
+11. tool, image, embedding, vector-store, retriever, RAG, document, memory,
+    agent, workflow, and orchestrator modules
+12. provider base class, factory, and built-in adapter
+13. Django and FastAPI integration exports and implementations
+14. tests that assert public signatures, return types, and error contracts
 
-Profiling evidence is not required for `DOC-012`.
+Profiling evidence and generated benchmark artifacts are not required for
+`DOC-013`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1555,7 +1588,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-012 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-013 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

@@ -75,6 +75,9 @@ The format loosely follows Keep a Changelog.
 * Focused security and secret-handling guide covering environment-specific
   credential sources, sensitive request and result data, provider governance,
   logging, tool authorization, multi-tenant boundaries, and incident response
+* Focused compatibility guide covering declared and verified Python versions,
+  dependency resolution, provider SDK and model boundaries, optional
+  frameworks, and contributor verification
 
 
 ### Improved
@@ -114,6 +117,9 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between toolkit safeguards and application-owned secret
   storage, data access, provider policy, output filtering, and incident
   response
+* Clear distinction between package installation, tested Python environments,
+  dependency compatibility, provider adapters, SDKs, accounts, regions, and
+  model capabilities
 * Clear ownership boundary between the FastAPI runtime extra, application-chosen
   ASGI servers, and test-client dependencies
 * Command-line secret-handling safeguards

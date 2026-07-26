@@ -6,6 +6,11 @@ The project is currently installed from a local source checkout. It is not yet
 published on PyPI, so commands such as `pip install python-ai-toolkit` are
 reserved for the later package-release milestone.
 
+The [compatibility guide](compatibility.md) distinguishes this declared
+installation floor from the versions currently verified by the full suite, the
+planned Version 1.0 test matrix, dependency compatibility, and live
+provider/model availability.
+
 ## Create a virtual environment
 
 Run these commands from the project root:
@@ -114,7 +119,8 @@ python -m pytest benchmarks --benchmark-only
 `pyproject.toml` is the authoritative package and optional-dependency
 definition. The repository's `requirements.txt` is an environment snapshot; it
 is not the supported installation interface and does not replace the extras
-above.
+above. A fresh dependency resolution can therefore differ from that snapshot;
+record the exact resolved versions when diagnosing compatibility.
 
 ## Change an existing installation
 

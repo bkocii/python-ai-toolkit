@@ -181,7 +181,7 @@ does not claim that every toolkit feature is supported.
 The built-in `OpenAIProvider` currently implements synchronous and asynchronous
 plain-text requests, synchronous streaming, tool calling, image inputs, and
 embeddings. Detailed model and SDK compatibility is handled separately from
-the registration contract.
+the registration contract in the [compatibility guide](compatibility.md).
 
 ## Errors and validation boundaries
 
@@ -218,4 +218,6 @@ Provider registration is explicit by design. It does not currently provide:
 - capability negotiation
 
 Those concerns should not be inferred from a name appearing in
-`available_providers()`.
+`available_providers()`. Registration also does not prove SDK compatibility,
+credential validity, account or regional access, or support for a capability
+by the selected model.

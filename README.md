@@ -99,7 +99,10 @@ python -m pip install -e ".[dev,benchmark]"
 
 See the [installation guide](docs/installation.md) for the complete extras
 matrix, clean-environment verification, and the difference between user and
-contributor installations.
+contributor installations. The
+[compatibility guide](docs/compatibility.md) separates the declared Python
+range from verified environments, dependency resolution, framework support,
+and live provider/model availability.
 
 ## Configuration
 
@@ -163,6 +166,8 @@ capabilities.
 
 See the [provider guide](docs/providers.md) for custom registration, constructor
 requirements, capability methods, registration lifecycle, and expected errors.
+See the [compatibility guide](docs/compatibility.md) before treating a
+registered adapter as proof that a selected model supports a capability.
 
 ## Quick start
 
@@ -492,6 +497,7 @@ concerns in focused documents:
 | [Framework and CLI integration guide](docs/integrations.md) | Django settings, FastAPI dependencies and test overrides, CLI commands, output, and exit codes |
 | [Exception and error-handling guide](docs/error_handling.md) | Toolkit exception hierarchy, retry decisions, ordinary Python failures, failed result objects, and application catch boundaries |
 | [Security and secret-handling guide](docs/security.md) | Credentials, sensitive data, logging, provider governance, tool authorization, and incident response |
+| [Compatibility guide](docs/compatibility.md) | Python versions, dependency resolution, provider SDKs and models, optional frameworks, and verification evidence |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |
