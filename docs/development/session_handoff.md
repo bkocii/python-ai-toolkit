@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-010 — Document exceptions and error handling`
+**Next task:** `DOC-011 — Document security and secret-handling guidance`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-010`.
+The next task is `DOC-011`.
 
 ---
 
@@ -977,45 +977,84 @@ CLI ask, config show, and config validate workflows executed offline
 
 ---
 
-# Exact Next Task — DOC-010
+# DOC-010 — Exceptions and Error Handling
 
-Document the toolkit exception hierarchy and practical error-handling behavior
-without expanding into the dedicated security, compatibility, public API
-reference, or final example-audit tasks.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect `ai/exceptions.py` and every production raise/catch boundary
-2. inspect exception-focused tests and existing error-message guidance
-3. map each public exception to the operation and failure that raises it
-4. document application catch boundaries without hiding programming defects
-5. document retry, structured-response, streaming, framework, and CLI error
-   behavior
-6. distinguish toolkit failures from provider, transport, business-validation,
-   and application-policy failures
-7. verify every documented exception example and failure path
-8. keep the change limited to `DOC-010`
+1. reviewed `ai/exceptions.py` and every production raise/catch boundary
+2. reviewed exception-focused tests, architecture, and developer error-message
+   guidance
+3. added `docs/error_handling.md`
+4. documented the complete `AIError` hierarchy and specific-versus-base catch
+   boundaries
+5. documented configuration timing, provider translation, exception chaining,
+   structured repair exhaustion, and provider-aware retry decisions
+6. documented ordinary Python, Pydantic, file-system, custom-provider, and
+   application-policy failures outside the toolkit hierarchy
+7. documented streaming failures during iteration and possible partial output
+8. documented raised exceptions versus workflow and orchestration failure
+   result objects
+9. documented framework propagation, CLI exit behavior, logging, and
+   application-owned error mapping
+10. updated the maintainer error-message guide and documentation navigation
+11. changed no runtime implementation, public API, dependency, test, example,
+    benchmark, or ADR
+
+Completion verification:
+
+```text
+offline error-contract workflows passed
+226 focused error-surface tests passed
+33 Python blocks in the affected documents parsed
+51 repository-relative Markdown links passed
+269 normal tests passed
+```
 
 ---
 
-# DOC-009 Verification and Repository State
+# Exact Next Task — DOC-011
+
+Document security and secret-handling guidance without expanding into the
+separate compatibility, stable public API reference, or final example-audit
+tasks.
+
+Required work:
+
+1. inspect configuration, `.env`, logging, CLI masking, provider error, example,
+   packaging, and repository surfaces that can expose credentials or sensitive
+   data
+2. distinguish local development, testing, continuous integration, and
+   production secret sources
+3. document safe environment-variable and secret-manager usage
+4. document what must not be committed, logged, printed, embedded in examples,
+   passed through prompts unnecessarily, or returned to untrusted clients
+5. document application ownership of access control, data classification,
+   provider retention choices, tool authorization, and incident response
+6. verify that current examples and documentation contain no real credentials
+7. keep the change limited to `DOC-011` unless review finds a release-blocking
+   security defect
+
+---
+
+# DOC-010 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
-docs/configuration.md
-docs/installation.md
+docs/error_handling.md
 docs/integrations.md
-examples/20_fastapi_integration.py
-examples/README.md
+docs/development/error_messages.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
 ```
 
-No runtime Python file, test file, package dependency, or ADR changed.
+No runtime Python file, test file, example, benchmark, package dependency, or
+ADR changed.
 
 Suggested focused commit:
 
@@ -1023,17 +1062,15 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    docs\configuration.md `
-    docs\installation.md `
+    docs\error_handling.md `
     docs\integrations.md `
-    examples\20_fastapi_integration.py `
-    examples\README.md `
+    docs\development\error_messages.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document framework and CLI integrations"
+git commit -m "docs: document exceptions and error handling"
 ```
 
 ---
@@ -1436,17 +1473,18 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `docs/requests.md`
-8. `docs/advanced_requests.md`
-9. `docs/retrieval.md`
-10. `docs/orchestration.md`
+7. `.env.example`
+8. `.gitignore`
+9. `docs/configuration.md`
+10. `docs/error_handling.md`
 11. `docs/integrations.md`
-12. `docs/development/error_messages.md`
-13. `ai/exceptions.py`
-14. production modules that raise or catch toolkit exceptions
-15. relevant exception, request, provider, framework, and CLI tests
+12. `ai/config.py`
+13. `ai/logger.py`
+14. `ai/cli/config_commands.py`
+15. provider adapters and examples that handle credentials or provider errors
+16. relevant configuration, logging, CLI, provider, and documentation tests
 
-Profiling evidence is not required for `DOC-010`.
+Profiling evidence is not required for `DOC-011`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1460,7 +1498,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-010 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-011 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

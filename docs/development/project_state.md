@@ -61,6 +61,7 @@ Completed PROD-003 documentation tasks:
 * DOC-007 Document embeddings, retrieval, and RAG
 * DOC-008 Document memory, agents, workflows, and orchestration
 * DOC-009 Document Django, FastAPI, and CLI integrations
+* DOC-010 Document exceptions and error handling
 
 Next active task:
 
@@ -71,7 +72,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-010 — Document exceptions and error handling
+DOC-011 — Document security and secret-handling guidance
 ```
 
 ---
@@ -151,6 +152,7 @@ DOC-010 — Document exceptions and error handling
 * example gallery
 * improved README documentation
 * error-message guidelines
+* public exception and error-handling guide
 * console command
 * configuration inspection commands
 * isolated benchmark suite
@@ -699,14 +701,15 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-010 — Document exceptions and error handling`.
+Begin `DOC-011 — Document security and secret-handling guidance`.
 
-Django, FastAPI, and command-line integrations are now verified and documented,
-including their configuration sources, sync and async helpers, dependency
-overrides, client-construction boundaries, CLI output and exit codes, and the
-distinction between structural checks and live provider requests. The next
-review should consolidate the toolkit exception hierarchy and application
-error-handling guidance.
+The public exception hierarchy and practical failure contracts are now verified
+and documented, including configuration, provider, parsing, structured repair,
+streaming, ordinary Python exceptions, workflow/orchestration result failures,
+framework propagation, logging, and CLI behavior. The next review should
+consolidate credential storage, secret exposure, logging, error-output,
+repository, example, and deployment guidance without changing unrelated
+runtime behavior.
 
 ---
 

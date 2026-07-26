@@ -442,8 +442,10 @@ Expected failures use toolkit-specific exceptions such as
 `AIConfigurationError`, `AIProviderError`, `AIJSONParseError`, and
 `AISchemaValidationError`.
 
-Detailed configuration, error-handling, and security guidance is part of the
-active Sprint 9 documentation work.
+See the [exception and error-handling guide](docs/error_handling.md) for the
+complete hierarchy, catch boundaries, repair and retry behavior, ordinary
+Python exceptions, failed result objects, framework propagation, and CLI error
+handling. Security and secret-handling guidance remains a separate concern.
 
 ## Examples
 
@@ -476,6 +478,7 @@ concerns in focused documents:
 | [Retrieval and RAG guide](docs/retrieval.md) | Embeddings, vector storage, retrieval, document loading, RAG responses, and grounding limits |
 | [Orchestration guide](docs/orchestration.md) | Memory, agents, workflows, multi-agent sequencing, state, and failure boundaries |
 | [Framework and CLI integration guide](docs/integrations.md) | Django settings, FastAPI dependencies and test overrides, CLI commands, output, and exit codes |
+| [Exception and error-handling guide](docs/error_handling.md) | Toolkit exception hierarchy, retry decisions, ordinary Python failures, failed result objects, and application catch boundaries |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |

@@ -67,6 +67,9 @@ The format loosely follows Keep a Changelog.
   multi-agent sequencing, result contracts, and failure boundaries
 * Focused integration guide covering Django settings and client helpers,
   FastAPI dependencies and test overrides, and CLI commands and exit behavior
+* Focused exception and error-handling guide covering the toolkit hierarchy,
+  application catch boundaries, retry decisions, ordinary Python exceptions,
+  result-based failures, framework propagation, and CLI behavior
 
 
 ### Improved
@@ -98,6 +101,9 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between framework configuration sources, client
   lifetimes, dependency overrides, structural CLI checks, and live provider
   requests
+* Clear distinction between classified toolkit exceptions, ordinary Python
+  failures, structured repair, provider retries, and failure-bearing result
+  objects
 * Clear ownership boundary between the FastAPI runtime extra, application-chosen
   ASGI servers, and test-client dependencies
 * Command-line secret-handling safeguards

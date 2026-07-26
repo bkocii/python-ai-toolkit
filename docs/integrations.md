@@ -194,7 +194,7 @@ and model access are checked only when the provider performs a request.
 
 Django decides how exceptions become HTTP responses, task failures, retries, or
 user-facing messages. Detailed toolkit exception guidance belongs to
-`DOC-010`.
+the [exception and error-handling guide](error_handling.md).
 
 ## FastAPI
 
@@ -454,4 +454,7 @@ checks, interactive setup, and shell completion remain future work.
 See the [installation guide](installation.md) for extras, the
 [configuration guide](configuration.md) for precedence and validation, the
 [provider guide](providers.md) for registration and capabilities, and the
-[request guide](requests.md) for request and result contracts.
+[request guide](requests.md) for request and result contracts. The
+[exception and error-handling guide](error_handling.md) documents framework
+propagation, CLI behavior, retry boundaries, and failures returned as result
+objects.

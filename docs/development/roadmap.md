@@ -1153,7 +1153,7 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-007 Document embeddings, retrieval, and RAG
 * [x] DOC-008 Document memory, agents, workflows, and orchestration
 * [x] DOC-009 Document Django, FastAPI, and CLI integrations
-* [ ] DOC-010 Document exceptions and error handling
+* [x] DOC-010 Document exceptions and error handling
 * [ ] DOC-011 Document security and secret-handling guidance
 * [ ] DOC-012 Document Python-version and provider compatibility
 * [ ] DOC-013 Create a stable public API reference
@@ -1572,6 +1572,59 @@ Next task:
 
 ```text
 DOC-010 — Document exceptions and error handling
+```
+
+#### DOC-010 — Exceptions and Error Handling
+
+Status: Completed
+
+Error behavior was reviewed against the public exception hierarchy, every
+production raise/catch boundary, request executors, provider adapters,
+configuration paths, structured parsing and repair, retrieval and document
+operations, orchestration primitives, framework integrations, CLI behavior,
+tests, architecture, and developer error-message guidance.
+
+Completed work:
+
+* added `docs/error_handling.md` as the focused public error-handling guide
+* documented the `AIError` hierarchy and the operation categories represented
+  by each concrete toolkit exception
+* documented narrow exception handling versus the common application boundary
+* documented configuration validation timing, unsupported provider behavior,
+  provider SDK translation, and preserved exception causes
+* distinguished structured-output repair from provider transport retries and
+  application recovery policy
+* documented ordinary `ValueError`, `FileNotFoundError`, file-system, Pydantic,
+  custom-provider, and business-policy exceptions outside `AIError`
+* documented lazy streaming failures and the possibility of partial output
+* documented raised request failures versus workflow and orchestration failure
+  result objects
+* documented framework propagation, CLI exit behavior, executor logging, and
+  application-owned exception-to-response mapping
+* updated the maintainer error-message guide with ordinary-exception and
+  exception-chaining rules
+* linked the guide from the README and integration documentation
+* verified guide examples, offline failure contracts, focused tests, Python
+  blocks, links, and the complete normal test suite
+
+Completion verification:
+
+```text
+Offline hierarchy, configuration, provider, parsing, vector, and workflow
+failure contracts passed
+226 focused error-surface tests passed
+33 Python blocks in the affected documents parsed
+51 repository-relative Markdown links passed
+269 normal tests passed
+```
+
+No runtime API, executable implementation, dependency, test, example,
+benchmark, or architectural contract changed.
+
+Next task:
+
+```text
+DOC-011 — Document security and secret-handling guidance
 ```
 
 ### Documentation Rules

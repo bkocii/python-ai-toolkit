@@ -2,6 +2,12 @@
 
 Errors are part of the toolkit's developer experience.
 
+This is a maintainer guide for designing exception messages inside the
+toolkit. Application users should begin with the
+[exceptions and error-handling guide](../error_handling.md), which documents
+the public hierarchy, catch boundaries, retry behavior, ordinary Python
+exceptions, and result-based failures.
+
 Every toolkit exception should help the developer understand:
 
 1. what went wrong
@@ -63,6 +69,10 @@ These messages do not help the developer solve the issue.
 
 Use the existing toolkit exception hierarchy.
 
+`AIError` is the common application catch boundary for classified toolkit
+failures. The concrete subclasses below should be used when the toolkit can
+identify the failure category.
+
 ### AIConfigurationError
 
 Use for invalid or missing toolkit configuration.
@@ -91,6 +101,40 @@ Use when the model response cannot be parsed as JSON.
 ### AISchemaValidationError
 
 Use when parsed JSON does not match the expected Pydantic schema.
+
+## Ordinary Python Exceptions
+
+Not every public failure should become an `AIError`.
+
+Keep ordinary exceptions when the failure belongs to ordinary Python or
+application input rather than toolkit configuration, provider communication,
+or structured response handling. Current examples include:
+
+- `ValueError` for blank prompts, workflow inputs, agent names, and vector
+  dimension mismatches
+- `FileNotFoundError` for missing document paths
+- native file-system exceptions for decoding, permissions, and reading
+- Pydantic `ValidationError` when application code constructs an invalid model
+- unexpected exceptions from defective custom provider implementations
+
+Do not wrap programming defects merely to make every exception inherit from
+`AIError`. A broad translation would hide the source of the problem and make
+retry decisions less reliable.
+
+## Preserve Causes
+
+When translating a known lower-level exception, preserve it with exception
+chaining:
+
+```python
+try:
+    provider_sdk_call()
+except ProviderSDKError as exc:
+    raise AIProviderError("Provider request failed.") from exc
+```
+
+The public message should identify the operation and suggest a correction when
+one is known. The chained cause keeps lower-level debugging context available.
 
 ## Rule of Thumb
 
