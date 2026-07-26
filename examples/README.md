@@ -463,6 +463,38 @@ process; it does not prove that optional capabilities or a live model are
 available. See the [provider guide](../docs/providers.md) for constructor,
 lifecycle, capability, and error boundaries.
 
+## 25 – Testing with a Fake Provider
+
+**File**
+
+```text
+25_testing_with_fake_provider.py
+```
+
+Demonstrates:
+
+* keeping application code dependent on `AIClient`
+* replacing provider construction only inside a test
+* returning deterministic structured data from a `BaseAIProvider` fake
+* exercising the real request executor and response parser
+* asserting application output and the prompt received by the fake
+* restoring factory behavior automatically without changing the registry
+* running without credentials, network access, or a live model
+
+Run the self-check directly:
+
+```bash
+python -m examples.25_testing_with_fake_provider
+```
+
+The placeholder key only satisfies structural configuration validation; it is
+never sent anywhere. In an application test suite, keep the factory patch
+inside a fixture or context manager and construct the client while that patch
+is active. The client retains the selected fake after construction.
+
+See the [provider guide](../docs/providers.md#testing-application-code-with-a-fake-provider)
+for the production-versus-test boundary.
+
 ## Running
 ```bash
 python -m examples.01_plain_text
@@ -493,3 +525,4 @@ python -m examples.01_plain_text
 22. Configuration CLI
 23. Explicit Configuration
 24. Custom Provider Registration
+25. Testing with a Fake Provider

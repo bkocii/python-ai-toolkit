@@ -342,3 +342,41 @@ def test_custom_provider_example_registers_and_runs_locally(
         output_tokens=5,
         total_tokens=9,
     )
+
+
+def test_fake_provider_example_tests_application_without_state_leaks(
+    monkeypatch,
+):
+    module = importlib.import_module("examples.25_testing_with_fake_provider")
+    registry_before = ProviderFactory.available_providers()
+
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+    monkeypatch.setenv("AI_API_KEY", "")
+    monkeypatch.setenv("AI_PROVIDER", "not-used-by-explicit-test-config")
+    monkeypatch.setenv("OPENAI_MODEL", "not-used-by-explicit-test-config")
+    monkeypatch.setattr(
+        "ai.client.get_ai_config",
+        lambda: pytest.fail("AIClient read environment configuration"),
+    )
+
+    fake_provider = module.FakeProvider(
+        {
+            "category": "billing",
+            "priority": "high",
+        }
+    )
+    client = module.build_test_client(fake_provider)
+    ticket = "I was charged twice for the same invoice."
+
+    classification = module.classify_support_ticket(client, ticket)
+
+    assert classification == module.TicketClassification(
+        category="billing",
+        priority="high",
+    )
+    assert len(fake_provider.prompts) == 1
+    assert "Classify this support ticket" in fake_provider.prompts[0]
+    assert ticket in fake_provider.prompts[0]
+    assert "Return valid JSON only." in fake_provider.prompts[0]
+    assert client.provider is fake_provider
+    assert ProviderFactory.available_providers() == registry_before

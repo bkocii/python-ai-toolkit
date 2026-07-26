@@ -113,6 +113,67 @@ Tests should isolate registry changes with fixtures such as pytest's
 `monkeypatch` rather than allowing a test registration to leak into later
 tests.
 
+## Testing application code with a fake provider
+
+Application services should accept an `AIClient` instead of importing a
+provider SDK. Tests can then replace `ProviderFactory.create()` only while the
+client is constructed:
+
+```python
+from unittest.mock import patch
+
+from ai.client import AIClient
+from ai.config import AIConfig
+from ai.config_validator import ConfigValidator
+from ai.providers.base import BaseAIProvider
+from ai.providers.factory import ProviderFactory
+from ai.schemas import ProviderResponse
+
+
+class FakeProvider(BaseAIProvider):
+    def ask_text(self, prompt: str) -> ProviderResponse:
+        return ProviderResponse(
+            text='{"category": "billing", "priority": "high"}'
+        )
+
+config = AIConfig(
+    provider="openai",
+    api_key="test-only-placeholder",
+    model="test-model",
+    file_logging_enabled=False,
+)
+ConfigValidator.validate(config)
+
+fake_provider = FakeProvider()
+
+with patch.object(ProviderFactory, "create", return_value=fake_provider):
+    client = AIClient(config=config)
+```
+
+The patch can end after client construction because the client retains the
+selected provider. Application code can then call the real `AIClient`, request
+executor, and structured parser while the fake returns controlled
+`ProviderResponse` values.
+
+This differs from custom-provider registration:
+
+- application production code remains unchanged
+- the fake exists only in the test
+- no class-level registry entry is added
+- the patch is restored automatically
+- no credential, network request, or live model is required
+
+Use an explicit, structurally valid test configuration. Its placeholder key is
+not a credential and must never leave the process; the factory patch must be
+active before `AIClient` is created. Assertions can cover application output,
+captured prompts, token metadata, structured validation, or controlled failure
+paths.
+
+The complete runnable example is
+[`examples/25_testing_with_fake_provider.py`](../examples/25_testing_with_fake_provider.py).
+It uses only the standard-library mock utility plus the toolkit's public
+interfaces.
+
 ## Constructor contract
 
 `ProviderFactory` constructs a registered provider with keyword arguments.

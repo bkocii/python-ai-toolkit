@@ -17,6 +17,9 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Fake-provider application testing example with scoped factory substitution
+* Regression coverage for deterministic structured application behavior,
+  captured prompts, explicit test configuration, and registry isolation
 * Custom provider registration example with a deterministic local provider
 * Regression coverage for process-local registration, factory construction,
   and plain-text execution through `AIClient`

@@ -12,7 +12,7 @@ The audit covers:
 - all focused public guides under `docs/`
 - `docs/api_reference.md`
 - `examples/README.md`
-- numbered example files 01 through 20 and 23 through 24
+- numbered example files 01 through 20 and 23 through 25
 - the Base64 image-helper variant
 - the command-line workflows
 
@@ -29,17 +29,17 @@ It does not add the new example topics assigned to `PROD-004`.
 
 ## Documentation Inventory
 
-The 14 user-facing Markdown files contain 206 fenced blocks after
-`EXAMPLE-002`.
+The 14 user-facing Markdown files contain 209 fenced blocks after
+`EXAMPLE-003`.
 
 | Block type | Count | Verification |
 | --- | ---: | --- |
-| Python | 80 | Executed in document order; intentional failure examples asserted |
-| Shell | 43 | Safe commands executed in isolated Linux environments; provider commands substituted |
+| Python | 81 | Executed in document order; intentional failure examples asserted |
+| Shell | 44 | Safe commands executed in isolated Linux environments; provider commands substituted |
 | PowerShell | 5 | Classified as Windows-dependent and inspected against the corresponding Linux workflow |
 | Environment configuration | 8 | Parsed and exercised through configuration and CLI tests |
 | TOML | 1 | Matched against `pyproject.toml` |
-| Output, signatures, and diagrams | 69 | Compared with current behavior and public contracts |
+| Output, signatures, and diagrams | 70 | Compared with current behavior and public contracts |
 
 All repository-relative links in the user-facing documentation resolve.
 
@@ -60,6 +60,7 @@ All repository-relative links in the user-facing documentation resolve.
 | 20 | Environment- and provider-dependent | FastAPI dependency override and endpoint response validation ran through `TestClient` |
 | 23 | Provider-dependent | Explicit configuration validation and injection ran with conflicting environment settings and a deterministic provider |
 | 24 | Executable | Process-local registration, factory construction, configuration validation, plain-text execution, and token metadata ran through the real client path |
+| 25 | Executable | Scoped factory substitution, explicit test configuration, structured parsing, prompt capture, and registry isolation ran without credentials or network access |
 | `hello_ai.py` and `drink_recommender.py` | Provider-dependent | Existing unnumbered examples also ran offline |
 
 The permanent regression tests live in:
@@ -80,6 +81,11 @@ not precede factory construction, configuration is not validated first, or the
 custom provider cannot complete a deterministic request through `AIClient`.
 The test replaces the class-level registry with a temporary copy so the example
 registration cannot leak into other tests.
+
+Example 25 has a fake-provider application regression: it fails if application
+logic bypasses `AIClient`, environment configuration is loaded, provider
+substitution leaks beyond construction, structured parsing is skipped, the
+application prompt does not reach the fake, or the provider registry changes.
 
 ## Command Workflows
 
@@ -159,6 +165,11 @@ pattern excluded.
 `EXAMPLE-002` later added `24_custom_provider.py`. Its focused Black and Ruff
 checks also pass with `N999` excluded. The example uses the public extension
 interfaces and makes no live provider request.
+
+`EXAMPLE-003` later added `25_testing_with_fake_provider.py`. Its focused Black
+and Ruff checks pass with `N999` excluded. The example uses scoped
+standard-library mocking and public toolkit interfaces; it neither registers a
+provider nor contacts a live service.
 
 Repository-wide cleanup and example naming normalization remain later roadmap
 work; they were not mixed into this documentation-verification task.

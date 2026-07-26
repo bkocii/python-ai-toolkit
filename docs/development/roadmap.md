@@ -1886,7 +1886,7 @@ Fill important example gaps required for a Version 1.0 release.
 
 * [x] EXAMPLE-001 Explicit `AIConfig` injection
 * [x] EXAMPLE-002 Custom provider registration
-* [ ] EXAMPLE-003 Testing application code with a fake provider
+* [x] EXAMPLE-003 Testing application code with a fake provider
 * [ ] EXAMPLE-004 Batch embedding and retrieval
 * [ ] EXAMPLE-005 End-to-end document indexing and RAG
 * [ ] EXAMPLE-006 Structured application service example
@@ -1979,6 +1979,48 @@ Next task:
 
 ```text
 EXAMPLE-003 — Testing application code with a fake provider
+```
+
+#### EXAMPLE-003 — Testing Application Code with a Fake Provider
+
+Status: Completed
+
+Completed work:
+
+* added `examples/25_testing_with_fake_provider.py` without renaming or
+  reassigning the existing 01 through 24 gallery entries
+* kept production application logic dependent on `AIClient`, not a provider
+  SDK or test double
+* implemented a deterministic `BaseAIProvider` fake that records prompts and
+  returns controlled structured JSON plus token metadata
+* patched `ProviderFactory.create()` only while constructing the test client,
+  then exercised the real request executor and structured parser
+* used validated explicit test configuration with a non-secret placeholder
+  while proving environment provider, model, and key values are ignored
+* asserted application output, prompt forwarding, selected provider identity,
+  and an unchanged process-local provider registry
+* linked the example from the gallery, learning path, README, and provider
+  guide
+* added permanent regression coverage for the no-credential, no-network, and
+  state-isolation contracts
+
+Completion verification:
+
+```text
+50 focused example, documentation, and provider-factory tests passed
+315 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+81 Python documentation blocks compiled
+142 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or
+architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-004 — Batch embedding and retrieval
 ```
 
 ### Exit Criteria

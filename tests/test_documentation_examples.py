@@ -105,6 +105,7 @@ def test_numbered_example_modules_exist():
         20: "20_fastapi_integration.py",
         23: "23_explicit_config.py",
         24: "24_custom_provider.py",
+        25: "25_testing_with_fake_provider.py",
     }
 
     for filename in expected_modules.values():

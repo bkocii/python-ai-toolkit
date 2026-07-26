@@ -72,6 +72,7 @@ Completed PROD-004 example tasks:
 
 * EXAMPLE-001 Explicit `AIConfig` injection
 * EXAMPLE-002 Custom provider registration
+* EXAMPLE-003 Testing application code with a fake provider
 
 Next active task:
 
@@ -82,7 +83,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-003 — Testing application code with a fake provider
+EXAMPLE-004 — Batch embedding and retrieval
 ```
 
 ---
@@ -711,13 +712,14 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-003 — Testing application code with a fake provider`.
+Begin `EXAMPLE-004 — Batch embedding and retrieval`.
 
-`EXAMPLE-002` added `examples/24_custom_provider.py` with a deterministic local
-provider, explicit process-local registration, validated configuration, and
-coverage of the real factory/client request path. The next task should teach
-application-level testing with a fake provider without changing production
-provider behavior or repeating the custom-registration example.
+`EXAMPLE-003` added `examples/25_testing_with_fake_provider.py`. Application
+logic remains provider-independent, while test code uses scoped factory
+substitution to exercise the real client, executor, and structured parser with
+a deterministic fake. The next task should demonstrate efficient batch
+embedding, vector storage, and retrieval without expanding into the complete
+document-indexing and RAG workflow reserved for `EXAMPLE-005`.
 
 ---
 

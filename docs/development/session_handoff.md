@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-003 — Testing application code with a fake provider`
+**Next task:** `EXAMPLE-004 — Batch embedding and retrieval`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-003`.
+The next task is `EXAMPLE-004`.
 
 ---
 
@@ -1257,29 +1257,66 @@ changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-003
+# EXAMPLE-003 Completion
 
-Add one focused example for testing application code with a fake provider.
+`EXAMPLE-003 — Testing application code with a fake provider` is complete.
+
+Completed work:
+
+1. added `examples/25_testing_with_fake_provider.py`
+2. kept application logic dependent only on `AIClient`
+3. added a deterministic `BaseAIProvider` fake with controlled structured
+   output, token metadata, and prompt capture
+4. patched `ProviderFactory.create()` only during client construction and let
+   the patch restore automatically
+5. exercised the real client, request executor, structured prompt builder, and
+   Pydantic parser without credentials or network access
+6. proved that explicit test configuration bypasses conflicting environment
+   values
+7. proved that no provider registration or registry-state leak occurs
+8. linked example 25 from the gallery, learning path, README, and provider
+   guide
+9. added permanent focused regressions for application output, prompt
+   forwarding, provider identity, environment bypass, and registry isolation
+
+Completion verification:
+
+```text
+50 focused example, documentation, and provider-factory tests passed
+315 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+209 fenced documentation blocks inventoried
+81 Python documentation blocks compiled
+142 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or ADR
+changed.
+
+---
+
+# Exact Next Task — EXAMPLE-004
+
+Add one focused example for batch embedding and retrieval.
 
 Required work:
 
-1. inspect the current client/provider seams, existing deterministic test
-   helpers, and example numbering before editing
-2. keep production application code provider-independent
-3. show a deterministic fake provider or equivalent supported injection seam
-   in application tests
-4. prove application behavior without credentials, network access, or a live
-   model
-5. isolate process-local registry or monkeypatch state so tests do not leak
-6. keep the example focused on application testing rather than repeating
-   custom-provider registration as the teaching goal
+1. inspect the current embedding, vector-store, retriever, deterministic test,
+   and example-numbering contracts before editing
+2. submit multiple texts in one `AIClient.embed_texts()` request
+3. preserve useful per-item metadata and embedding order
+4. add the resulting vectors to `InMemoryVectorStore` and retrieve relevant
+   records for an embedded query
+5. keep the workflow focused on batch embedding and retrieval rather than the
+   end-to-end document-indexing and RAG scope reserved for `EXAMPLE-005`
+6. prove the example deterministically without credentials or network access
 7. update the gallery and learning path
 8. run focused and full tests plus documentation/link checks
 9. update roadmap, project state, session handoff, and changelog
 
 ---
 
-# EXAMPLE-002 Verification and Repository State
+# EXAMPLE-003 Verification and Repository State
 
 Changed project files:
 
@@ -1291,7 +1328,7 @@ docs/development/example_verification.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
-examples/24_custom_provider.py
+examples/25_testing_with_fake_provider.py
 examples/README.md
 tests/test_documentation_examples.py
 tests/test_examples.py
@@ -1311,13 +1348,13 @@ git add `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md `
-    examples\24_custom_provider.py `
+    examples\25_testing_with_fake_provider.py `
     examples\README.md `
     tests\test_documentation_examples.py `
     tests\test_examples.py
 
 git diff --cached
-git commit -m "docs: add custom provider example"
+git commit -m "docs: add fake provider testing example"
 ```
 
 ---
@@ -1775,21 +1812,22 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `pyproject.toml`
 8. `ai/client.py`
-9. `ai/config.py`
-10. `ai/config_validator.py`
-11. `ai/providers/base.py`
-12. `ai/providers/factory.py`
+9. `ai/embeddings.py`
+10. `ai/vector_store.py`
+11. `ai/retriever.py`
+12. `ai/providers/base.py`
 13. `ai/schemas.py`
-14. `docs/providers.md`
+14. `docs/retrieval.md`
 15. `docs/api_reference.md`
 16. `docs/development/example_verification.md`
 17. the complete `examples/` directory
-18. `tests/test_client.py`
-19. `tests/test_examples.py`
-20. `tests/test_provider_factory.py`
+18. `tests/test_embeddings.py`
+19. `tests/test_vector_store.py`
+20. `tests/test_retriever.py`
+21. `tests/test_examples.py`
 
-Profiling evidence, benchmark artifacts, and unrelated later `PROD-004`
-example ideas are not required for `EXAMPLE-003`.
+Profiling evidence, benchmark artifacts, and the end-to-end document-indexing
+and RAG scope reserved for `EXAMPLE-005` are not required for `EXAMPLE-004`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1803,8 +1841,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-003 is still the correct next task.
-4. Confirm that EXAMPLE-002 added deterministic process-local provider registration through the real client path.
+3. Verify the repository's current state and confirm that EXAMPLE-004 is still the correct next task.
+4. Confirm that EXAMPLE-003 added isolated fake-provider application testing through the real client and structured parsing path.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
