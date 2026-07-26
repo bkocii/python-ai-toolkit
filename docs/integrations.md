@@ -466,4 +466,6 @@ framework, provider SDK, account, region, and model-capability boundaries. The
 propagation, CLI behavior, retry boundaries, and failures returned as result
 objects. The [security and secret-handling guide](security.md) covers
 credential sources, terminal output, HTTP exposure, logging, tenant isolation,
-and incident response.
+and incident response. The [public API reference](api_reference.md) lists the
+exact Django and FastAPI exports, dependency aliases, CLI commands, and exit
+codes.

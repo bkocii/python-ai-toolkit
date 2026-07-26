@@ -78,6 +78,9 @@ The format loosely follows Keep a Changelog.
 * Focused compatibility guide covering declared and verified Python versions,
   dependency resolution, provider SDK and model boundaries, optional
   frameworks, and contributor verification
+* Stable public API reference covering supported import paths, signatures,
+  typed models, extension interfaces, exceptions, lifecycle boundaries, and
+  Version 1.0 API-freeze review items
 
 
 ### Improved
@@ -120,6 +123,9 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between package installation, tested Python environments,
   dependency compatibility, provider adapters, SDKs, accounts, regions, and
   model capabilities
+* Clear distinction between supported public imports, compatibility helpers,
+  extension interfaces, implementation details, and importable names awaiting
+  Version 1.0 API-freeze decisions
 * Clear ownership boundary between the FastAPI runtime extra, application-chosen
   ASGI servers, and test-client dependencies
 * Command-line secret-handling safeguards

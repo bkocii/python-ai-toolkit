@@ -238,6 +238,8 @@ permissions, money, security, or irreversible actions.
 
 ## Related documentation
 
+- [Public API reference](api_reference.md) lists exact client, configuration,
+  result, parsing-helper, and exception contracts.
 - [Advanced requests](advanced_requests.md) covers streaming, async requests,
   tool calling, image inputs, and their different return contracts.
 - [Configuration](configuration.md) explains retry configuration and client

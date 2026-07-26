@@ -221,3 +221,6 @@ Those concerns should not be inferred from a name appearing in
 `available_providers()`. Registration also does not prove SDK compatibility,
 credential validity, account or regional access, or support for a capability
 by the selected model.
+
+See the [public API reference](api_reference.md) for the supported provider
+extension interface, factory signatures, and direct-adapter boundary.

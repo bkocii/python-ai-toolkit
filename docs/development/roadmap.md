@@ -1156,7 +1156,7 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-010 Document exceptions and error handling
 * [x] DOC-011 Document security and secret-handling guidance
 * [x] DOC-012 Document Python-version and provider compatibility
-* [ ] DOC-013 Create a stable public API reference
+* [x] DOC-013 Create a stable public API reference
 * [ ] DOC-014 Verify every documented example
 
 #### DOC-001 — README Structure Review
@@ -1750,6 +1750,60 @@ Next task:
 DOC-013 — Create a stable public API reference
 ```
 
+#### DOC-013 — Stable Public API Reference
+
+Status: Completed
+
+The supported public surface was reviewed against package exports, all
+application-facing classes and functions, typed models, abstract extension
+interfaces, exceptions, framework integrations, CLI entry points, focused
+guides, and contract tests.
+
+Completed work:
+
+* added `docs/api_reference.md` as the authoritative public-surface inventory
+* documented the current module-level import contract and the empty top-level
+  `ai` namespace
+* defined 71 supported symbols across clients, configuration, results, request
+  and prompt helpers, advanced inputs, retrieval, orchestration, providers,
+  integrations, exceptions, parsing, cost compatibility, and the CLI
+* documented signatures, parameters, return types, defaults, result fields,
+  raised toolkit exceptions, ordinary Python exceptions, lifecycle behavior,
+  mutable and volatile state, partial failures, and capability limits
+* retained `parse_json_response()` as the supported low-level parsing helper
+  already used by the error guide
+* retained `estimate_cost_usd()` as the compatibility function preserved by
+  the profiling work
+* explicitly excluded executors, structured-prompt and repair plumbing,
+  pre-resolved cost helpers, logger construction, direct built-in adapter use,
+  provider-SDK translation helpers, and private names
+* recorded top-level re-exports, automatic explicit-config validation, builder
+  construction, public client implementation attributes, direct provider
+  adapter imports, compatibility helpers, and importable undocumented names
+  for the Version 1.0 API-freeze review
+* linked the reference from the README and every focused public capability
+  guide
+
+Completion verification:
+
+```text
+71 documented public symbols imported
+key runtime signatures, enum values, defaults, and result properties matched
+239 focused public-surface tests passed
+80 Python blocks across README and focused public guides parsed
+130 repository-relative Markdown links passed
+271 normal tests passed on Linux with CPython 3.12.13
+```
+
+No runtime API, import path, executable implementation, package dependency,
+test, example, benchmark, or architectural contract changed.
+
+Next task:
+
+```text
+DOC-014 — Verify every documented example
+```
+
 ### Documentation Rules
 
 * Documentation must match the implemented public API.
@@ -1763,7 +1817,7 @@ DOC-013 — Create a stable public API reference
 * [ ] New users can install and make a first request
 * [ ] Advanced users can find all major capabilities
 * [ ] Integrations and optional dependencies are documented
-* [ ] Public APIs and exceptions are documented
+* [x] Public APIs and exceptions are documented
 * [ ] All documented code is verified
 
 ---
@@ -1937,6 +1991,15 @@ Before release, explicitly review:
 * CLI commands
 * whether client constructors should automatically validate explicitly supplied
   `AIConfig` objects
+* whether `ai.__init__` should provide curated top-level re-exports and
+  `__all__`
+* whether direct `AIRequestBuilder` construction should depend on the internal
+  `RequestExecutor`
+* whether visible client implementation attributes such as `provider` and
+  `executor` are supported contracts
+* whether built-in provider adapter classes are public or factory-only
+* whether `ImageRequest`, `normalize_path()`, `estimate_cost_usd()`, and other
+  importable low-level or compatibility names remain public in Version 1.0
 * advanced-request return contracts and their current request-metadata
   boundaries
 * whether capability discovery or preflight checks belong in the stable
@@ -1947,6 +2010,7 @@ Before release, explicitly review:
 * message-count memory limits, agent metadata exposure, workflow state and
   failed-step semantics, unknown-agent sequence lookup, and partial-execution
   result contracts
+* whether an empty `MultiAgentResponse` should report `success=True`
 
 ### Release Verification
 

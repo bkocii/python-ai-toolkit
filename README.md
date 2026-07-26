@@ -22,6 +22,7 @@ application business logic can remain in Python.
 - [Major capabilities](#major-capabilities)
 - [Examples](#examples)
 - [Documentation](#documentation)
+- [Public API reference](docs/api_reference.md)
 - [Development](#development)
 - [Project status](#project-status)
 
@@ -487,6 +488,7 @@ concerns in focused documents:
 
 | Document | Purpose |
 | --- | --- |
+| [Public API reference](docs/api_reference.md) | Supported import paths, signatures, models, exceptions, lifecycle boundaries, and Version 1.0 review items |
 | [Installation guide](docs/installation.md) | Local installation, optional extras, and contributor setup |
 | [Configuration guide](docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
 | [Provider guide](docs/providers.md) | Built-in provider, custom registration, constructor contract, capabilities, and errors |

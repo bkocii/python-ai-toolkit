@@ -311,6 +311,9 @@ removed quickly.
 
 ## Related documentation
 
+- [Public API reference](api_reference.md) identifies the supported surface and
+  the result, memory, tool, image, context, and raw-response objects that can
+  carry sensitive data.
 - [Configuration](configuration.md) explains credential resolution and
   explicit configuration.
 - [Advanced requests](advanced_requests.md) covers tools, images, and repair

@@ -470,6 +470,8 @@ contexts as traceability data rather than verified citations.
 
 ## Related documentation
 
+- [Public API reference](api_reference.md) lists exact embedding, vector-store,
+  retriever, document-loader, and RAG contracts.
 - [Configuration](configuration.md) covers embedding-model and dimension
   settings.
 - [Providers](providers.md) explains optional provider capabilities.

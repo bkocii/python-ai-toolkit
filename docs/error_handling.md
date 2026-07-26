@@ -431,6 +431,8 @@ protocol.
 
 ## Related documentation
 
+- [Public API reference](api_reference.md) lists the complete supported surface
+  and its raised-versus-returned failure boundaries.
 - [Configuration guide](configuration.md) explains structural validation and
   explicit configuration.
 - [Provider guide](providers.md) explains registration and optional capability

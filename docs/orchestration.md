@@ -512,6 +512,8 @@ See the [Version 1.0 review and Future Backlog](development/roadmap.md#future-ba
 
 ## Related documentation
 
+- [Public API reference](api_reference.md) lists exact memory, agent, workflow,
+  orchestrator, result-model, and extension-interface contracts.
 - [Plain and structured requests](requests.md)
 - [Advanced requests](advanced_requests.md)
 - [Embeddings, retrieval, and RAG](retrieval.md)

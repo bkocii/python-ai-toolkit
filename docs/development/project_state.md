@@ -64,6 +64,7 @@ Completed PROD-003 documentation tasks:
 * DOC-010 Document exceptions and error handling
 * DOC-011 Document security and secret-handling guidance
 * DOC-012 Document Python-version and provider compatibility
+* DOC-013 Create a stable public API reference
 
 Next active task:
 
@@ -74,7 +75,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-013 — Create a stable public API reference
+DOC-014 — Verify every documented example
 ```
 
 ---
@@ -703,14 +704,14 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-013 — Create a stable public API reference`.
+Begin `DOC-014 — Verify every documented example`.
 
-Python-version, dependency, provider, model, framework, proxy, and verification
-boundaries are now consolidated in `docs/compatibility.md`. The guide separates
-the declared Python `>=3.11` metadata from the planned 3.11–3.14 release matrix
-and from the current full-suite evidence on CPython 3.12.13. The next review
-should inventory and document the intended stable public API without changing
-runtime behavior or performing the separate final example audit.
+The intended supported surface is now consolidated in
+`docs/api_reference.md`. It defines module-level import paths, signatures,
+typed models, extension interfaces, exceptions, lifecycle boundaries, and
+explicit exclusions without changing runtime exports or behavior. The next
+task should execute every documented example and command, correct any
+documentation or example defects found, and complete `PROD-003`.
 
 ---
 

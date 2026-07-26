@@ -232,3 +232,6 @@ Use explicit configuration when:
 Keep credential storage outside source code. The
 [security and secret-handling guide](security.md) covers local, testing, CI,
 and production secret sources plus rotation, logging, and incident response.
+See the [public API reference](api_reference.md) for the exact configuration
+dataclasses, resolver functions, validators, defaults, and raised toolkit
+exceptions.

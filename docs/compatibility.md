@@ -277,3 +277,6 @@ Include:
 
 This evidence distinguishes a toolkit defect from a resolver, framework, SDK,
 account, region, or model-capability problem.
+
+See the [public API reference](api_reference.md) for the exact supported
+imports and signatures whose compatibility the release matrix must protect.

@@ -376,6 +376,8 @@ See the [Version 1.0 review and Future Backlog](development/roadmap.md#future-ba
 
 ## Related documentation
 
+- [Public API reference](api_reference.md) lists exact async, streaming, tool,
+  image, provider, and return-model contracts.
 - [Request guide](requests.md) explains `AIResult`, structured validation, and
   repair behavior.
 - [Provider guide](providers.md) explains registration and optional capability

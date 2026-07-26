@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-013 — Create a stable public API reference`
+**Next task:** `DOC-014 — Verify every documented example`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-013`.
+The next task is `DOC-014`.
 
 ---
 
@@ -1099,46 +1099,93 @@ core, CLI, Django, and FastAPI imports passed
 
 ---
 
-# Exact Next Task — DOC-013
+# DOC-013 — Stable Public API Reference
 
-Create a stable public API reference without changing the runtime API and
-without expanding into the separate final example-verification task.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect package exports, public classes, functions, methods, typed models,
-   protocols or abstract bases, exceptions, integrations, and CLI entry points
-2. define the intended public surface rather than documenting every internal
-   implementation helper
-3. document signatures, parameters, return types, raised toolkit exceptions,
-   important state and lifecycle behavior, and capability-specific limits
-4. preserve the distinctions already established in the focused guides instead
-   of duplicating their tutorials
-5. identify any ambiguous or accidentally public surface for the Version 1.0
-   API-freeze review rather than silently changing it in a documentation task
-6. link the reference from the README and relevant guides
-7. keep final execution of every documented example for `DOC-014`
+1. inspected package exports, public classes, functions, methods, typed models,
+   abstract extension interfaces, exceptions, integrations, CLI entry points,
+   tests, and focused capability guides
+2. added `docs/api_reference.md`
+3. defined 71 supported symbols across current module-level import paths
+4. documented exact client methods, configuration dataclasses, typed results,
+   provider and application extension interfaces, framework exports, CLI
+   commands, exception boundaries, and important lifecycle behavior
+5. retained `parse_json_response()` as the documented low-level parsing helper
+   and `estimate_cost_usd()` as the preserved compatibility helper
+6. explicitly excluded request executors, structured-prompt and repair
+   plumbing, pre-resolved cost helpers, logger construction, direct built-in
+   adapter construction, and private provider translation helpers
+7. recorded the empty top-level `ai` namespace, builder constructor,
+   client implementation attributes, direct adapter imports, and other
+   importable-but-undocumented names for the Version 1.0 API freeze
+8. linked the reference from the README and every focused public capability
+   guide
+9. changed no runtime API, import path, implementation, dependency, test,
+   example, benchmark, or ADR
+
+Completion verification:
+
+```text
+71 documented public symbols imported
+key runtime signatures, enum values, defaults, and result properties matched
+239 focused public-surface tests passed
+80 Python blocks across README and focused public guides parsed
+130 repository-relative Markdown links passed
+271 normal tests passed on Linux with CPython 3.12.13
+```
 
 ---
 
-# DOC-012 Verification and Repository State
+# Exact Next Task — DOC-014
+
+Verify every documented example without expanding into the later additional
+examples roadmap item.
+
+Required work:
+
+1. inventory every Python, shell, PowerShell, Django, FastAPI, and CLI example
+   in the README, focused guides, API reference, and example gallery
+2. classify examples as executable, environment-dependent, provider-dependent,
+   or intentionally illustrative
+3. execute all deterministic examples and commands in an isolated environment
+4. verify provider-dependent examples with deterministic substitutes where
+   possible and keep live provider smoke tests explicit
+5. verify example files 01 through 20 and the documented CLI workflows
+6. correct any documentation, example, test, or narrow runtime defect found
+   by execution, without adding unrelated examples from `PROD-004`
+7. run the full normal suite and applicable documentation/link checks
+8. update the roadmap, project state, session handoff, and changelog
+
+---
+
+# DOC-013 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
+docs/api_reference.md
+docs/advanced_requests.md
 docs/compatibility.md
-docs/installation.md
-docs/providers.md
+docs/configuration.md
+docs/error_handling.md
 docs/integrations.md
+docs/orchestration.md
+docs/providers.md
+docs/requests.md
+docs/retrieval.md
+docs/security.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
 ```
 
-No runtime API, executable implementation, dependency, test, example,
-benchmark, or ADR changed.
+No runtime API, import path, executable implementation, dependency, test,
+example, benchmark, or ADR changed.
 
 Suggested focused commit:
 
@@ -1146,16 +1193,23 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
+    docs\api_reference.md `
+    docs\advanced_requests.md `
     docs\compatibility.md `
-    docs\installation.md `
-    docs\providers.md `
+    docs\configuration.md `
+    docs\error_handling.md `
     docs\integrations.md `
+    docs\orchestration.md `
+    docs\providers.md `
+    docs\requests.md `
+    docs\retrieval.md `
+    docs\security.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md
 
 git diff --cached
-git commit -m "docs: document compatibility"
+git commit -m "docs: add public API reference"
 ```
 
 ---
@@ -1564,17 +1618,15 @@ For the immediate next task, also provide:
 
 6. `README.md`
 7. `pyproject.toml`
-8. all focused public guides under `docs/`
-9. `ai/__init__.py`
-10. client, configuration, result, request-builder, and exception modules
-11. tool, image, embedding, vector-store, retriever, RAG, document, memory,
-    agent, workflow, and orchestrator modules
-12. provider base class, factory, and built-in adapter
-13. Django and FastAPI integration exports and implementations
-14. tests that assert public signatures, return types, and error contracts
+8. `docs/api_reference.md`
+9. all focused public guides under `docs/`
+10. the complete `examples/` directory
+11. the production `ai/` package
+12. deterministic providers and fixtures used to run examples offline
+13. relevant integration and CLI tests
 
-Profiling evidence and generated benchmark artifacts are not required for
-`DOC-013`.
+Profiling evidence, benchmark artifacts, and new `PROD-004` example ideas are
+not required for `DOC-014`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1588,8 +1640,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-013 is still the correct next task.
-4. Confirm that PROD-002 closed with its profiling report and no public API change.
+3. Verify the repository's current state and confirm that DOC-014 is still the correct next task.
+4. Confirm that DOC-013 defined the intended public surface without changing runtime imports or behavior.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
