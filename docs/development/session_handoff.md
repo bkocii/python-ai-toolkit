@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-005 — End-to-end document indexing and RAG`
+**Next task:** `EXAMPLE-006 — Structured application service example`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-005`.
+The next task is `EXAMPLE-006`.
 
 ---
 
@@ -1333,31 +1333,71 @@ changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-005
+# EXAMPLE-005 Completion
 
-Add one end-to-end example for document indexing and grounded RAG.
+`EXAMPLE-005 — End-to-end document indexing and RAG` is complete.
+
+Completed work:
+
+1. added `examples/27_document_indexing_and_rag.py`
+2. loaded the existing `.txt` and `.md` sample files through
+   `DirectoryLoader` using a module-relative path
+3. explicitly added stable application-owned IDs and collection metadata
+4. converted prepared documents through `documents_to_embedding_inputs()`
+5. embedded all documents in one batch and restored input order from
+   `EmbeddingVector.index`
+6. preserved loader, source, filename, record, and collection metadata in
+   `VectorRecord`
+7. indexed records in `InMemoryVectorStore`, retrieved the Redis document,
+   and generated one grounded answer through `RAGPipeline`
+8. kept chunking, persistent storage, access policy, citation verification,
+   and indexing orchestration out of toolkit scope
+9. linked example 27 from the gallery, complete learning path, README, and
+   retrieval guide
+10. added deterministic regression coverage for the complete loader-to-answer
+    workflow, including reversed embedding results and grounded prompt contents
+
+Completion verification:
+
+```text
+104 focused document, embedding, vector-store, retriever, RAG, example, and documentation tests passed
+319 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+214 fenced documentation blocks inventoried
+81 Python documentation blocks compiled
+147 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or ADR
+changed.
+
+---
+
+# Exact Next Task — EXAMPLE-006
+
+Add one framework-independent structured application service example.
 
 Required work:
 
-1. inspect the current document-loader, embedding, vector-store, retriever,
-   RAG, deterministic test, and example-numbering contracts before editing
-2. load the existing sample documents through the public document-loader API
-3. convert documents into embedding inputs without introducing an automatic
-   chunking or indexing helper
-4. batch embed the prepared documents and create stable, metadata-preserving
-   vector records
-5. store the records, retrieve relevant contexts, and generate one grounded
-   answer through `RAGPipeline`
-6. keep document preparation and application-owned IDs explicit
-7. prove the complete workflow deterministically without credentials or
-   network access
-8. update the gallery, learning path, retrieval guide, and README
+1. inspect the current structured-request, Pydantic-model, client-injection,
+   deterministic-test, and example-numbering contracts before editing
+2. add the next numbered example without renaming existing examples
+3. keep the application service dependent on `AIClient`, not a provider SDK
+4. define a small application-owned input flow, prompt, and validated Pydantic
+   response model
+5. keep domain rules and decisions in application code rather than adding a
+   toolkit service abstraction
+6. demonstrate explicit dependency injection suitable for frameworks,
+   background jobs, or ordinary Python applications
+7. prove the complete service workflow deterministically without credentials
+   or network access
+8. update the gallery, learning path, request guide, and README
 9. run focused and full tests plus documentation/link checks
 10. update roadmap, project state, session handoff, and changelog
 
 ---
 
-# EXAMPLE-004 Verification and Repository State
+# EXAMPLE-005 Verification and Repository State
 
 Changed project files:
 
@@ -1369,7 +1409,7 @@ docs/development/example_verification.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
-examples/26_batch_embedding_and_retrieval.py
+examples/27_document_indexing_and_rag.py
 examples/README.md
 tests/test_documentation_examples.py
 tests/test_examples.py
@@ -1389,13 +1429,13 @@ git add `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md `
-    examples\26_batch_embedding_and_retrieval.py `
+    examples\27_document_indexing_and_rag.py `
     examples\README.md `
     tests\test_documentation_examples.py `
     tests\test_examples.py
 
 git diff --cached
-git commit -m "docs: add batch retrieval example"
+git commit -m "docs: add end-to-end RAG example"
 ```
 
 ---
@@ -1853,26 +1893,24 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `pyproject.toml`
 8. `ai/client.py`
-9. `ai/embeddings.py`
-10. `ai/vector_store.py`
-11. `ai/retriever.py`
-12. `ai/documents.py`
-13. `ai/rag.py`
+9. `ai/config.py`
+10. `ai/config_validator.py`
+11. `ai/executor.py`
+12. `ai/structured.py`
+13. `ai/schemas.py`
 14. `ai/providers/base.py`
-15. `ai/schemas.py`
-16. `docs/retrieval.md`
-17. `docs/api_reference.md`
-18. `docs/development/example_verification.md`
-19. the complete `examples/` directory, including `sample_docs/`
-20. `tests/test_documents.py`
-21. `tests/test_embeddings.py`
-22. `tests/test_vector_store.py`
-23. `tests/test_retriever.py`
-24. `tests/test_rag.py`
-25. `tests/test_examples.py`
+15. `docs/requests.md`
+16. `docs/api_reference.md`
+17. `docs/development/example_verification.md`
+18. the complete `examples/` directory
+19. `tests/test_client.py`
+20. `tests/test_executor.py`
+21. `tests/test_structured.py`
+22. `tests/test_examples.py`
 
-Profiling evidence, benchmark artifacts, automatic chunking, and a new
-high-level document-indexing helper are not required for `EXAMPLE-005`.
+Framework-specific integration changes, a new toolkit application-service
+abstraction, profiling evidence, and benchmark artifacts are not required for
+`EXAMPLE-006`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1886,8 +1924,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-005 is still the correct next task.
-4. Confirm that EXAMPLE-004 added one-request batch embedding, index-based ordering, metadata-preserving vector storage, and deterministic retrieval.
+3. Verify the repository's current state and confirm that EXAMPLE-006 is still the correct next task.
+4. Confirm that EXAMPLE-005 added explicit document preparation, stable IDs, one-request batch indexing, grounded RAG generation, and deterministic end-to-end verification.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

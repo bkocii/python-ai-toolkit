@@ -17,6 +17,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* End-to-end document indexing and grounded RAG example with explicit document
+  preparation, stable IDs, batch-order restoration, retrieval, and source
+  contexts
+* Deterministic regression coverage for the complete loader-to-answer workflow
+  without credentials or network access
 * Batch embedding and retrieval example with input-order restoration, stable
   record IDs, metadata preservation, vector storage, and filtered retrieval
 * Deterministic regression coverage for one-request batch embedding,

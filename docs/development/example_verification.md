@@ -12,7 +12,7 @@ The audit covers:
 - all focused public guides under `docs/`
 - `docs/api_reference.md`
 - `examples/README.md`
-- numbered example files 01 through 20 and 23 through 26
+- numbered example files 01 through 20 and 23 through 27
 - the Base64 image-helper variant
 - the command-line workflows
 
@@ -29,17 +29,17 @@ It does not add the new example topics assigned to `PROD-004`.
 
 ## Documentation Inventory
 
-The 14 user-facing Markdown files contain 211 fenced blocks after
-`EXAMPLE-004`.
+The 14 user-facing Markdown files contain 214 fenced blocks after
+`EXAMPLE-005`.
 
 | Block type | Count | Verification |
 | --- | ---: | --- |
 | Python | 81 | Executed in document order; intentional failure examples asserted |
-| Shell | 45 | Safe commands executed in isolated Linux environments; provider commands substituted |
+| Shell | 47 | Safe commands executed in isolated Linux environments; provider commands substituted |
 | PowerShell | 5 | Classified as Windows-dependent and inspected against the corresponding Linux workflow |
 | Environment configuration | 8 | Parsed and exercised through configuration and CLI tests |
 | TOML | 1 | Matched against `pyproject.toml` |
-| Output, signatures, and diagrams | 71 | Compared with current behavior and public contracts |
+| Output, signatures, and diagrams | 72 | Compared with current behavior and public contracts |
 
 All repository-relative links in the user-facing documentation resolve.
 
@@ -62,6 +62,7 @@ All repository-relative links in the user-facing documentation resolve.
 | 24 | Executable | Process-local registration, factory construction, configuration validation, plain-text execution, and token metadata ran through the real client path |
 | 25 | Executable | Scoped factory substitution, explicit test configuration, structured parsing, prompt capture, and registry isolation ran without credentials or network access |
 | 26 | Provider-dependent | One metadata-bearing embedding batch, input-order restoration, vector storage, query embedding, filtering, and relevant-context ranking ran with a deterministic substitute |
+| 27 | Provider-dependent | Document loading, explicit preparation, stable IDs, one embedding batch, vector storage, retrieval, grounded prompt construction, answer generation, and source contexts ran with a deterministic substitute |
 | `hello_ai.py` and `drink_recommender.py` | Provider-dependent | Existing unnumbered examples also ran offline |
 
 The permanent regression tests live in:
@@ -94,6 +95,13 @@ position instead of `EmbeddingVector.index`, stable IDs or metadata are lost,
 the query is not embedded separately, or the caching context is not ranked
 first. The provider substitute deliberately reverses the returned knowledge
 embeddings and makes no network request.
+
+Example 27 has an end-to-end document RAG regression: it fails if the existing
+sample files are not loaded through the public loader, document preparation or
+stable IDs are lost, indexing uses more than one batch, returned embedding
+order is trusted, the Redis file is not retrieved first, the grounding prompt
+omits the question or context, or the deterministic answer and source metadata
+do not survive the complete workflow.
 
 ## Command Workflows
 
@@ -183,6 +191,11 @@ provider nor contacts a live service.
 Black and Ruff checks pass with `N999` excluded. The example uses the public
 embedding, in-memory vector-store, and retriever contracts; deterministic
 verification requires neither credentials nor a live provider.
+
+`EXAMPLE-005` later added `27_document_indexing_and_rag.py`. Its focused Black
+and Ruff checks pass with `N999` excluded. The example composes the public
+loader, embedding, vector-store, retriever, and RAG contracts without adding
+automatic chunking or a high-level indexing API.
 
 Repository-wide cleanup and example naming normalization remain later roadmap
 work; they were not mixed into this documentation-verification task.

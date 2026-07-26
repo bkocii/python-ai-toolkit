@@ -376,7 +376,10 @@ boundaries, RAG metadata, and grounding limitations.
 
 See examples
 [10 through 14](examples/README.md#10--embeddings) for the complete progression
-from embeddings to document-backed RAG.
+from embeddings to document-backed RAG. The release-focused
+[end-to-end indexing example](examples/27_document_indexing_and_rag.py) adds
+stable document IDs, batch-order restoration, and deterministic verification
+of the complete grounded-answer workflow.
 
 ### Memory, agents, and workflows
 
@@ -481,6 +484,7 @@ The [example gallery](examples/README.md) provides a numbered learning path:
 | Custom provider registration | 24 |
 | Testing application code with a fake provider | 25 |
 | Batch embedding and retrieval | 26 |
+| End-to-end document indexing and RAG | 27 |
 
 Network-dependent examples require valid provider configuration. The examples
 remain application-focused and keep business logic intentionally small.

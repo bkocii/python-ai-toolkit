@@ -30,8 +30,11 @@ class DeterministicExampleProvider:
     def __init__(self):
         self.embedding_requests = []
         self.reverse_embedding_results = False
+        self.text_prompts = []
 
     def ask_text(self, prompt: str) -> ProviderResponse:
+        self.text_prompts.append(prompt)
+
         return ProviderResponse(
             text=self._response_text(prompt),
             token_usage=self.token_usage,
@@ -145,6 +148,12 @@ class DeterministicExampleProvider:
                 }
             )
 
+        if (
+            "using only the context below" in prompt
+            and "Which technology should I use for caching?" in prompt
+        ):
+            return "Redis is the technology to use for caching."
+
         return "Deterministic example response."
 
 
@@ -190,6 +199,7 @@ def deterministic_provider(monkeypatch):
         "examples.18_multi_agent_orchestration",
         "examples.23_explicit_config",
         "examples.26_batch_embedding_and_retrieval",
+        "examples.27_document_indexing_and_rag",
         "examples.hello_ai",
         "examples.drink_recommender",
     ],
@@ -426,3 +436,43 @@ def test_batch_embedding_and_retrieval_uses_one_ordered_batch(
     assert store.count() == 3
     assert contexts[0].id == "redis-cache"
     assert contexts[0].metadata["topic"] == "caching"
+
+
+def test_document_indexing_and_rag_runs_complete_grounded_workflow(
+    deterministic_provider,
+):
+    module = importlib.import_module("examples.27_document_indexing_and_rag")
+    deterministic_provider.reverse_embedding_results = True
+    client = module.AIClient()
+    store = module.InMemoryVectorStore()
+    question = "Which technology should I use for caching?"
+
+    records = module.index_documents(client, store)
+    response = module.answer_question(client, store, question)
+
+    assert len(deterministic_provider.embedding_requests) == 2
+    assert [
+        item.metadata["filename"]
+        for item in deterministic_provider.embedding_requests[0]
+    ] == [
+        "jango.md",
+        "postgres.txt",
+        "redis.md",
+    ]
+    assert len(deterministic_provider.embedding_requests[0]) == 3
+    assert len(deterministic_provider.embedding_requests[1]) == 1
+    assert [record.id for record in records] == [
+        "sample-docs/jango.md",
+        "sample-docs/postgres.txt",
+        "sample-docs/redis.md",
+    ]
+    assert all(record.metadata["collection"] == "sample-docs" for record in records)
+    assert records[2].metadata["loader"] == "MarkdownFileLoader"
+    assert store.count() == 3
+    assert response.answer == "Redis is the technology to use for caching."
+    assert response.contexts[0].id == "sample-docs/redis.md"
+    assert response.contexts[0].metadata["filename"] == "redis.md"
+    assert len(deterministic_provider.text_prompts) == 1
+    assert "using only the context below" in deterministic_provider.text_prompts[0]
+    assert "Redis is often used as a cache" in deterministic_provider.text_prompts[0]
+    assert question in deterministic_provider.text_prompts[0]

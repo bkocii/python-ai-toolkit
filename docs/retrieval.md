@@ -404,6 +404,27 @@ one-call indexing helper. Embedding an entire file as one vector may reduce
 retrieval quality or exceed a provider's input limit. Applications should
 prepare appropriately sized text units before embedding.
 
+The
+[end-to-end document indexing and RAG
+example](../examples/27_document_indexing_and_rag.py) keeps that preparation
+visible. It loads the existing sample files, adds application-owned IDs and
+collection metadata, converts them through
+`documents_to_embedding_inputs()`, restores a deliberately out-of-order
+embedding batch by `EmbeddingVector.index`, stores the records, and generates
+one grounded answer through `RAGPipeline`.
+
+Running the example normally requires configured provider credentials plus
+embedding- and text-generation-capable models:
+
+```bash
+python -m examples.27_document_indexing_and_rag
+```
+
+Its deterministic regression exercises the same loader-to-answer control flow
+without credentials or network access. The example deliberately does not add
+automatic chunking, a high-level indexing helper, persistent vector storage,
+or verified citation generation.
+
 ## Build a RAG pipeline
 
 `RAGPipeline` combines a text-generation client with any `BaseRetriever`:
@@ -488,7 +509,8 @@ contexts as traceability data rather than verified citations.
 - [Requests](requests.md) documents the underlying `AIResult` contract.
 - [Security and secret handling](security.md) covers document authorization,
   tenant isolation, sensitive embeddings, retention, and provider policy.
-- [Example gallery](../examples/README.md) contains examples 10 through 14.
+- [Example gallery](../examples/README.md) contains the numbered retrieval
+  progression and release-focused examples 26 and 27.
 - [Architecture](architecture/architecture.md) describes the retrieval layers.
 - [ADR-0010](architecture/decisions/0010-provider-independent-rag-abstractions.md)
   records the provider-independent RAG design.

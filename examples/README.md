@@ -529,6 +529,44 @@ See the [retrieval and RAG guide](../docs/retrieval.md) for embedding-index
 correlation, vector-store limits, retrieval scores, and provider capability
 boundaries.
 
+## 27 – End-to-End Document Indexing and RAG
+
+**File**
+
+```text
+27_document_indexing_and_rag.py
+```
+
+Demonstrates:
+
+* loading the existing `.txt` and `.md` sample files through `DirectoryLoader`
+* explicitly adding stable application IDs and collection metadata
+* converting prepared documents through `documents_to_embedding_inputs()`
+* embedding all documents in one batch and restoring input order by index
+* preserving loader and source metadata in `VectorRecord`
+* retrieving relevant documents through `VectorStoreRetriever`
+* generating one grounded answer and returning its source contexts through
+  `RAGPipeline`
+
+Run with valid provider configuration and models supporting both embeddings
+and text generation:
+
+```bash
+python -m examples.27_document_indexing_and_rag
+```
+
+The automated regression substitutes a deterministic provider, reverses the
+document embedding results, and verifies the complete loader-to-answer
+workflow without credentials or network access.
+
+Each sample file remains one document. Document chunking, persistent vector
+storage, access policy, and stable ID design for a production corpus are
+application responsibilities; this example keeps those boundaries visible
+rather than introducing a high-level indexing helper.
+
+See the [retrieval and RAG guide](../docs/retrieval.md) for document-preparation,
+grounding, source-context, and in-memory storage boundaries.
+
 ## Running
 ```bash
 python -m examples.01_plain_text
@@ -561,11 +599,4 @@ python -m examples.01_plain_text
 24. Custom Provider Registration
 25. Testing with a Fake Provider
 26. Batch Embedding and Retrieval
-18. Multi-Agent Orchestration
-19. Django Integration
-20. FastAPI Integration
-21. Command-Line Interface
-22. Configuration CLI
-23. Explicit Configuration
-24. Custom Provider Registration
-25. Testing with a Fake Provider
+27. End-to-End Document Indexing and RAG

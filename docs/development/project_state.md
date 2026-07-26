@@ -74,6 +74,7 @@ Completed PROD-004 example tasks:
 * EXAMPLE-002 Custom provider registration
 * EXAMPLE-003 Testing application code with a fake provider
 * EXAMPLE-004 Batch embedding and retrieval
+* EXAMPLE-005 End-to-end document indexing and RAG
 
 Next active task:
 
@@ -84,7 +85,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-005 — End-to-end document indexing and RAG
+EXAMPLE-006 — Structured application service example
 ```
 
 ---
@@ -713,15 +714,15 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-005 — End-to-end document indexing and RAG`.
+Begin `EXAMPLE-006 — Structured application service example`.
 
-`EXAMPLE-004` added `examples/26_batch_embedding_and_retrieval.py`. It submits
-one metadata-bearing embedding batch, restores input order from returned
-indexes, stores stable application records, and retrieves filtered contexts
-through the public retriever contract. The next task should compose document
-loading, explicit indexing, retrieval, and grounded answer generation into one
-end-to-end workflow without introducing an automatic indexing helper or
-chunking API.
+`EXAMPLE-005` added `examples/27_document_indexing_and_rag.py`. It loads the
+existing sample files, adds application-owned IDs and collection metadata,
+batch embeds and indexes them, retrieves the Redis document, and generates one
+grounded answer through `RAGPipeline`. The next task should demonstrate a
+small, framework-independent application service that returns a validated
+structured model while keeping prompts and business decisions in application
+code.
 
 ---
 

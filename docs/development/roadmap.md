@@ -1888,7 +1888,7 @@ Fill important example gaps required for a Version 1.0 release.
 * [x] EXAMPLE-002 Custom provider registration
 * [x] EXAMPLE-003 Testing application code with a fake provider
 * [x] EXAMPLE-004 Batch embedding and retrieval
-* [ ] EXAMPLE-005 End-to-end document indexing and RAG
+* [x] EXAMPLE-005 End-to-end document indexing and RAG
 * [ ] EXAMPLE-006 Structured application service example
 * [ ] EXAMPLE-007 Review and normalize all example descriptions
 * [ ] EXAMPLE-008 Verify all examples against current APIs
@@ -2065,6 +2065,53 @@ Next task:
 
 ```text
 EXAMPLE-005 — End-to-end document indexing and RAG
+```
+
+#### EXAMPLE-005 — End-to-End Document Indexing and RAG
+
+Status: Completed
+
+Completed work:
+
+* added `examples/27_document_indexing_and_rag.py` without renaming or
+  reassigning the existing 01 through 26 gallery entries
+* loaded the existing `.txt` and `.md` sample files through `DirectoryLoader`
+  using a module-relative path that works independently of the current working
+  directory
+* kept document preparation explicit by adding application-owned stable IDs
+  and collection metadata before `documents_to_embedding_inputs()`
+* submitted all prepared documents in one embedding batch and restored input
+  order from `EmbeddingVector.index`
+* preserved loader, filename, source, record, and collection metadata in
+  `VectorRecord`
+* composed `InMemoryVectorStore`, `VectorStoreRetriever`, and `RAGPipeline` to
+  retrieve Redis context and generate one grounded answer
+* kept chunking, persistent storage, access policy, citation verification, and
+  high-level indexing orchestration application-owned
+* linked the example from the gallery, complete learning path, README, and
+  retrieval guide
+* added deterministic regression coverage for the complete loader-to-answer
+  workflow, reversed embedding results, grounded prompt contents, answer data,
+  and returned source metadata
+
+Completion verification:
+
+```text
+104 focused document, embedding, vector-store, retriever, RAG, example, and documentation tests passed
+319 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+214 fenced documentation blocks inventoried
+81 Python documentation blocks compiled
+147 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or
+architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-006 — Structured application service example
 ```
 
 ### Exit Criteria

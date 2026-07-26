@@ -107,6 +107,7 @@ def test_numbered_example_modules_exist():
         24: "24_custom_provider.py",
         25: "25_testing_with_fake_provider.py",
         26: "26_batch_embedding_and_retrieval.py",
+        27: "27_document_indexing_and_rag.py",
     }
 
     for filename in expected_modules.values():
