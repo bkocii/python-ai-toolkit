@@ -24,6 +24,7 @@ Completed Sprint 9 tasks:
 
 * PROD-001 Benchmark Suite
 * PROD-002 Performance Profiling
+* PROD-003 Complete Documentation
 
 Completed PROD-001 benchmark tasks:
 
@@ -65,17 +66,18 @@ Completed PROD-003 documentation tasks:
 * DOC-011 Document security and secret-handling guidance
 * DOC-012 Document Python-version and provider compatibility
 * DOC-013 Create a stable public API reference
+* DOC-014 Verify every documented example
 
 Next active task:
 
 ```text
-PROD-003 — Complete Documentation
+PROD-004 — Additional Examples
 ```
 
 Next roadmap task:
 
 ```text
-DOC-014 — Verify every documented example
+EXAMPLE-001 — Explicit AIConfig injection
 ```
 
 ---
@@ -597,10 +599,10 @@ Completed:
 
 * PROD-001 Benchmark Suite
 * PROD-002 Performance Profiling
+* PROD-003 Complete Documentation
 
 Remaining:
 
-* PROD-003 Complete Documentation
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
 * PROD-006 Release Automation
@@ -699,19 +701,19 @@ docs/development/performance_profiling.md
 The next active roadmap item is:
 
 ```text
-PROD-003 — Complete Documentation
+PROD-004 — Additional Examples
 ```
 
 ### Next Recommended Focus
 
-Begin `DOC-014 — Verify every documented example`.
+Begin `EXAMPLE-001 — Explicit AIConfig injection`.
 
-The intended supported surface is now consolidated in
-`docs/api_reference.md`. It defines module-level import paths, signatures,
-typed models, extension interfaces, exceptions, lifecycle boundaries, and
-explicit exclusions without changing runtime exports or behavior. The next
-task should execute every documented example and command, correct any
-documentation or example defects found, and complete `PROD-003`.
+`PROD-003` is complete. Every user-facing code block and current numbered
+example is verified, with deterministic regression coverage and explicit live
+provider boundaries recorded in
+`docs/development/example_verification.md`. The next task should add the first
+missing Version 1.0 example without redesigning the configuration API or
+combining unrelated `PROD-004` items.
 
 ---
 

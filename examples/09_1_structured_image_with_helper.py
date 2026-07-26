@@ -1,8 +1,16 @@
 import base64
 from pathlib import Path
 
+from pydantic import BaseModel
+
 from ai.client import AIClient
 from ai.images import ImageInput, ImageInputType
+
+
+class ImageDescription(BaseModel):
+    subject: str
+    colors: list[str]
+    visible_text: str | None = None
 
 
 def image_file_to_data_url(path: str) -> str:
@@ -37,11 +45,16 @@ def main() -> None:
     )
 
     result = ai.ask_with_images(
-        prompt="Describe this image in one short paragraph.",
+        prompt="Extract structured information from this image.",
         images=[image],
+        response_type=ImageDescription,
     )
 
     print(result.data)
+    print()
+    print(f"Subject: {result.data.subject}")
+    print(f"Colors: {', '.join(result.data.colors)}")
+    print(f"Visible text: {result.data.visible_text}")
 
 
 if __name__ == "__main__":

@@ -2,7 +2,12 @@
 
 This directory contains small, self-contained examples demonstrating how to use the Python AI Toolkit.
 
-## 01 – Summarize Text
+The [documented example verification record](../docs/development/example_verification.md)
+explains which workflows run offline, which use deterministic provider
+substitutes, and which still require a real provider or platform-specific
+environment.
+
+## 01 – Plain Text Request
 
 - file: `01_plain_text.py`
 - creating an AIClient
@@ -105,8 +110,9 @@ The local-file variant is:
 ```
 
 It demonstrates converting a local JPEG, PNG, or WebP file into a Base64 data
-URL before constructing `ImageInput`. Local-path reading is example application
-code, not a built-in `ImageInput` feature.
+URL before constructing `ImageInput`, then validating a structured
+`ImageDescription`. Local-path reading is example application code, not a
+built-in `ImageInput` feature.
 
 ---
 
@@ -391,11 +397,11 @@ provider boundaries.
 
 ## Running
 ```bash
-python -m examples.01_summarize_text
+python -m examples.01_plain_text
 ```
 
 ## Learning Path
-1. Summarize Text
+1. Plain Text Request
 2. Extract Structured Data
 3. Builder Usage
 4. Prompt Templates

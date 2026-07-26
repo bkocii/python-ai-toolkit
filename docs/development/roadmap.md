@@ -1157,7 +1157,7 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-011 Document security and secret-handling guidance
 * [x] DOC-012 Document Python-version and provider compatibility
 * [x] DOC-013 Create a stable public API reference
-* [ ] DOC-014 Verify every documented example
+* [x] DOC-014 Verify every documented example
 
 #### DOC-001 — README Structure Review
 
@@ -1804,6 +1804,60 @@ Next task:
 DOC-014 — Verify every documented example
 ```
 
+#### DOC-014 — Documented Example Verification
+
+Status: Completed
+
+Every user-facing code and command block was inventoried across the README,
+focused guides, API reference, and example gallery. The results and execution
+boundaries are recorded in
+`docs/development/example_verification.md`.
+
+Completed work:
+
+* classified 201 fenced blocks as executable, provider-dependent,
+  environment-dependent, or intentionally illustrative
+* executed all 80 Python blocks in document order with deterministic provider
+  behavior where required
+* added offline regression coverage for numbered examples 01 through 20, the
+  Base64 helper variant, the two existing unnumbered examples, Django, and
+  FastAPI
+* verified core, Django, FastAPI, contributor, benchmark, CLI, and Uvicorn
+  command workflows in isolated environments
+* kept live provider verification explicit instead of treating fake responses
+  as proof of credentials, account access, or model capability
+* corrected the gallery's nonexistent `examples.01_summarize_text` command
+* aligned example 01's title with its plain-request behavior
+* made the Base64 image-helper example validate a structured response
+* made the async `ask_text()` snippet independently valid
+* added the missing `Document` import to the retrieval guide
+* added permanent Python-block, link, gallery-reference, and deterministic
+  example regression tests
+* preserved the later `PROD-004` scope for new example topics and naming
+  normalization
+
+Completion verification:
+
+```text
+201 documented fenced blocks inventoried
+80 Python documentation blocks executed
+40 focused documentation and example tests passed
+core, Django, and FastAPI clean installations passed
+CLI configuration and Uvicorn target checks passed
+9 benchmarks passed; 4 infrastructure tests skipped
+311 normal tests passed on Linux with CPython 3.12.13
+136 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, package dependency, public import
+path, benchmark, or architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-001 — Explicit AIConfig injection
+```
+
 ### Documentation Rules
 
 * Documentation must match the implemented public API.
@@ -1814,11 +1868,11 @@ DOC-014 — Verify every documented example
 
 ### Exit Criteria
 
-* [ ] New users can install and make a first request
-* [ ] Advanced users can find all major capabilities
-* [ ] Integrations and optional dependencies are documented
+* [x] New users can install and make a first request
+* [x] Advanced users can find all major capabilities
+* [x] Integrations and optional dependencies are documented
 * [x] Public APIs and exceptions are documented
-* [ ] All documented code is verified
+* [x] All documented code is verified
 
 ---
 

@@ -119,7 +119,8 @@ async def summarize(client: AsyncAIClient, text: str) -> str:
 Use `await client.ask_text(prompt)` when only the response string is needed:
 
 ```python
-text = await client.ask_text("Explain dependency injection briefly.")
+async def ask_plain_text(client: AsyncAIClient) -> str:
+    return await client.ask_text("Explain dependency injection briefly.")
 ```
 
 ### Async structured responses

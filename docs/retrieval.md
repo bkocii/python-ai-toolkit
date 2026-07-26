@@ -350,6 +350,8 @@ and blank files produce no document.
 Every loaded `Document` contains:
 
 ```python
+from ai.documents import Document
+
 Document(
     text="...",
     metadata={

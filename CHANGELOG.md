@@ -10,6 +10,11 @@ The format loosely follows Keep a Changelog.
 * Python 3.11-compatible multiple-exception handling in `RequestExecutor`
 * Structured parse and schema errors no longer include raw provider responses
   that could be copied into exception logs
+* Corrected the example-gallery command to use the existing
+  `examples.01_plain_text` module
+* Added the missing `Document` import to the retrieval-guide example
+* Aligned the Base64 image-helper example with its documented structured-image
+  behavior
 
 ### Added
 * Explicit `AIConfig` injection for `AIClient`
@@ -81,6 +86,8 @@ The format loosely follows Keep a Changelog.
 * Stable public API reference covering supported import paths, signatures,
   typed models, extension interfaces, exceptions, lifecycle boundaries, and
   Version 1.0 API-freeze review items
+* Documented-example verification record and deterministic example regression
+  tests
 
 
 ### Improved
@@ -126,6 +133,10 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between supported public imports, compatibility helpers,
   extension interfaces, implementation details, and importable names awaiting
   Version 1.0 API-freeze decisions
+* Verified user-facing Python snippets, numbered examples, installation paths,
+  framework workflows, CLI commands, and documentation links
+* Made the asynchronous `ask_text()` example independently valid inside an
+  async function
 * Clear ownership boundary between the FastAPI runtime extra, application-chosen
   ASGI servers, and test-client dependencies
 * Command-line secret-handling safeguards

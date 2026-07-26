@@ -5,8 +5,8 @@
 **Project:** Python AI Toolkit  
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
-**Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-014 — Verify every documented example`
+**Active roadmap item:** `PROD-004 — Additional Examples`  
+**Next task:** `EXAMPLE-001 — Explicit AIConfig injection`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-014`.
+The next task is `EXAMPLE-001`.
 
 ---
 
@@ -1139,53 +1139,93 @@ key runtime signatures, enum values, defaults, and result properties matched
 
 ---
 
-# Exact Next Task — DOC-014
+# DOC-014 Completion
 
-Verify every documented example without expanding into the later additional
-examples roadmap item.
+`DOC-014 — Verify every documented example` is complete, which also completes
+`PROD-003 — Complete Documentation`.
 
-Required work:
+Completed work:
 
-1. inventory every Python, shell, PowerShell, Django, FastAPI, and CLI example
-   in the README, focused guides, API reference, and example gallery
-2. classify examples as executable, environment-dependent, provider-dependent,
-   or intentionally illustrative
-3. execute all deterministic examples and commands in an isolated environment
-4. verify provider-dependent examples with deterministic substitutes where
-   possible and keep live provider smoke tests explicit
-5. verify example files 01 through 20 and the documented CLI workflows
-6. correct any documentation, example, test, or narrow runtime defect found
-   by execution, without adding unrelated examples from `PROD-004`
-7. run the full normal suite and applicable documentation/link checks
-8. update the roadmap, project state, session handoff, and changelog
+1. inventoried 201 fenced blocks across the README, focused guides, API
+   reference, and example gallery
+2. executed all 80 Python blocks in document order, including asserted failure
+   examples
+3. verified numbered examples 01 through 20, the Base64 helper variant, and
+   the two existing unnumbered examples with deterministic provider behavior
+4. verified Django service use, FastAPI dependency overrides, CLI
+   configuration commands, Uvicorn target loading, and clean core/framework
+   installations
+5. added permanent regression tests for examples, Python blocks, relative
+   links, gallery references, and numbered modules
+6. corrected the wrong example 01 run command and title
+7. made the Base64 helper's behavior match its structured-image name
+8. corrected the async `ask_text()` fragment and retrieval `Document` import
+9. kept live provider verification explicit because deterministic substitutes
+   do not prove credentials, account access, regions, or model capabilities
+10. recorded the complete classification and boundaries in
+    `docs/development/example_verification.md`
+
+Completion verification:
+
+```text
+201 fenced blocks inventoried
+80 Python documentation blocks executed
+40 focused documentation and example tests passed
+core, Django, and FastAPI clean installations passed
+CLI configuration and Uvicorn target checks passed
+9 benchmarks passed; 4 infrastructure tests skipped
+311 normal tests passed on Linux with CPython 3.12.13
+136 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, package dependency, public import
+path, benchmark, or ADR changed.
 
 ---
 
-# DOC-013 Verification and Repository State
+# Exact Next Task — EXAMPLE-001
+
+Add one focused example for explicit `AIConfig` injection.
+
+Required work:
+
+1. inspect the current `AIConfig`, `ConfigValidator`, `AIClient`, configuration
+   guide, API reference, and existing numbered examples
+2. choose the next available example number without renaming the existing
+   gallery during this task
+3. demonstrate application-supplied configuration without reading `.env`
+   values for the client
+4. call `ConfigValidator.validate(config)` before creating the client, matching
+   the current documented contract
+5. keep credentials as placeholders or injected values and preserve the
+   security guide's secret-handling rules
+6. add the example to `examples/README.md` and the learning path
+7. extend deterministic example regression coverage
+8. run the focused and full suites plus documentation/link checks
+9. update roadmap, project state, session handoff, and changelog
+
+---
+
+# DOC-014 Verification and Repository State
 
 Changed project files:
 
 ```text
-README.md
 CHANGELOG.md
-docs/api_reference.md
 docs/advanced_requests.md
-docs/compatibility.md
-docs/configuration.md
-docs/error_handling.md
-docs/integrations.md
-docs/orchestration.md
-docs/providers.md
-docs/requests.md
 docs/retrieval.md
-docs/security.md
+docs/development/example_verification.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
+examples/09_1_structured_image_with_helper.py
+examples/README.md
+tests/test_documentation_examples.py
+tests/test_examples.py
 ```
 
-No runtime API, import path, executable implementation, dependency, test,
-example, benchmark, or ADR changed.
+No production runtime API, provider adapter, package dependency, public import
+path, benchmark, or ADR changed.
 
 Suggested focused commit:
 
@@ -1618,15 +1658,18 @@ For the immediate next task, also provide:
 
 6. `README.md`
 7. `pyproject.toml`
-8. `docs/api_reference.md`
-9. all focused public guides under `docs/`
-10. the complete `examples/` directory
-11. the production `ai/` package
-12. deterministic providers and fixtures used to run examples offline
-13. relevant integration and CLI tests
+8. `ai/config.py`
+9. `ai/config_validator.py`
+10. `ai/client.py`
+11. `docs/configuration.md`
+12. `docs/api_reference.md`
+13. `docs/security.md`
+14. `docs/development/example_verification.md`
+15. the complete `examples/` directory
+16. `tests/test_examples.py`
 
-Profiling evidence, benchmark artifacts, and new `PROD-004` example ideas are
-not required for `DOC-014`.
+Profiling evidence, benchmark artifacts, and unrelated later `PROD-004`
+example ideas are not required for `EXAMPLE-001`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1640,8 +1683,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-014 is still the correct next task.
-4. Confirm that DOC-013 defined the intended public surface without changing runtime imports or behavior.
+3. Verify the repository's current state and confirm that EXAMPLE-001 is still the correct next task.
+4. Confirm that DOC-014 completed PROD-003 and added deterministic example regression coverage.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
