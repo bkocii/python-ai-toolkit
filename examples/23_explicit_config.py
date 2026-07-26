@@ -32,7 +32,7 @@ def build_ai_client(api_key: str) -> AIClient:
 
 
 def main() -> None:
-    api_key = os.environ.get("EXAMPLE_AI_API_KEY")
+    api_key = os.environ.get("OPENAI_API_KEY")
 
     if not api_key:
         raise RuntimeError(

@@ -1885,7 +1885,7 @@ Fill important example gaps required for a Version 1.0 release.
 ### Tasks
 
 * [x] EXAMPLE-001 Explicit `AIConfig` injection
-* [ ] EXAMPLE-002 Custom provider registration
+* [x] EXAMPLE-002 Custom provider registration
 * [ ] EXAMPLE-003 Testing application code with a fake provider
 * [ ] EXAMPLE-004 Batch embedding and retrieval
 * [ ] EXAMPLE-005 End-to-end document indexing and RAG
@@ -1938,6 +1938,47 @@ Next task:
 
 ```text
 EXAMPLE-002 — Custom provider registration
+```
+
+#### EXAMPLE-002 — Custom Provider Registration
+
+Status: Completed
+
+Completed work:
+
+* added `examples/24_custom_provider.py` without renaming or reassigning the
+  existing 01 through 23 gallery entries
+* implemented a deterministic `LocalEchoProvider` with the required
+  `api_key`, `model`, and synchronous `ask_text()` contracts
+* registered the exact `local_echo` name before client construction
+* selected the custom provider with an explicit, structurally validated
+  `AIConfig`
+* exercised the real factory, client, executor, `ProviderResponse`, and token
+  metadata path without credentials or network access
+* documented process-local registry lifetime and the distinction between
+  registration and optional or live capability support
+* linked the example from the gallery, learning path, README, and provider
+  guide
+* added isolated regression coverage for registration, validation order,
+  provider construction, response data, model metadata, and token usage
+
+Completion verification:
+
+```text
+49 focused example, documentation, and provider-factory tests passed
+314 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+80 Python documentation blocks compiled
+140 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or
+architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-003 — Testing application code with a fake provider
 ```
 
 ### Exit Criteria

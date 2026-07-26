@@ -478,6 +478,7 @@ The [example gallery](examples/README.md) provides a numbered learning path:
 | Django and FastAPI | 19–20 |
 | Command-line usage and configuration | 21–22 |
 | Explicit application configuration | 23 |
+| Custom provider registration | 24 |
 
 Network-dependent examples require valid provider configuration. The examples
 remain application-focused and keep business logic intentionally small.

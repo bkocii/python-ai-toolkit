@@ -433,6 +433,36 @@ The [configuration guide](../docs/configuration.md#explicit-aiconfig) explains
 why explicit values are not merged with `.env` and why manual validation is
 currently required.
 
+## 24 – Custom Provider Registration
+
+**File**
+
+```text
+24_custom_provider.py
+```
+
+Demonstrates:
+
+* implementing the required `BaseAIProvider.ask_text()` method
+* accepting the factory's required `api_key` and `model` constructor arguments
+* registering an exact provider name before client construction
+* selecting the registered provider through an explicit `AIConfig`
+* validating configuration before passing it to `AIClient`
+* returning `ProviderResponse` and token-usage metadata
+* running deterministically without a credential or network request
+
+Run the example directly:
+
+```bash
+python -m examples.24_custom_provider
+```
+
+The example implements synchronous plain text only. A provider appearing in
+`ProviderFactory.available_providers()` is registered in the current Python
+process; it does not prove that optional capabilities or a live model are
+available. See the [provider guide](../docs/providers.md) for constructor,
+lifecycle, capability, and error boundaries.
+
 ## Running
 ```bash
 python -m examples.01_plain_text
@@ -462,3 +492,4 @@ python -m examples.01_plain_text
 21. Command-Line Interface
 22. Configuration CLI
 23. Explicit Configuration
+24. Custom Provider Registration

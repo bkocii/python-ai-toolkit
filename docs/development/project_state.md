@@ -71,6 +71,7 @@ Completed PROD-003 documentation tasks:
 Completed PROD-004 example tasks:
 
 * EXAMPLE-001 Explicit `AIConfig` injection
+* EXAMPLE-002 Custom provider registration
 
 Next active task:
 
@@ -81,7 +82,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-002 — Custom provider registration
+EXAMPLE-003 — Testing application code with a fake provider
 ```
 
 ---
@@ -710,13 +711,13 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-002 — Custom provider registration`.
+Begin `EXAMPLE-003 — Testing application code with a fake provider`.
 
-`EXAMPLE-001` added `examples/23_explicit_config.py` with manual structural
-validation, application-owned secret injection, and deterministic proof that a
-supplied `AIConfig` bypasses environment-based provider and model resolution.
-The next task should add one focused custom-provider registration example
-without combining the later fake-provider testing task.
+`EXAMPLE-002` added `examples/24_custom_provider.py` with a deterministic local
+provider, explicit process-local registration, validated configuration, and
+coverage of the real factory/client request path. The next task should teach
+application-level testing with a fake provider without changing production
+provider behavior or repeating the custom-registration example.
 
 ---
 

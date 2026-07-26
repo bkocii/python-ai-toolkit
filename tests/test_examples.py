@@ -302,3 +302,43 @@ def test_explicit_config_example_uses_validated_supplied_values(
         module.build_ai_client(" ")
 
     assert len(observed_configs) == 1
+
+
+def test_custom_provider_example_registers_and_runs_locally(
+    monkeypatch,
+):
+    module = importlib.import_module("examples.24_custom_provider")
+    events = []
+    validate = module.ConfigValidator.validate
+    create = module.ProviderFactory.create.__func__
+
+    monkeypatch.setattr(
+        ProviderFactory,
+        "_registry",
+        ProviderFactory._registry.copy(),
+    )
+    monkeypatch.setattr(
+        module.ConfigValidator,
+        "validate",
+        staticmethod(lambda config: events.append("validate") or validate(config)),
+    )
+    monkeypatch.setattr(
+        module.ProviderFactory,
+        "create",
+        classmethod(lambda cls, config: events.append("create") or create(cls, config)),
+    )
+
+    assert module.PROVIDER_NAME not in ProviderFactory.available_providers()
+
+    client = module.build_ai_client()
+    result = client.ask("Hello from the application.")
+
+    assert events == ["validate", "create"]
+    assert module.PROVIDER_NAME in ProviderFactory.available_providers()
+    assert result.data == "[local-echo-v1] Hello from the application."
+    assert result.model == "local-echo-v1"
+    assert result.token_usage == TokenUsage(
+        input_tokens=4,
+        output_tokens=5,
+        total_tokens=9,
+    )

@@ -17,6 +17,9 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Custom provider registration example with a deterministic local provider
+* Regression coverage for process-local registration, factory construction,
+  and plain-text execution through `AIClient`
 * Explicit `AIConfig` injection example with application-owned secret lookup
 * Deterministic regression coverage for explicit configuration precedence and
   pre-client validation

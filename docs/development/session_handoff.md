@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-002 — Custom provider registration`
+**Next task:** `EXAMPLE-003 — Testing application code with a fake provider`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-002`.
+The next task is `EXAMPLE-003`.
 
 ---
 
@@ -1220,25 +1220,105 @@ changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-002
+# EXAMPLE-002 Completion
 
-Add one focused example for custom provider registration.
+`EXAMPLE-002 — Custom provider registration` is complete.
+
+Completed work:
+
+1. added `examples/24_custom_provider.py`
+2. preserved all existing gallery numbers and assigned the next Python example
+   number
+3. implemented `LocalEchoProvider` with the factory's required constructor and
+   the abstract synchronous plain-text method
+4. registered `local_echo` before client construction
+5. selected it with an explicit `AIConfig` validated before `AIClient`
+   construction
+6. returned deterministic response and token-usage metadata without a
+   credential or network request
+7. documented that registration is process-local and does not prove optional
+   capabilities or live provider/model support
+8. added isolated regression coverage for registry state, validation order,
+   factory construction, and the complete plain-text client path
+
+Completion verification:
+
+```text
+49 focused example, documentation, and provider-factory tests passed
+314 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+206 fenced documentation blocks inventoried
+80 Python documentation blocks compiled
+140 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or ADR
+changed.
+
+---
+
+# Exact Next Task — EXAMPLE-003
+
+Add one focused example for testing application code with a fake provider.
 
 Required work:
 
-1. inspect `BaseAIProvider`, `ProviderFactory`, `AIConfig`, provider
-   documentation, the API reference, and current example numbering
-2. add the next focused example without renaming existing gallery entries
-3. implement the smallest illustrative custom provider that satisfies the
-   current constructor and abstract-method contracts
-4. register it through `ProviderFactory.register()` before client construction
-5. validate the explicit configuration before passing it to `AIClient`
-6. distinguish process-local registration from live capability support
-7. avoid mixing in `EXAMPLE-003` application testing patterns beyond the
-   deterministic regression coverage needed for this example
-8. update the gallery and learning path
-9. run focused and full tests plus documentation/link checks
-10. update roadmap, project state, session handoff, and changelog
+1. inspect the current client/provider seams, existing deterministic test
+   helpers, and example numbering before editing
+2. keep production application code provider-independent
+3. show a deterministic fake provider or equivalent supported injection seam
+   in application tests
+4. prove application behavior without credentials, network access, or a live
+   model
+5. isolate process-local registry or monkeypatch state so tests do not leak
+6. keep the example focused on application testing rather than repeating
+   custom-provider registration as the teaching goal
+7. update the gallery and learning path
+8. run focused and full tests plus documentation/link checks
+9. update roadmap, project state, session handoff, and changelog
+
+---
+
+# EXAMPLE-002 Verification and Repository State
+
+Changed project files:
+
+```text
+README.md
+CHANGELOG.md
+docs/providers.md
+docs/development/example_verification.md
+docs/development/roadmap.md
+docs/development/project_state.md
+docs/development/session_handoff.md
+examples/24_custom_provider.py
+examples/README.md
+tests/test_documentation_examples.py
+tests/test_examples.py
+```
+
+No production runtime API, provider adapter, package dependency, benchmark, or
+ADR changed.
+
+Suggested focused commit:
+
+```powershell
+git add `
+    README.md `
+    CHANGELOG.md `
+    docs\providers.md `
+    docs\development\example_verification.md `
+    docs\development\roadmap.md `
+    docs\development\project_state.md `
+    docs\development\session_handoff.md `
+    examples\24_custom_provider.py `
+    examples\README.md `
+    tests\test_documentation_examples.py `
+    tests\test_examples.py
+
+git diff --cached
+git commit -m "docs: add custom provider example"
+```
 
 ---
 
@@ -1694,22 +1774,22 @@ For the immediate next task, also provide:
 
 6. `README.md`
 7. `pyproject.toml`
-8. `ai/config.py`
-9. `ai/config_validator.py`
-10. `ai/client.py`
+8. `ai/client.py`
+9. `ai/config.py`
+10. `ai/config_validator.py`
 11. `ai/providers/base.py`
 12. `ai/providers/factory.py`
 13. `ai/schemas.py`
 14. `docs/providers.md`
 15. `docs/api_reference.md`
-16. `docs/security.md`
-17. `docs/development/example_verification.md`
-18. the complete `examples/` directory
+16. `docs/development/example_verification.md`
+17. the complete `examples/` directory
+18. `tests/test_client.py`
 19. `tests/test_examples.py`
 20. `tests/test_provider_factory.py`
 
 Profiling evidence, benchmark artifacts, and unrelated later `PROD-004`
-example ideas are not required for `EXAMPLE-002`.
+example ideas are not required for `EXAMPLE-003`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1723,8 +1803,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-002 is still the correct next task.
-4. Confirm that EXAMPLE-001 added validated explicit configuration injection and deterministic precedence coverage.
+3. Verify the repository's current state and confirm that EXAMPLE-003 is still the correct next task.
+4. Confirm that EXAMPLE-002 added deterministic process-local provider registration through the real client path.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

@@ -71,6 +71,11 @@ print(result.data)
 
 This example is deterministic and makes no network request.
 
+For the same workflow as a complete runnable module, see
+[`examples/24_custom_provider.py`](../examples/24_custom_provider.py). It uses
+the real factory and client request lifecycle while keeping the provider local
+and deterministic.
+
 Registration changes the factory registry, not environment configuration.
 Applications using environment-based configuration must both register the
 implementation and select the same name:

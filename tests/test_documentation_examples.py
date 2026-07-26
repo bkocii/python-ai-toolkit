@@ -104,6 +104,7 @@ def test_numbered_example_modules_exist():
         19: "19_django_integration.py",
         20: "20_fastapi_integration.py",
         23: "23_explicit_config.py",
+        24: "24_custom_provider.py",
     }
 
     for filename in expected_modules.values():
