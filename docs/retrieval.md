@@ -474,6 +474,8 @@ contexts as traceability data rather than verified citations.
   settings.
 - [Providers](providers.md) explains optional provider capabilities.
 - [Requests](requests.md) documents the underlying `AIResult` contract.
+- [Security and secret handling](security.md) covers document authorization,
+  tenant isolation, sensitive embeddings, retention, and provider policy.
 - [Example gallery](../examples/README.md) contains examples 10 through 14.
 - [Architecture](architecture/architecture.md) describes the retrieval layers.
 - [ADR-0010](architecture/decisions/0010-provider-independent-rag-abstractions.md)

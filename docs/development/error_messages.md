@@ -102,6 +102,11 @@ Use when the model response cannot be parsed as JSON.
 
 Use when parsed JSON does not match the expected Pydantic schema.
 
+Structured-response exceptions may be written by executor exception logging.
+Do not include the raw provider response in either exception message. The
+caller can inspect `AIResult.raw_response` only after a successful request;
+failed response bodies must not be copied into ordinary logs.
+
 ## Ordinary Python Exceptions
 
 Not every public failure should become an `AIError`.
@@ -124,7 +129,7 @@ retry decisions less reliable.
 ## Preserve Causes
 
 When translating a known lower-level exception, preserve it with exception
-chaining:
+chaining unless that cause can expose protected request or response content:
 
 ```python
 try:
@@ -135,6 +140,12 @@ except ProviderSDKError as exc:
 
 The public message should identify the operation and suggest a correction when
 one is known. The chained cause keeps lower-level debugging context available.
+
+JSON parsing and Pydantic response validation are deliberate exceptions to the
+general chaining rule because their exception objects can retain or render the
+rejected provider response. Raise the toolkit parse or schema exception
+`from None` so ordinary executor traceback logging does not disclose that
+content.
 
 ## Rule of Thumb
 

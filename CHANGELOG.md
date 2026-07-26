@@ -8,6 +8,8 @@ The format loosely follows Keep a Changelog.
 ### Fixed
 
 * Python 3.11-compatible multiple-exception handling in `RequestExecutor`
+* Structured parse and schema errors no longer include raw provider responses
+  that could be copied into exception logs
 
 ### Added
 * Explicit `AIConfig` injection for `AIClient`
@@ -70,6 +72,9 @@ The format loosely follows Keep a Changelog.
 * Focused exception and error-handling guide covering the toolkit hierarchy,
   application catch boundaries, retry decisions, ordinary Python exceptions,
   result-based failures, framework propagation, and CLI behavior
+* Focused security and secret-handling guide covering environment-specific
+  credential sources, sensitive request and result data, provider governance,
+  logging, tool authorization, multi-tenant boundaries, and incident response
 
 
 ### Improved
@@ -104,6 +109,11 @@ The format loosely follows Keep a Changelog.
 * Clear distinction between classified toolkit exceptions, ordinary Python
   failures, structured repair, provider retries, and failure-bearing result
   objects
+* Repository safeguards for local `.env.*` files while keeping
+  `.env.example` tracked
+* Clear distinction between toolkit safeguards and application-owned secret
+  storage, data access, provider policy, output filtering, and incident
+  response
 * Clear ownership boundary between the FastAPI runtime extra, application-chosen
   ASGI servers, and test-client dependencies
 * Command-line secret-handling safeguards

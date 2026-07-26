@@ -238,6 +238,13 @@ executor catches these two exceptions and may request a corrected response.
 When `max_retries` is exhausted, the final parse or schema exception is
 re-raised and no `AIResult` is returned.
 
+The parse and schema exception messages identify the failure category without
+including the raw provider response. This prevents the executor's exception
+logging from copying a malformed response body into the normal toolkit log.
+Because JSON and Pydantic validation failures hold the rejected response, the
+toolkit suppresses those content-bearing lower-level causes at this boundary.
+Applications should preserve that boundary in their own exception mapping.
+
 Repair does not apply to:
 
 - plain-text requests
@@ -437,5 +444,7 @@ protocol.
   partial state.
 - [Framework and CLI guide](integrations.md) explains framework propagation and
   CLI exit codes.
+- [Security and secret-handling guide](security.md) explains safe public error
+  mapping, log exposure, secret rotation, and incident response.
 - [Developer error-message guidelines](development/error_messages.md) define
   the style expected when toolkit maintainers add or change errors.

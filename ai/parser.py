@@ -14,14 +14,12 @@ def parse_json_response(raw_response: str, response_type: type[T]) -> T:
     """
     try:
         data = json.loads(raw_response)
-    except json.JSONDecodeError as exc:
-        raise AIJSONParseError(
-            f"AI response was not valid JSON: {raw_response}"
-        ) from exc
+    except json.JSONDecodeError:
+        raise AIJSONParseError("AI response was not valid JSON.") from None
 
     try:
         return response_type.model_validate(data)
-    except ValidationError as exc:
+    except ValidationError:
         raise AISchemaValidationError(
-            f"AI response did not match schema: {raw_response}"
-        ) from exc
+            "AI response did not match the requested schema."
+        ) from None

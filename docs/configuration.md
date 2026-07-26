@@ -229,5 +229,6 @@ Use explicit configuration when:
 - one process needs multiple clients with different settings
 - an application factory constructs dependencies explicitly
 
-Keep credential storage outside source code. Detailed secret handling belongs
-to the separate security guide.
+Keep credential storage outside source code. The
+[security and secret-handling guide](security.md) covers local, testing, CI,
+and production secret sources plus rotation, logging, and incident response.

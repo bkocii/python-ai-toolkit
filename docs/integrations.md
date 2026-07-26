@@ -457,4 +457,6 @@ See the [installation guide](installation.md) for extras, the
 [request guide](requests.md) for request and result contracts. The
 [exception and error-handling guide](error_handling.md) documents framework
 propagation, CLI behavior, retry boundaries, and failures returned as result
-objects.
+objects. The [security and secret-handling guide](security.md) covers
+credential sources, terminal output, HTTP exposure, logging, tenant isolation,
+and incident response.

@@ -515,6 +515,7 @@ See the [Version 1.0 review and Future Backlog](development/roadmap.md#future-ba
 - [Plain and structured requests](requests.md)
 - [Advanced requests](advanced_requests.md)
 - [Embeddings, retrieval, and RAG](retrieval.md)
+- [Security and secret handling](security.md)
 - [Examples 15 through 18](../examples/README.md#15--conversation-memory)
 - [Architecture](architecture/architecture.md#agents-and-workflows-architecture)
 - [Roadmap](development/roadmap.md)

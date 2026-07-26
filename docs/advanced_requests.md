@@ -382,6 +382,8 @@ See the [Version 1.0 review and Future Backlog](development/roadmap.md#future-ba
   methods.
 - [Configuration guide](configuration.md) explains sync and async client
   construction.
+- [Security and secret handling](security.md) explains tool authorization,
+  image URL and data-URL exposure, CLI safety, and provider governance.
 - [Example gallery](../examples/README.md) links the runnable examples numbered
   05 through 09.
 - [Architecture](architecture/architecture.md) explains why synchronous and

@@ -445,7 +445,19 @@ Expected failures use toolkit-specific exceptions such as
 See the [exception and error-handling guide](docs/error_handling.md) for the
 complete hierarchy, catch boundaries, repair and retry behavior, ordinary
 Python exceptions, failed result objects, framework propagation, and CLI error
-handling. Security and secret-handling guidance remains a separate concern.
+handling.
+
+### Security
+
+Keep real credentials outside source control and inject them from the process
+environment or an application-owned secret manager. Treat prompts, provider
+responses, raw result fields, RAG contexts, memory, tool arguments, image data
+URLs, CLI output, and provider errors as potentially sensitive.
+
+The [security and secret-handling guide](docs/security.md) covers local,
+testing, CI, and production secret sources; repository and logging safety;
+provider data governance; tool authorization; multi-tenant boundaries; and
+incident response.
 
 ## Examples
 
@@ -479,6 +491,7 @@ concerns in focused documents:
 | [Orchestration guide](docs/orchestration.md) | Memory, agents, workflows, multi-agent sequencing, state, and failure boundaries |
 | [Framework and CLI integration guide](docs/integrations.md) | Django settings, FastAPI dependencies and test overrides, CLI commands, output, and exit codes |
 | [Exception and error-handling guide](docs/error_handling.md) | Toolkit exception hierarchy, retry decisions, ordinary Python failures, failed result objects, and application catch boundaries |
+| [Security and secret-handling guide](docs/security.md) | Credentials, sensitive data, logging, provider governance, tool authorization, and incident response |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |

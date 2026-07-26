@@ -21,16 +21,26 @@ def test_parse_json_response_valid():
 
 
 def test_parse_json_response_invalid_json():
-    with pytest.raises(AIJSONParseError):
+    sensitive_response = "not json; password=do-not-log"
+
+    with pytest.raises(AIJSONParseError) as exc_info:
         parse_json_response(
-            "not json",
+            sensitive_response,
             SampleResponse,
         )
+
+    assert str(exc_info.value) == "AI response was not valid JSON."
+    assert sensitive_response not in str(exc_info.value)
 
 
 def test_parse_json_response_invalid_schema():
-    with pytest.raises(AISchemaValidationError):
+    sensitive_response = '{"password": "do-not-log"}'
+
+    with pytest.raises(AISchemaValidationError) as exc_info:
         parse_json_response(
-            '{"name": "Genius Green"}',
+            sensitive_response,
             SampleResponse,
         )
+
+    assert str(exc_info.value) == ("AI response did not match the requested schema.")
+    assert sensitive_response not in str(exc_info.value)

@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-003 — Complete Documentation`  
-**Next task:** `DOC-011 — Document security and secret-handling guidance`
+**Next task:** `DOC-012 — Document Python-version and provider compatibility`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `DOC-011`.
+The next task is `DOC-012`.
 
 ---
 
@@ -1014,63 +1014,122 @@ offline error-contract workflows passed
 
 ---
 
-# Exact Next Task — DOC-011
+# DOC-011 — Security and Secret Handling
 
-Document security and secret-handling guidance without expanding into the
-separate compatibility, stable public API reference, or final example-audit
-tasks.
+**Status:** Completed
 
-Required work:
+Completed work:
 
-1. inspect configuration, `.env`, logging, CLI masking, provider error, example,
-   packaging, and repository surfaces that can expose credentials or sensitive
-   data
-2. distinguish local development, testing, continuous integration, and
-   production secret sources
-3. document safe environment-variable and secret-manager usage
-4. document what must not be committed, logged, printed, embedded in examples,
-   passed through prompts unnecessarily, or returned to untrusted clients
-5. document application ownership of access control, data classification,
-   provider retention choices, tool authorization, and incident response
-6. verify that current examples and documentation contain no real credentials
-7. keep the change limited to `DOC-011` unless review finds a release-blocking
-   security defect
+1. reviewed configuration, `.env`, logging, CLI masking, provider errors,
+   requests, structured repair, tools, images, retrieval, memory,
+   orchestration, framework, example, packaging, and repository surfaces
+2. added `docs/security.md`
+3. documented local, test, CI, and production secret sources
+4. documented repository, history, artifact, terminal, logging, error, prompt,
+   provider, result, persistence, and retention boundaries
+5. documented application ownership of data classification, provider
+   governance, tenant access, tool authorization, and incident response
+6. expanded `.gitignore` to exclude `.env.*` while preserving `.env.example`
+7. added a placeholder-only warning to `.env.example`
+8. linked the guide from the README and relevant capability guides
+9. removed raw provider responses from parse and schema exception messages so
+   executor traceback logging cannot disclose them
+10. added regression coverage for redacted exceptions and failure logs
+11. preserved the public exception hierarchy, provider API, dependencies,
+    examples, benchmarks, and ADRs
+
+Completion verification:
+
+```text
+security explicit-configuration example executed offline
+.env and .env.* ignore behavior passed with .env.example retained
+credential-pattern scan found no likely real secrets in maintained files
+94 focused security and request-lifecycle tests passed
+focused Black and Ruff checks passed
+70 Python blocks in the affected guides parsed
+95 repository-relative Markdown links passed
+271 normal tests passed
+```
 
 ---
 
-# DOC-010 Verification and Repository State
+# Exact Next Task — DOC-012
+
+Document Python-version and provider compatibility without expanding into the
+separate stable public API reference or final example-audit tasks.
+
+Required work:
+
+1. inspect `pyproject.toml`, dependency metadata, provider adapters,
+   integrations, tests, installation guidance, and supported runtime evidence
+2. document the supported Python-version range without claiming untested
+   versions as verified
+3. distinguish toolkit compatibility from provider SDK, provider account,
+   model, region, and capability availability
+4. document optional Django and FastAPI compatibility boundaries
+5. identify the exact tested environments and explain how contributors should
+   verify additional supported versions
+6. keep provider-specific claims tied to implemented adapters and current
+   dependency constraints
+7. keep the change limited to `DOC-012` unless review finds a release-blocking
+   compatibility defect
+
+---
+
+# DOC-011 Verification and Repository State
 
 Changed project files:
 
 ```text
+.env.example
+.gitignore
 README.md
 CHANGELOG.md
-docs/error_handling.md
+docs/security.md
+docs/configuration.md
+docs/requests.md
+docs/advanced_requests.md
+docs/retrieval.md
+docs/orchestration.md
 docs/integrations.md
+docs/error_handling.md
 docs/development/error_messages.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
+ai/parser.py
+tests/test_parser.py
+tests/test_logging_integration.py
 ```
 
-No runtime Python file, test file, example, benchmark, package dependency, or
-ADR changed.
+No provider API, dependency, example, benchmark, or ADR changed.
 
 Suggested focused commit:
 
 ```powershell
 git add `
+    .env.example `
+    .gitignore `
     README.md `
     CHANGELOG.md `
-    docs\error_handling.md `
+    docs\security.md `
+    docs\configuration.md `
+    docs\requests.md `
+    docs\advanced_requests.md `
+    docs\retrieval.md `
+    docs\orchestration.md `
     docs\integrations.md `
+    docs\error_handling.md `
     docs\development\error_messages.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
-    docs\development\session_handoff.md
+    docs\development\session_handoff.md `
+    ai\parser.py `
+    tests\test_parser.py `
+    tests\test_logging_integration.py
 
 git diff --cached
-git commit -m "docs: document exceptions and error handling"
+git commit -m "docs: document security and secret handling"
 ```
 
 ---
@@ -1473,18 +1532,16 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `.env.example`
-8. `.gitignore`
-9. `docs/configuration.md`
-10. `docs/error_handling.md`
+7. `pyproject.toml`
+8. `requirements.txt`
+9. `docs/installation.md`
+10. `docs/providers.md`
 11. `docs/integrations.md`
-12. `ai/config.py`
-13. `ai/logger.py`
-14. `ai/cli/config_commands.py`
-15. provider adapters and examples that handle credentials or provider errors
-16. relevant configuration, logging, CLI, provider, and documentation tests
+12. provider base class, factory, built-in adapters, and package metadata
+13. integration and provider tests
+14. current environment and supported-version evidence
 
-Profiling evidence is not required for `DOC-011`.
+Profiling evidence is not required for `DOC-012`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1498,7 +1555,7 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that DOC-011 is still the correct next task.
+3. Verify the repository's current state and confirm that DOC-012 is still the correct next task.
 4. Confirm that PROD-002 closed with its profiling report and no public API change.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.

@@ -244,6 +244,8 @@ permissions, money, security, or irreversible actions.
   construction.
 - [Providers](providers.md) explains provider registration and capability
   boundaries.
+- [Security and secret handling](security.md) explains sensitive prompts,
+  repair requests, raw responses, and safe result exposure.
 - [Example gallery](../examples/README.md) starts with plain and structured
   request scripts.
 - [Architecture](architecture/architecture.md) describes the request layers.

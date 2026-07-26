@@ -1,10 +1,28 @@
 import logging
+from io import StringIO
+
+import pytest
+from pydantic import BaseModel
 
 from ai.async_client import AsyncAIClient
 from ai.async_executor import AsyncRequestExecutor
 from ai.client import AIClient
 from ai.config import AIConfig
+from ai.exceptions import AIJSONParseError, AISchemaValidationError
 from ai.executor import RequestExecutor
+from ai.schemas import ProviderResponse
+
+
+class StructuredResponse(BaseModel):
+    name: str
+
+
+class SensitiveResponseProvider:
+    def __init__(self, text: str):
+        self.text = text
+
+    def ask_text(self, _prompt: str) -> ProviderResponse:
+        return ProviderResponse(text=self.text)
 
 
 def test_request_executor_uses_injected_logger():
@@ -155,3 +173,46 @@ def test_async_ai_client_configures_and_injects_logger(monkeypatch):
         "file_path": "custom/async-toolkit.log",
         "file_logging_enabled": False,
     }
+
+
+@pytest.mark.parametrize(
+    ("sensitive_response", "expected_exception"),
+    [
+        ("not json; password=do-not-log", AIJSONParseError),
+        ('{"password": "do-not-log"}', AISchemaValidationError),
+    ],
+)
+def test_structured_failure_log_excludes_raw_provider_response(
+    sensitive_response,
+    expected_exception,
+):
+    stream = StringIO()
+    handler = logging.StreamHandler(stream)
+    logger = logging.getLogger("structured-failure-redaction")
+    logger.handlers.clear()
+    logger.addHandler(handler)
+    logger.setLevel(logging.ERROR)
+    logger.propagate = False
+
+    executor = RequestExecutor(
+        provider=SensitiveResponseProvider(sensitive_response),
+        model="test-model",
+        max_retries=0,
+        logger=logger,
+    )
+
+    try:
+        with pytest.raises(expected_exception):
+            executor.execute(
+                prompt="Return a structured response.",
+                response_type=StructuredResponse,
+            )
+    finally:
+        logger.removeHandler(handler)
+        handler.close()
+
+    log_output = stream.getvalue()
+
+    assert "AI request failed" in log_output
+    assert sensitive_response not in log_output
+    assert "password=do-not-log" not in log_output

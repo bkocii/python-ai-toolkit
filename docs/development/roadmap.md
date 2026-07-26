@@ -1154,7 +1154,7 @@ Make the toolkit understandable and usable without reading its implementation.
 * [x] DOC-008 Document memory, agents, workflows, and orchestration
 * [x] DOC-009 Document Django, FastAPI, and CLI integrations
 * [x] DOC-010 Document exceptions and error handling
-* [ ] DOC-011 Document security and secret-handling guidance
+* [x] DOC-011 Document security and secret-handling guidance
 * [ ] DOC-012 Document Python-version and provider compatibility
 * [ ] DOC-013 Create a stable public API reference
 * [ ] DOC-014 Verify every documented example
@@ -1625,6 +1625,66 @@ Next task:
 
 ```text
 DOC-011 — Document security and secret-handling guidance
+```
+
+#### DOC-011 — Security and Secret Handling
+
+Status: Completed
+
+Security boundaries were reviewed across configuration, `.env` handling,
+repository ignores, logging, CLI output, provider exceptions, requests,
+structured repair, image and tool inputs, embeddings, retrieval, memory,
+orchestration, framework adapters, examples, tests, packaging, and deployment
+guidance.
+
+Completed work:
+
+* added `docs/security.md` as the focused public security guide
+* distinguished local-development, automated-test, CI, and production secret
+  sources
+* documented environment and application-owned secret-manager injection
+* documented repository, history, build-artifact, terminal, logging, and
+  exception-output exposure
+* documented provider-bound data for requests, structured repair, streaming,
+  tools, images, embeddings, RAG, agents, and multi-agent handoffs
+* documented sensitive fields in result, retrieval, memory, workflow, and
+  orchestration objects
+* documented provider retention, residency, training, subprocessor, encryption,
+  and regulated-data review as application governance
+* documented allow-listing, argument validation, caller authorization,
+  least-privileged execution, confirmation, audit, and prompt-injection
+  boundaries for tools
+* documented web and multi-tenant access-control responsibilities
+* added an incident-response sequence and production checklist
+* expanded `.gitignore` to exclude `.env.*` while preserving `.env.example`
+* added an explicit placeholder-only warning to `.env.example`
+* linked the security guide from the README and capability guides
+* verified maintained files contain no likely real credentials
+* removed raw provider responses from JSON parse and schema-validation
+  exception messages so executor traceback logging does not disclose them
+* added regression coverage for exception messages and structured-failure logs
+
+Completion verification:
+
+```text
+Security explicit-configuration example executed without network access
+.env and .env.* ignore behavior passed with .env.example retained
+Credential-pattern scan found no likely real secrets in maintained files
+94 focused security and request-lifecycle tests passed
+Focused Black and Ruff checks passed
+70 Python blocks in the affected guides parsed
+95 repository-relative Markdown links passed
+271 normal tests passed
+```
+
+The release-blocking response-disclosure path was corrected without changing
+the public exception hierarchy, provider API, dependency set, example code,
+benchmark suite, or architectural contract.
+
+Next task:
+
+```text
+DOC-012 — Document Python-version and provider compatibility
 ```
 
 ### Documentation Rules

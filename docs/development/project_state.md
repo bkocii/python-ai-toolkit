@@ -62,6 +62,7 @@ Completed PROD-003 documentation tasks:
 * DOC-008 Document memory, agents, workflows, and orchestration
 * DOC-009 Document Django, FastAPI, and CLI integrations
 * DOC-010 Document exceptions and error handling
+* DOC-011 Document security and secret-handling guidance
 
 Next active task:
 
@@ -72,7 +73,7 @@ PROD-003 — Complete Documentation
 Next roadmap task:
 
 ```text
-DOC-011 — Document security and secret-handling guidance
+DOC-012 — Document Python-version and provider compatibility
 ```
 
 ---
@@ -701,15 +702,15 @@ PROD-003 — Complete Documentation
 
 ### Next Recommended Focus
 
-Begin `DOC-011 — Document security and secret-handling guidance`.
+Begin `DOC-012 — Document Python-version and provider compatibility`.
 
-The public exception hierarchy and practical failure contracts are now verified
-and documented, including configuration, provider, parsing, structured repair,
-streaming, ordinary Python exceptions, workflow/orchestration result failures,
-framework propagation, logging, and CLI behavior. The next review should
-consolidate credential storage, secret exposure, logging, error-output,
-repository, example, and deployment guidance without changing unrelated
-runtime behavior.
+Security and secret-handling guidance is now consolidated and verified across
+local development, tests, CI, production, repository ignores, logging, CLI
+output, provider-bound data, returned objects, tool authorization,
+multi-tenant access, provider governance, and incident response. The next
+review should document supported Python versions and distinguish toolkit,
+provider-adapter, provider-SDK, model-capability, and framework compatibility
+without changing unrelated runtime behavior.
 
 ---
 
@@ -738,6 +739,8 @@ runtime behavior.
 * Tests and benchmarks can disable toolkit-managed file logging.
 * Application-owned logging handlers must be preserved.
 * Prompts and provider responses are not logged.
+* Structured parse and schema exception messages exclude raw provider
+  responses.
 * Benchmarks measure toolkit overhead rather than provider latency.
 * Benchmarks use deterministic fake providers and fixtures.
 * Existing benchmarks should remain stable when internal implementations are optimized.
