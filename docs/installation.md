@@ -255,6 +255,56 @@ is not the supported installation interface and does not replace the extras
 above. A fresh dependency resolution can therefore differ from that snapshot;
 record the exact resolved versions when diagnosing compatibility.
 
+## Build distributions locally
+
+A package build converts the source checkout into two standard files:
+
+| Format | Purpose |
+| --- | --- |
+| Wheel (`.whl`) | Ready-to-install pure-Python package used by `pip` |
+| Source distribution (`.tar.gz`) | Source and build metadata from which a wheel can be rebuilt |
+
+Install the standard build frontend in the active development environment:
+
+```powershell
+python -m pip install build
+```
+
+On Windows PowerShell, remove only older generated package output before a
+release build:
+
+```powershell
+Remove-Item build, dist -Recurse -Force -ErrorAction SilentlyContinue
+Get-ChildItem -Directory -Filter "*.egg-info" |
+    Remove-Item -Recurse -Force
+```
+
+Then build both formats from the project root:
+
+```powershell
+python -m build
+Get-ChildItem dist
+```
+
+For version `0.7.0.dev0`, the expected filenames are:
+
+```text
+python_ai_toolkit-0.7.0.dev0-py3-none-any.whl
+python_ai_toolkit-0.7.0.dev0.tar.gz
+```
+
+The `py3-none-any` wheel tag means that the wheel contains pure Python and is
+not restricted to one operating system or CPU architecture. The build frontend
+reads `pyproject.toml`, creates an isolated build environment, asks setuptools
+to construct the source distribution, and then builds the wheel from that
+source distribution.
+
+The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
+they are reproducible outputs rather than source files. Do not upload these
+development artifacts to PyPI. Building proves that both files can be created;
+the separate distribution-validation step must still check their metadata,
+rendered README, archive contents, and installation behavior before release.
+
 ## Change an existing installation
 
 After changing extras or pulling package-metadata updates, rerun the appropriate

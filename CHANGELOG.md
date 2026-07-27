@@ -21,6 +21,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Reproducible local construction of the `0.7.0.dev0` wheel and source
+  distribution with the standard `python -m build` workflow
+* Windows PowerShell guidance for cleaning older generated package output,
+  building both distribution formats, and inspecting the resulting filenames
+* Regression coverage keeping `build/`, `dist/`, and `*.egg-info/` out of
+  source control
 * Clean-install verification that the `ai-toolkit` executable is generated,
   loads `ai.cli.main:main`, routes supported commands, and preserves exit codes
 * Focused regressions keeping console-script metadata and the installed entry

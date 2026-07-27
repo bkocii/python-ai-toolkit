@@ -11,3 +11,8 @@ __pycache__/
 .ruff_cache/
 .benchmarks/
 logs/
+
+# Generated package-build artifacts
+build/
+dist/
+*.egg-info/

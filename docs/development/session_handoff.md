@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-006 — Build source distribution and wheel`
+**Next task:** `PACKAGE-007 — Validate distributions`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `PACKAGE-006`.
+The current next task is `PACKAGE-007`.
 
 ---
 
@@ -1701,21 +1701,66 @@ output, or architectural decision changed.
 
 ---
 
-# Exact Next Task — PACKAGE-006
+# PACKAGE-006 — Source Distribution and Wheel
 
-Build the source distribution and wheel.
+**Status:** Completed
+
+Completed work:
+
+1. separated older generated build output before constructing the release
+   artifacts
+2. ran the standard isolated `python -m build` workflow
+3. built `python_ai_toolkit-0.7.0.dev0.tar.gz`
+4. built `python_ai_toolkit-0.7.0.dev0-py3-none-any.whl`
+5. confirmed at a basic level that the wheel contains all six `ai` package
+   areas, metadata, the console entry point, and the MIT license
+6. confirmed at a basic level that the source distribution contains package
+   source, `pyproject.toml`, README, MIT license, and tests
+7. added `build/`, `dist/`, and `*.egg-info/` to `.gitignore`
+8. added a regression preserving the generated-output exclusions
+9. documented the Windows PowerShell clean-build workflow, expected filenames,
+   and meaning of the pure-Python wheel tag
+10. preserved detailed archive, metadata, rendered-README, and `twine`
+    validation for `PACKAGE-007`
+
+Final verification:
+
+```text
+wheel and source distribution built successfully with python -m build
+wheel contains 46 entries and is tagged py3-none-any
+source distribution contains 94 entries
+14 focused package-metadata regressions passed
+35 package-metadata and documentation tests passed
+341 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the complete environment
+focused Black and Ruff checks passed
+193 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency
+declaration, optional group, license metadata, benchmark, example, or
+architectural decision changed.
+
+---
+
+# Exact Next Task — PACKAGE-007
+
+Validate the built distributions.
 
 Required work:
 
-1. inspect build inputs and exclude stale generated artifacts from the source
-   tree as needed
-2. build both distribution formats from the reviewed package metadata
-3. record the exact build command and resulting filenames
-4. inspect archive contents at a basic level without claiming the full
-   distribution validation owned by `PACKAGE-007`
-5. correct only defects demonstrated by the build
-6. update package guidance and project records
-7. leave `twine check` and full artifact validation to `PACKAGE-007`
+1. run `python -m twine check dist/*`
+2. inspect wheel and source-distribution metadata in detail
+3. verify the rendered long description and declared license metadata
+4. compare packaged modules and required files with the reviewed source
+5. verify archive safety and absence of generated or unintended content
+6. correct only defects demonstrated by distribution validation
+7. update package guidance and project records
+8. leave clean virtual-environment installation to `PACKAGE-008`
 
 ---
 
@@ -2248,18 +2293,16 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `CHANGELOG.md`
 8. `pyproject.toml`
-9. `ai/cli/main.py`
-10. `ai/cli/config_commands.py`
-11. `docs/integrations.md`
-12. `docs/installation.md`
-13. `tests/test_cli.py`
-14. `tests/test_package_metadata.py`
+9. `LICENSE`
+10. `.gitignore`
+11. `docs/installation.md`
+12. `tests/test_package_metadata.py`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-005`. The script metadata, CLI implementation, command guidance, and
-CLI/package-metadata tests are required so installation and command routing can
-be verified without building the final release distributions.
+`PACKAGE-007`. The built wheel and source distribution, package metadata,
+license, README, build guidance, and package-metadata tests are required so
+the archives can be validated without mixing in later installation work.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2273,8 +2316,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-005 is still the correct next task.
-4. Confirm that PACKAGE-004 verified the core and all optional installation shapes without changing dependency declarations.
+3. Verify the repository's current state and confirm that PACKAGE-007 is still the correct next task.
+4. Confirm that PACKAGE-006 built both standard distribution formats and left detailed validation for PACKAGE-007.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

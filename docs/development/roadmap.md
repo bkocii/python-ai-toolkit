@@ -2272,7 +2272,7 @@ Produce a valid, installable Python source distribution and wheel.
 * [x] PACKAGE-003 Confirm license metadata and license file
 * [x] PACKAGE-004 Verify optional dependency groups
 * [x] PACKAGE-005 Verify console entry points
-* [ ] PACKAGE-006 Build source distribution and wheel
+* [x] PACKAGE-006 Build source distribution and wheel
 * [ ] PACKAGE-007 Validate distributions
 * [ ] PACKAGE-008 Test installation in a clean virtual environment
 * [ ] PACKAGE-009 Test core installation without optional frameworks
@@ -2539,6 +2539,59 @@ Next task:
 PACKAGE-006 — Build source distribution and wheel
 ```
 
+#### PACKAGE-006 — Build Source Distribution and Wheel
+
+Status: Completed
+
+Completed work:
+
+* separated older generated `build/` and `python_ai_toolkit.egg-info/`
+  directories before building so stale output could not affect the evidence
+* ran the standard isolated `python -m build` workflow without changing
+  package metadata or runtime code
+* created `python_ai_toolkit-0.7.0.dev0.tar.gz`
+* created `python_ai_toolkit-0.7.0.dev0-py3-none-any.whl`
+* confirmed at a basic level that the wheel contains all six discovered `ai`
+  package areas, distribution metadata, the console entry point, and MIT
+  license
+* confirmed at a basic level that the source distribution contains the
+  package source, `pyproject.toml`, README, MIT license, and tests needed to
+  reproduce and inspect the source package
+* added `build/`, `dist/`, and `*.egg-info/` to `.gitignore`
+* added a regression preserving those generated-output exclusions
+* documented the build frontend, artifact formats, expected filenames, pure
+  Python wheel tag, and clean Windows PowerShell workflow
+* left `twine check`, detailed metadata/archive validation, and installation
+  from each built artifact to `PACKAGE-007` and later installation tasks
+
+Completion verification:
+
+```text
+wheel and source distribution built successfully with python -m build
+wheel contains 46 entries and is tagged py3-none-any
+source distribution contains 94 entries
+14 focused package-metadata regressions passed
+35 package-metadata and documentation tests passed
+341 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the complete environment
+focused Black and Ruff checks passed
+193 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency
+declaration, optional group, license metadata, benchmark, example, or
+architectural decision changed.
+
+Next task:
+
+```text
+PACKAGE-007 — Validate distributions
+```
+
 Clean-environment checks must verify:
 
 ```text
@@ -2549,8 +2602,8 @@ pip install python-ai-toolkit[fastapi]
 
 ### Exit Criteria
 
-* [ ] Wheel builds successfully
-* [ ] Source distribution builds successfully
+* [x] Wheel builds successfully
+* [x] Source distribution builds successfully
 * [ ] Distribution validation passes
 * [ ] Core installation does not require Django or FastAPI
 * [x] Console command is installed

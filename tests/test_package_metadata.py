@@ -7,6 +7,7 @@ from ai.cli.main import main
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
+GITIGNORE_PATH = PROJECT_ROOT / ".gitignore"
 EXPECTED_CLASSIFIERS = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
@@ -171,6 +172,16 @@ def test_build_backend_supports_current_license_metadata():
     build_requirements = load_pyproject()["build-system"]["requires"]
 
     assert build_requirements == ["setuptools>=77.0.3", "wheel"]
+
+
+def test_generated_package_build_outputs_are_ignored():
+    ignored_paths = {
+        line.strip()
+        for line in GITIGNORE_PATH.read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    }
+
+    assert {"build/", "dist/", "*.egg-info/"}.issubset(ignored_paths)
 
 
 def test_console_script_metadata_targets_supported_cli_main():

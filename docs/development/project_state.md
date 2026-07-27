@@ -87,6 +87,7 @@ Completed PROD-005 package tasks:
 * PACKAGE-003 Confirm license metadata and license file
 * PACKAGE-004 Verify optional dependency groups
 * PACKAGE-005 Verify console entry points
+* PACKAGE-006 Build source distribution and wheel
 
 Next active task:
 
@@ -97,7 +98,7 @@ PROD-005 — PyPI Package
 Next roadmap task:
 
 ```text
-PACKAGE-006 — Build source distribution and wheel
+PACKAGE-007 — Validate distributions
 ```
 
 ---
@@ -636,7 +637,8 @@ Remaining:
 `PACKAGE-002 — Add Package Classifiers`,
 `PACKAGE-003 — Confirm License Metadata and License File`, and
 `PACKAGE-004 — Verify Optional Dependency Groups`, and
-`PACKAGE-005 — Verify Console Entry Points` are complete.
+`PACKAGE-005 — Verify Console Entry Points`, and
+`PACKAGE-006 — Build Source Distribution and Wheel` are complete.
 
 The current metadata now:
 
@@ -664,13 +666,21 @@ The current metadata now:
 * declares `ai-toolkit = "ai.cli.main:main"` as the only console script
 * generates a working installed command with documented exit codes `0`, `1`,
   and `2`
+* builds `python_ai_toolkit-0.7.0.dev0.tar.gz` and
+  `python_ai_toolkit-0.7.0.dev0-py3-none-any.whl` with the isolated
+  `python -m build` workflow
+* keeps reproducible `build/`, `dist/`, and `*.egg-info/` output outside source
+  control
 
-Thirteen focused metadata regressions and all 340 normal tests pass. Separate
-clean environments prove the optional-dependency boundaries and that the core
-installation generates a console command which loads the supported
-`ai.cli.main:main` implementation. The later full-quality release gate still
-owns two older Black formatting files and 96 repository-wide Ruff findings;
-`PACKAGE-005` introduced none of them.
+The wheel and source distribution build successfully, and basic archive
+inspection confirms the expected package source, metadata, console entry point,
+README, and MIT license. Separate clean environments already prove the
+optional-dependency boundaries and that the core installation generates a
+console command which loads the supported `ai.cli.main:main` implementation.
+Fourteen focused package-metadata regressions and all 341 normal tests pass.
+Detailed distribution validation remains assigned to `PACKAGE-007`. The later
+full-quality release gate still owns two older Black formatting files and 68
+repository-wide Ruff findings; `PACKAGE-006` introduced none of them.
 
 ---
 
@@ -770,12 +780,12 @@ PROD-005 — PyPI Package
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-006 — Build source distribution and wheel`.
+Begin `PACKAGE-007 — Validate distributions`.
 
-`PACKAGE-005` verified the installed console entry point without finding a
-metadata or CLI implementation defect. The next task must build the actual
-source distribution and wheel from the reviewed package recipe. Distribution
-validation remains separate in `PACKAGE-007`.
+`PACKAGE-006` built the actual source distribution and pure-Python wheel from
+the reviewed package recipe without finding a metadata or runtime defect. The
+next task must validate the resulting archives, metadata, and rendered package
+description before installation testing begins.
 
 ---
 

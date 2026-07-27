@@ -558,8 +558,18 @@ Run the isolated benchmark suite:
 python -m pytest benchmarks --benchmark-only
 ```
 
+Build the local wheel and source distribution:
+
+```bash
+python -m pip install build
+python -m build
+```
+
 Benchmark methodology and comparison rules are documented in
 [`benchmarks/README.md`](benchmarks/README.md).
+The [installation guide](docs/installation.md#build-distributions-locally)
+explains the generated files, clean Windows build steps, and the boundary
+between building and validating a release.
 
 ## Project status
 
