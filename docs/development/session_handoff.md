@@ -5,8 +5,8 @@
 **Project:** Python AI Toolkit  
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
-**Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-010 — Test Django and FastAPI extras separately`
+**Active roadmap item:** `PROD-006 — Release Automation`  
+**Next task:** `RELEASE-001 — Add continuous-integration workflow`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `PACKAGE-010`.
+The current next task is `RELEASE-001`.
 
 ---
 
@@ -1877,20 +1877,74 @@ architectural decision changed.
 
 ---
 
-# Exact Next Task — PACKAGE-010
+# PACKAGE-010 — Django and FastAPI Extras Separately
 
-Test the Django and FastAPI extras separately.
+**Status:** Completed
+
+Completed work:
+
+1. rebuilt and validated the current distribution artifacts
+2. installed the wheel with only the Django extra in a clean environment
+3. confirmed Django `6.0.7` and every Django adapter module loaded from isolated
+   `site-packages`
+4. confirmed FastAPI was neither installed nor importable in the Django
+   environment
+5. installed the wheel with only the FastAPI extra in a second clean environment
+6. confirmed FastAPI `0.140.7` and every FastAPI adapter module loaded from
+   isolated `site-packages`
+7. confirmed Django was neither installed nor importable in the FastAPI
+   environment
+8. exercised both adapters through a deterministic offline provider and passed
+   `pip check` in both environments
+9. added `scripts/verify_framework_extra_installation.py` for repeatable release
+   checks
+10. added regressions keeping the verifier aligned with optional-dependency
+    metadata and every framework adapter module
+11. documented the Windows PowerShell workflow
+
+Verification evidence:
+
+```text
+Django-only wheel installation passed on Linux with CPython 3.12.13
+Django 6.0.7 installed; FastAPI distribution and module were absent
+FastAPI-only wheel installation passed on Linux with CPython 3.12.13
+FastAPI 0.140.7 installed; Django distribution and module were absent
+both toolkit imports resolved from isolated site-packages
+both installed adapter module sets imported successfully
+both offline integration behavior checks passed
+pip check passed in both environments
+19 focused package-metadata regressions passed
+40 package-metadata and documentation tests passed
+346 normal tests passed on Linux with CPython 3.12.13
+Twine strict and offline distribution validation passed
+focused Black and Ruff checks passed
+202 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, license, benchmark, example, or
+architectural decision changed.
+
+---
+
+# Exact Next Task — RELEASE-001
+
+Add a continuous-integration workflow.
 
 Required work:
 
-1. create two isolated environments outside the source checkout
-2. install the wheel with only the Django extra in one environment
-3. verify the Django adapter and confirm FastAPI is absent
-4. install the wheel with only the FastAPI extra in the other environment
-5. verify the FastAPI adapter and confirm Django is absent
-6. run representative offline integration behavior and `pip check`
-7. correct only dependency or adapter defects demonstrated by the tests
-8. update package guidance and project records
+1. inspect the roadmap's release-automation scope and repository layout
+2. decide the smallest correct initial CI trigger and job structure
+3. install the project from authoritative package metadata
+4. run the appropriate existing test and package checks automatically
+5. preserve later ownership of the Python-version matrix, complete Black/Ruff
+   enforcement, distribution building, and release publishing
+6. add tests or static validation for the workflow where practical
+7. document local equivalents and update project records
 
 ---
 
@@ -2438,9 +2492,9 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-010`. The validated wheel, optional-dependency metadata, framework
-adapters, integration tests, and installation guidance are required so the
-Django and FastAPI extras can each be verified without the other framework.
+`RELEASE-001`. The package metadata, tests, existing validation scripts,
+roadmap, and installation guidance are required so the first CI workflow can
+automate current checks without taking over later release tasks.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2454,8 +2508,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-010 is still the correct next task.
-4. Confirm that PACKAGE-009 proved the core installation works without Django or FastAPI.
+3. Verify the repository's current state and confirm that RELEASE-001 is still the correct next task.
+4. Confirm that PROD-005 completed all ten package tasks, including separate core, Django, and FastAPI installations.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

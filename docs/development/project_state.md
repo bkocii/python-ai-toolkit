@@ -26,6 +26,7 @@ Completed Sprint 9 tasks:
 * PROD-002 Performance Profiling
 * PROD-003 Complete Documentation
 * PROD-004 Additional Examples
+* PROD-005 PyPI Package
 
 Completed PROD-001 benchmark tasks:
 
@@ -91,17 +92,18 @@ Completed PROD-005 package tasks:
 * PACKAGE-007 Validate distributions
 * PACKAGE-008 Test installation in a clean virtual environment
 * PACKAGE-009 Test core installation without optional frameworks
+* PACKAGE-010 Test Django and FastAPI extras separately
 
 Next active task:
 
 ```text
-PROD-005 — PyPI Package
+PROD-006 — Release Automation
 ```
 
 Next roadmap task:
 
 ```text
-PACKAGE-010 — Test Django and FastAPI extras separately
+RELEASE-001 — Add continuous-integration workflow
 ```
 
 ---
@@ -625,10 +627,10 @@ Completed:
 * PROD-002 Performance Profiling
 * PROD-003 Complete Documentation
 * PROD-004 Additional Examples
+* PROD-005 PyPI Package
 
 Remaining:
 
-* PROD-005 PyPI Package
 * PROD-006 Release Automation
 * PROD-007 Version 1.0 Release
 
@@ -643,9 +645,9 @@ Remaining:
 `PACKAGE-005 — Verify Console Entry Points`,
 `PACKAGE-006 — Build Source Distribution and Wheel`,
 `PACKAGE-007 — Validate Distributions`,
-`PACKAGE-008 — Test Installation in a Clean Virtual Environment`, and
-`PACKAGE-009 — Test Core Installation Without Optional Frameworks` are
-complete.
+`PACKAGE-008 — Test Installation in a Clean Virtual Environment`,
+`PACKAGE-009 — Test Core Installation Without Optional Frameworks`, and
+`PACKAGE-010 — Test Django and FastAPI Extras Separately` are complete.
 
 The current metadata now:
 
@@ -701,24 +703,33 @@ prompt and vector-store behavior passes, and `pip check` reports no broken
 requirements. The reusable verifier and metadata regressions keep that boundary
 explicit as the package evolves.
 
+Two additional clean environments prove each framework extra independently.
+The Django-only installation loads Django `6.0.7` and every Django adapter
+module while FastAPI remains absent. The FastAPI-only installation loads
+FastAPI `0.140.7` and every FastAPI adapter module while Django remains absent.
+Both adapters construct clients through a deterministic offline provider,
+complete an offline request, and pass `pip check`. The reusable verifier keeps
+the installed metadata and adapter-module inventory aligned.
+
 Twine proves that the packaged Markdown is renderable but does not visit link
 destinations. The README's repository-relative documentation links remain
 appropriate for the source checkout; confirmed public project URLs and
 PyPI-page link behavior must be resolved before Version 1.0 publication.
 
-The next packaging task must install the Django and FastAPI extras separately
-and verify each adapter in isolation. The later full-quality release gate still
-owns the older repository-wide formatting and lint findings; `PACKAGE-009`
-introduced none of them.
+`PROD-005 — PyPI Package` is complete. The next milestone item must add the
+continuous-integration workflow that will repeat the supported checks
+automatically. The later full-quality release gate still owns the older
+repository-wide formatting and lint findings; `PACKAGE-010` introduced none of
+them.
 
-`PACKAGE-009` completion verification passed the core-only wheel installation,
-17 focused package-metadata regressions, 38 package-metadata/documentation
-tests, 344 normal tests, strict Twine and offline distribution validation, and
-focused Black and Ruff checks. The installed environment imported all 35
-non-framework modules, passed offline prompt and vector-store checks, and
-passed dependency validation without Django or FastAPI. Documentation
-verification inventoried 200 fenced blocks, compiled 82 Python blocks, and
-validated 183 repository-relative links.
+`PACKAGE-010` completion verification passed the separate Django and FastAPI
+wheel installations, 19 focused package-metadata regressions, 40
+package-metadata/documentation tests, 346 normal tests, strict Twine and offline
+distribution validation, and focused Black and Ruff checks. Both installed
+environments loaded only their selected framework, imported every corresponding
+adapter module, completed an offline integration request, and passed dependency
+validation. Documentation verification inventoried 202 fenced blocks, compiled
+82 Python blocks, and validated 183 repository-relative links.
 
 ---
 
@@ -813,16 +824,16 @@ docs/development/performance_profiling.md
 The next active roadmap item is:
 
 ```text
-PROD-005 — PyPI Package
+PROD-006 — Release Automation
 ```
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-010 — Test Django and FastAPI extras separately`.
+Begin `RELEASE-001 — Add continuous-integration workflow`.
 
-`PACKAGE-009` proved that the validated core wheel installs, imports, and runs
-without Django or FastAPI. The next task must install each framework extra in a
-separate clean environment and verify its adapter without the other framework.
+`PROD-005` proved that the distribution builds, validates, installs in core and
+framework-specific forms, and preserves its optional dependency boundaries.
+The next task must automate the first release checks in continuous integration.
 
 ---
 

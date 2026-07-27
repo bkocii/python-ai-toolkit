@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Separate clean-wheel verification for the Django and FastAPI extras, proving
+  each adapter works while the unselected framework remains absent
+* Reusable installed-extra verifier covering metadata, import origin, complete
+  adapter modules, supported framework versions, and offline client behavior
+* Windows PowerShell guidance for testing the Django and FastAPI wheel extras in
+  independent virtual environments
 * Core-only wheel installation verification proving that Django and FastAPI
   remain absent while all 35 non-framework toolkit modules import successfully
 * Reusable installed-environment verifier covering core requirements, import

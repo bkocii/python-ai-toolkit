@@ -2276,7 +2276,7 @@ Produce a valid, installable Python source distribution and wheel.
 * [x] PACKAGE-007 Validate distributions
 * [x] PACKAGE-008 Test installation in a clean virtual environment
 * [x] PACKAGE-009 Test core installation without optional frameworks
-* [ ] PACKAGE-010 Test Django and FastAPI extras separately
+* [x] PACKAGE-010 Test Django and FastAPI extras separately
 
 ### Required Package Checks
 
@@ -2753,6 +2753,69 @@ Next task:
 PACKAGE-010 — Test Django and FastAPI extras separately
 ```
 
+#### PACKAGE-010 — Test Django and FastAPI Extras Separately
+
+Status: Completed
+
+Completed work:
+
+* rebuilt and validated the current wheel and source distribution before
+  framework-extra testing
+* installed the wheel with only the Django extra in one clean environment
+* confirmed Django `6.0.7`, the complete Django adapter, and the toolkit loaded
+  from isolated `site-packages`
+* confirmed FastAPI was neither installed nor importable in the Django
+  environment
+* installed the wheel with only the FastAPI extra in a second clean environment
+* confirmed FastAPI `0.140.7`, the complete FastAPI adapter, and the toolkit
+  loaded from isolated `site-packages`
+* confirmed Django was neither installed nor importable in the FastAPI
+  environment
+* exercised both adapters through a deterministic offline provider without
+  credentials or network requests
+* confirmed each installed artifact exposes exactly one requirement for its
+  selected framework extra
+* ran `pip check` successfully in both environments
+* added a reusable installed-extra verifier and regressions keeping it aligned
+  with optional-dependency metadata and every framework adapter module
+* documented the complete Windows PowerShell verification workflow
+* retained all runtime APIs, dependencies, optional groups, entry points, and
+  package metadata because both clean installations demonstrated correct
+  boundaries
+
+Completion verification:
+
+```text
+Django-only wheel installation passed on Linux with CPython 3.12.13
+Django 6.0.7 installed; FastAPI distribution and module were absent
+FastAPI-only wheel installation passed on Linux with CPython 3.12.13
+FastAPI 0.140.7 installed; Django distribution and module were absent
+both toolkit imports resolved from isolated site-packages
+both installed adapter module sets imported successfully
+both offline integration behavior checks passed
+pip check passed in both environments
+19 focused package-metadata regressions passed
+40 package-metadata and documentation tests passed
+346 normal tests passed
+Twine strict and offline distribution validation passed
+focused Black and Ruff checks passed
+202 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, license, benchmark, example, or
+architectural decision changed.
+
+Next task:
+
+```text
+RELEASE-001 — Add continuous-integration workflow
+```
+
 Clean-environment checks must verify:
 
 ```text
@@ -2766,7 +2829,7 @@ pip install python-ai-toolkit[fastapi]
 * [x] Wheel builds successfully
 * [x] Source distribution builds successfully
 * [x] Distribution validation passes
-* [ ] Core installation does not require Django or FastAPI
+* [x] Core installation does not require Django or FastAPI
 * [x] Console command is installed
 * [x] Package imports successfully in a clean environment
 

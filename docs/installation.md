@@ -463,6 +463,59 @@ distribution supports every extra. Importing
 extra is not a supported core operation. Normal core modules must remain
 importable without either framework; the verifier checks every one.
 
+### Test the framework extras separately on Windows
+
+This release check installs each optional framework into its own environment.
+It proves that selecting one extra does not silently install the other and that
+the installed adapter can construct a toolkit client and complete an offline
+request.
+
+Run from the project root after building and validating `dist\`:
+
+```powershell
+$projectRoot = (Get-Location).Path
+$testRoot = Join-Path (Split-Path $projectRoot) "python-ai-toolkit-package010"
+$wheel = (Resolve-Path "dist\*.whl").Path
+
+Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
+py -m venv "$testRoot\django-env"
+py -m venv "$testRoot\fastapi-env"
+
+& "$testRoot\django-env\Scripts\python.exe" -m pip install "${wheel}[django]"
+& "$testRoot\fastapi-env\Scripts\python.exe" -m pip install "${wheel}[fastapi]"
+
+Push-Location $testRoot
+& "$testRoot\django-env\Scripts\python.exe" `
+    "$projectRoot\scripts\verify_framework_extra_installation.py" django
+& "$testRoot\django-env\Scripts\python.exe" -m pip check
+
+& "$testRoot\fastapi-env\Scripts\python.exe" `
+    "$projectRoot\scripts\verify_framework_extra_installation.py" fastapi
+& "$testRoot\fastapi-env\Scripts\python.exe" -m pip check
+Pop-Location
+```
+
+Expected output includes:
+
+```text
+Django extra verification: PASSED
+Unselected framework absent: fastapi
+Offline integration behavior: PASSED
+
+FastAPI extra verification: PASSED
+Unselected framework absent: django
+Offline integration behavior: PASSED
+```
+
+Both toolkit paths must resolve inside the corresponding environment's
+`Lib\site-packages\ai\` directory, and both dependency checks must report no
+broken requirements.
+
+The FastAPI runtime extra does not include a test-client dependency. Application
+testing belongs to the `dev` extra, which includes `httpx2`; the runtime verifier
+checks the dependency aliases, route registration, and client construction
+without expanding the supported `[fastapi]` installation.
+
 ## Change an existing installation
 
 After changing extras or pulling package-metadata updates, rerun the appropriate
