@@ -423,9 +423,10 @@ application-focused starting points.
 
 ### Command-line interface
 
-Editable installation exposes the `ai-toolkit` command:
+Installing the package exposes the `ai-toolkit` command:
 
 ```bash
+ai-toolkit --help
 ai-toolkit ask "Explain dependency injection simply."
 ai-toolkit config show
 ai-toolkit config validate
@@ -434,7 +435,9 @@ ai-toolkit config validate
 Configuration display masks API keys, and structural validation does not contact
 the configured provider. The
 [framework and CLI integration guide](docs/integrations.md#command-line-interface)
-documents command scope, output, and exit codes.
+documents command scope, output, and exit codes. The
+[installation guide](docs/installation.md#verify-the-console-command-on-windows)
+includes a local PowerShell verification procedure.
 
 ### Logging and errors
 

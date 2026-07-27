@@ -1,6 +1,9 @@
 import ast
+import importlib.metadata
 import tomllib
 from pathlib import Path
+
+from ai.cli.main import main
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
@@ -168,6 +171,32 @@ def test_build_backend_supports_current_license_metadata():
     build_requirements = load_pyproject()["build-system"]["requires"]
 
     assert build_requirements == ["setuptools>=77.0.3", "wheel"]
+
+
+def test_console_script_metadata_targets_supported_cli_main():
+    scripts = load_pyproject()["project"]["scripts"]
+
+    assert scripts == {
+        "ai-toolkit": "ai.cli.main:main",
+    }
+
+
+def test_installed_console_entry_point_loads_supported_cli_main():
+    distribution_name = load_pyproject()["project"]["name"]
+    console_scripts = [
+        entry_point
+        for entry_point in importlib.metadata.distribution(
+            distribution_name
+        ).entry_points
+        if entry_point.group == "console_scripts"
+    ]
+
+    assert [
+        (entry_point.name, entry_point.value) for entry_point in console_scripts
+    ] == [
+        ("ai-toolkit", "ai.cli.main:main"),
+    ]
+    assert console_scripts[0].load() is main
 
 
 def test_package_discovery_covers_every_ai_package():

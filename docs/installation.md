@@ -132,6 +132,58 @@ Configuration and provider credentials are covered separately in the
 [configuration guide](configuration.md). The import and help checks above do
 not need an API key or network request.
 
+### Verify the console command on Windows
+
+After activating the virtual environment in PowerShell, confirm that Windows
+finds the command inside that environment:
+
+```powershell
+Get-Command ai-toolkit
+ai-toolkit --help
+$LASTEXITCODE
+```
+
+`Get-Command` should display a path ending in
+`.venv\Scripts\ai-toolkit.exe`. Help should return exit code `0`.
+
+The configuration command can also be tested without contacting OpenAI. The
+key and model below are temporary structural-test values, not real
+credentials:
+
+```powershell
+$env:AI_PROVIDER = "openai"
+$env:OPENAI_API_KEY = "local-structure-check"
+$env:OPENAI_MODEL = "test-model"
+$env:AI_FILE_LOGGING_ENABLED = "false"
+
+ai-toolkit config validate
+$LASTEXITCODE
+```
+
+The command should say that the configuration is structurally valid and return
+`0`. It does not authenticate the placeholder key or send a model request.
+
+To verify the invalid-command contract, run the command without a subcommand:
+
+```powershell
+ai-toolkit
+$LASTEXITCODE
+```
+
+The usage error is expected, and the exit code should be `2`. Close the
+PowerShell window after this check, or remove the temporary variables with:
+
+```powershell
+Remove-Item Env:AI_PROVIDER
+Remove-Item Env:OPENAI_API_KEY
+Remove-Item Env:OPENAI_MODEL
+Remove-Item Env:AI_FILE_LOGGING_ENABLED
+```
+
+If `Get-Command` cannot find `ai-toolkit`, confirm that the intended virtual
+environment is active and rerun `python -m pip install .`. If it finds a
+command outside `.venv\Scripts`, a different installation is being executed.
+
 ## Optional extras
 
 Extras are additive. Choose only the groups needed by the application or
