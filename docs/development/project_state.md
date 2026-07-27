@@ -89,6 +89,7 @@ Completed PROD-005 package tasks:
 * PACKAGE-005 Verify console entry points
 * PACKAGE-006 Build source distribution and wheel
 * PACKAGE-007 Validate distributions
+* PACKAGE-008 Test installation in a clean virtual environment
 
 Next active task:
 
@@ -99,7 +100,7 @@ PROD-005 — PyPI Package
 Next roadmap task:
 
 ```text
-PACKAGE-008 — Test installation in a clean virtual environment
+PACKAGE-009 — Test core installation without optional frameworks
 ```
 
 ---
@@ -640,7 +641,8 @@ Remaining:
 `PACKAGE-004 — Verify Optional Dependency Groups`, and
 `PACKAGE-005 — Verify Console Entry Points`, and
 `PACKAGE-006 — Build Source Distribution and Wheel`, and
-`PACKAGE-007 — Validate Distributions` are complete.
+`PACKAGE-007 — Validate Distributions`, and
+`PACKAGE-008 — Test Installation in a Clean Virtual Environment` are complete.
 
 The current metadata now:
 
@@ -681,18 +683,30 @@ agreement with all reviewed `ai` modules, matching metadata and required files,
 valid wheel `RECORD` hashes, and no secret, cache, compiled, log, deliverable,
 or nested build content.
 
+Separate clean environments now prove that both the wheel and source
+distribution install successfully, report version `0.7.0.dev0`, import the
+toolkit from isolated `site-packages` directories, run representative offline
+prompt and vector-store operations, generate the working console command, and
+pass dependency validation. The archive validator now handles Windows and Unix
+README line endings consistently without accepting real text differences.
+
 Twine proves that the packaged Markdown is renderable but does not visit link
 destinations. The README's repository-relative documentation links remain
 appropriate for the source checkout; confirmed public project URLs and
 PyPI-page link behavior must be resolved before Version 1.0 publication.
 
-Separate clean environments already prove the optional-dependency boundaries
-and that a source installation generates a console command which loads the
-supported `ai.cli.main:main` implementation. Installation and import testing
-from the actual wheel and source distribution now remains assigned to
-`PACKAGE-008`. The later full-quality release gate still owns the older
-repository-wide formatting and lint findings; `PACKAGE-007` introduced none of
-them.
+The next packaging task must prove that the core artifact does not install or
+require Django or FastAPI. Framework-extra installation remains separately
+assigned to `PACKAGE-010`. The later full-quality release gate still owns the
+older repository-wide formatting and lint findings; `PACKAGE-008` introduced
+none of them.
+
+`PACKAGE-008` completion verification passed 342 normal tests, 15 focused
+package-metadata regressions, 36 package-metadata/documentation tests, both
+clean artifact installation workflows, strict Twine and offline distribution
+validation, and focused Black and Ruff checks. Documentation verification
+inventoried 198 fenced blocks, compiled 82 Python blocks, and validated 183
+repository-relative links.
 
 ---
 
@@ -792,12 +806,12 @@ PROD-005 — PyPI Package
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-008 — Test installation in a clean virtual environment`.
+Begin `PACKAGE-009 — Test core installation without optional frameworks`.
 
-`PACKAGE-007` validated the actual source distribution and pure-Python wheel
-without finding a package defect. The next task must install each artifact into
-an isolated environment and prove that the installed package imports and runs
-without resolving code from the source checkout.
+`PACKAGE-008` installed both validated artifacts into isolated environments and
+proved that the installed package imports and runs without resolving code from
+the source checkout. The next task must verify the core dependency boundary
+explicitly, including the absence of Django and FastAPI.
 
 ---
 

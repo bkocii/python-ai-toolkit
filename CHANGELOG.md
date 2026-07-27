@@ -7,6 +7,8 @@ The format loosely follows Keep a Changelog.
 ---
 ### Fixed
 
+* Made distribution README validation independent of Windows `CRLF` versus
+  Unix `LF` line endings while continuing to reject real content differences
 * Normalized the development package version to `0.7.0.dev0` instead of
   declaring the in-progress code as a final `0.7.0` distribution
 * Added minimum compatible OpenAI and Pydantic versions to the core dependency
@@ -21,6 +23,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Clean virtual-environment installation verification from both the wheel and
+  source distribution, including installed-path, version, offline public API,
+  console-command, configuration, and dependency checks
+* Windows PowerShell guidance for installing and checking each built artifact
+  outside the source checkout
 * Strict Twine validation for the wheel and source distribution, including the
   rendered Markdown long description and modern license metadata
 * Reusable offline distribution validator covering archive safety, exact source

@@ -82,6 +82,11 @@ def metadata_description(data: bytes) -> str:
     return description.decode("utf-8")
 
 
+def normalize_text_newlines(text: str) -> str:
+    """Return text with platform-specific line endings normalized to LF."""
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def assert_metadata_matches(
     metadata: Message,
     *,
@@ -99,7 +104,9 @@ def assert_metadata_matches(
     assert metadata["License-Expression"] == project["license"]
     assert metadata.get_all("License-File") == project["license-files"]
     assert metadata["Description-Content-Type"] == "text/markdown"
-    assert description == readme
+    assert normalize_text_newlines(description) == normalize_text_newlines(
+        readme
+    ), "packaged long description differs from README.md"
 
     requirements = metadata.get_all("Requires-Dist")
     for dependency in project["dependencies"]:
@@ -246,7 +253,11 @@ def validate_sdist(
         }
         assert archived_tests == source_python_files(source_root, Path("tests"))
 
-        assert files[f"{archive_root}/README.md"].decode("utf-8") == readme
+        assert normalize_text_newlines(
+            files[f"{archive_root}/README.md"].decode("utf-8")
+        ) == normalize_text_newlines(
+            readme
+        ), "source-distribution README.md differs from the project README.md"
         assert files[f"{archive_root}/LICENSE"] == license_text
         assert (
             files[f"{archive_root}/pyproject.toml"]

@@ -2274,7 +2274,7 @@ Produce a valid, installable Python source distribution and wheel.
 * [x] PACKAGE-005 Verify console entry points
 * [x] PACKAGE-006 Build source distribution and wheel
 * [x] PACKAGE-007 Validate distributions
-* [ ] PACKAGE-008 Test installation in a clean virtual environment
+* [x] PACKAGE-008 Test installation in a clean virtual environment
 * [ ] PACKAGE-009 Test core installation without optional frameworks
 * [ ] PACKAGE-010 Test Django and FastAPI extras separately
 
@@ -2639,6 +2639,64 @@ Next task:
 PACKAGE-008 — Test installation in a clean virtual environment
 ```
 
+#### PACKAGE-008 — Test Installation in a Clean Virtual Environment
+
+Status: Completed
+
+Completed work:
+
+* installed the built wheel and source distribution into separate new virtual
+  environments outside the source checkout
+* confirmed both installations report `python-ai-toolkit==0.7.0.dev0`
+* confirmed `ai.client` resolves from each environment's `site-packages`
+  directory rather than from the project source tree
+* ran deterministic offline smoke checks through `PromptTemplate` and
+  `InMemoryVectorStore`
+* verified the installed `ai-toolkit` help command and offline structural
+  configuration validation in both environments
+* ran `pip check` successfully in both environments
+* corrected the distribution validator's Windows-only README mismatch by
+  normalizing `CRLF`, `LF`, and legacy `CR` line endings before textual
+  comparison while preserving strict content equality
+* added a regression for cross-platform README comparison and documented the
+  complete Windows PowerShell artifact-installation workflow
+* retained all runtime APIs, dependencies, optional groups, entry points, and
+  package metadata because clean installation demonstrated no package defect
+* left core dependency isolation and framework-extra installation to
+  `PACKAGE-009` and `PACKAGE-010`
+
+Completion verification:
+
+```text
+wheel clean installation passed on Linux with CPython 3.12.13
+source-distribution clean installation passed on Linux with CPython 3.12.13
+both installed imports resolved from isolated site-packages directories
+offline prompt and vector-store smoke checks passed in both environments
+installed CLI help and structural configuration validation passed
+pip check passed in both environments
+Windows-style CRLF README validation passed against both artifacts
+Twine strict validation and the complete offline archive validator passed
+15 focused package-metadata regressions passed
+36 package-metadata and documentation tests passed
+342 normal tests passed
+focused Black and Ruff checks passed
+198 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, license, benchmark, example, or
+architectural decision changed.
+
+Next task:
+
+```text
+PACKAGE-009 — Test core installation without optional frameworks
+```
+
 Clean-environment checks must verify:
 
 ```text
@@ -2651,10 +2709,10 @@ pip install python-ai-toolkit[fastapi]
 
 * [x] Wheel builds successfully
 * [x] Source distribution builds successfully
-* [ ] Distribution validation passes
+* [x] Distribution validation passes
 * [ ] Core installation does not require Django or FastAPI
 * [x] Console command is installed
-* [ ] Package imports successfully in a clean environment
+* [x] Package imports successfully in a clean environment
 
 ---
 

@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-008 — Test installation in a clean virtual environment`
+**Next task:** `PACKAGE-009 — Test core installation without optional frameworks`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `PACKAGE-008`.
+The current next task is `PACKAGE-009`.
 
 ---
 
@@ -1785,21 +1785,64 @@ artifact, or architectural decision changed.
 
 ---
 
-# Exact Next Task — PACKAGE-008
+# PACKAGE-008 — Clean Artifact Installation
 
-Test installation from each built artifact in a clean virtual environment.
+**Status:** Completed
+
+Completed work:
+
+1. installed the wheel and source distribution in separate isolated
+   environments outside the source checkout
+2. confirmed both installations report version `0.7.0.dev0`
+3. confirmed imports resolve from each environment's `site-packages`
+4. ran offline prompt and vector-store API smoke checks
+5. verified installed CLI help and offline configuration validation
+6. ran `pip check` successfully for both installations
+7. fixed Windows distribution validation by normalizing textual newline forms
+   without weakening README content comparison
+8. added the cross-platform regression and Windows PowerShell instructions
+
+Verification evidence:
+
+```text
+wheel and source-distribution clean installations passed
+both installed paths resolved from isolated site-packages
+offline public-API smoke checks passed
+installed CLI and structural configuration checks passed
+pip check passed in both environments
+Windows CRLF distribution validation passed
+15 focused package-metadata regressions passed
+36 package-metadata and documentation tests passed
+342 normal tests passed on Linux with CPython 3.12.13
+Twine strict and offline distribution validation passed
+focused Black and Ruff checks passed
+198 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, license, benchmark, example, or
+architectural decision changed.
+
+---
+
+# Exact Next Task — PACKAGE-009
+
+Test the core installation without optional frameworks.
 
 Required work:
 
-1. create isolated environments outside the source checkout
-2. install the wheel and source distribution separately
-3. confirm imports resolve from the installed package rather than local source
-4. run representative offline API and console-command smoke checks
-5. run `pip check` in both environments
-6. correct only defects demonstrated by clean installation
+1. create a new isolated environment outside the source checkout
+2. install only the core wheel without extras
+3. confirm Django and FastAPI are not installed
+4. confirm core imports and representative offline behavior still work
+5. inspect installed requirements and run `pip check`
+6. correct only dependency-boundary defects demonstrated by the test
 7. update package guidance and project records
-8. leave core-versus-framework dependency separation to `PACKAGE-009` and
-   `PACKAGE-010`
+8. leave separate framework-extra installation to `PACKAGE-010`
 
 ---
 
@@ -2342,10 +2385,10 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-008`. The validated wheel and source distribution, package metadata,
-license, README, installation guidance, distribution validator, and
-package-metadata tests are required so clean installation can be tested against
-the exact validated artifacts.
+`PACKAGE-009`. The validated core wheel, package metadata, installation
+guidance, distribution validator, and package-metadata tests are required so
+the core dependency boundary can be verified against the exact validated
+artifact.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2359,8 +2402,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-008 is still the correct next task.
-4. Confirm that PACKAGE-007 validated both standard distribution formats and left clean installation for PACKAGE-008.
+3. Verify the repository's current state and confirm that PACKAGE-009 is still the correct next task.
+4. Confirm that PACKAGE-008 installed both artifacts successfully and left core dependency isolation for PACKAGE-009.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

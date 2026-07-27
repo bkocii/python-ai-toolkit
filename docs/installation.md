@@ -355,12 +355,67 @@ It prints the final archive SHA-256 hashes so the exact validated files can be
 identified later. This validates archive construction only. Installation and
 imports from each artifact must still be tested in a clean virtual environment.
 
+The README comparison treats Windows `CRLF` and Unix `LF` line endings as the
+same text. This is necessary because package metadata may serialize line
+endings differently from a Windows checkout. Every character other than those
+line-ending forms must still match.
+
 Twine proves that the long description is valid, renderable Markdown; it does
 not visit link destinations. The current README intentionally uses
 repository-relative documentation links, while the canonical public repository
 URL is still unconfirmed. Before publishing Version 1.0 to PyPI, configure the
 confirmed project URLs and convert or otherwise verify those links for the PyPI
 page rather than inventing placeholder destinations during local validation.
+
+### Test each artifact in a clean Windows environment
+
+Run these commands from the project root after rebuilding and validating
+`dist\`. The environments are created beside the source checkout so importing
+from the project directory cannot hide a missing packaged module:
+
+```powershell
+$projectRoot = (Get-Location).Path
+$testRoot = Join-Path (Split-Path $projectRoot) "python-ai-toolkit-package008"
+$wheel = (Resolve-Path "dist\*.whl").Path
+$sdist = (Resolve-Path "dist\*.tar.gz").Path
+
+Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
+New-Item $testRoot -ItemType Directory | Out-Null
+
+py -m venv "$testRoot\wheel-env"
+py -m venv "$testRoot\sdist-env"
+
+& "$testRoot\wheel-env\Scripts\python.exe" -m pip install $wheel
+& "$testRoot\sdist-env\Scripts\python.exe" -m pip install $sdist
+```
+
+For each environment, work from the temporary directory and verify that the
+installed distribution is used:
+
+```powershell
+Push-Location $testRoot
+
+& "$testRoot\wheel-env\Scripts\python.exe" -c `
+    "from pathlib import Path; import ai.client; print(Path(ai.client.__file__).resolve())"
+& "$testRoot\wheel-env\Scripts\python.exe" -c `
+    "from importlib.metadata import version; from ai.prompts import PromptTemplate; assert version('python-ai-toolkit') == '0.7.0.dev0'; assert PromptTemplate('Hello {name}').render(name='Burim') == 'Hello Burim'; print('wheel smoke: PASSED')"
+& "$testRoot\wheel-env\Scripts\ai-toolkit.exe" --help
+& "$testRoot\wheel-env\Scripts\python.exe" -m pip check
+
+& "$testRoot\sdist-env\Scripts\python.exe" -c `
+    "from pathlib import Path; import ai.client; print(Path(ai.client.__file__).resolve())"
+& "$testRoot\sdist-env\Scripts\python.exe" -c `
+    "from importlib.metadata import version; from ai.prompts import PromptTemplate; assert version('python-ai-toolkit') == '0.7.0.dev0'; assert PromptTemplate('Hello {name}').render(name='Burim') == 'Hello Burim'; print('source smoke: PASSED')"
+& "$testRoot\sdist-env\Scripts\ai-toolkit.exe" --help
+& "$testRoot\sdist-env\Scripts\python.exe" -m pip check
+
+Pop-Location
+```
+
+Both printed module paths must be inside their environment's
+`Lib\site-packages\ai\` directory, not the project checkout. `pip check` must
+report `No broken requirements found`. The environments can be deleted after
+the check.
 
 ## Change an existing installation
 

@@ -4,6 +4,7 @@ import tomllib
 from pathlib import Path
 
 from ai.cli.main import main
+from scripts.validate_distributions import normalize_text_newlines
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
@@ -66,6 +67,16 @@ def test_readme_metadata_uses_the_project_readme():
     assert project["readme"] == "README.md"
     assert readme.startswith("# Python AI Toolkit\n")
     assert "`0.7.0-dev`" in readme
+
+
+def test_distribution_readme_comparison_is_platform_independent():
+    readme_with_lf = "# Toolkit\n\nInstall on Windows.\n"
+    readme_with_crlf = readme_with_lf.replace("\n", "\r\n")
+
+    assert normalize_text_newlines(readme_with_crlf) == readme_with_lf
+    assert normalize_text_newlines(readme_with_lf) != (
+        "# Toolkit\n\nDifferent content.\n"
+    )
 
 
 def test_core_dependencies_express_runtime_compatibility_boundaries():
