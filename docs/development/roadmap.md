@@ -1889,7 +1889,7 @@ Fill important example gaps required for a Version 1.0 release.
 * [x] EXAMPLE-003 Testing application code with a fake provider
 * [x] EXAMPLE-004 Batch embedding and retrieval
 * [x] EXAMPLE-005 End-to-end document indexing and RAG
-* [ ] EXAMPLE-006 Structured application service example
+* [x] EXAMPLE-006 Structured application service example
 * [ ] EXAMPLE-007 Review and normalize all example descriptions
 * [ ] EXAMPLE-008 Verify all examples against current APIs
 
@@ -2114,9 +2114,50 @@ Next task:
 EXAMPLE-006 — Structured application service example
 ```
 
+#### EXAMPLE-006 — Structured Application Service Example
+
+Status: Completed
+
+Completed work:
+
+* added `examples/28_structured_application_service.py` without renaming or
+  reassigning the existing 01 through 27 gallery entries
+* defined constrained application-owned `FeedbackAnalysis` and
+  `FeedbackOutcome` Pydantic models
+* injected `AIClient` into a framework-independent `CustomerFeedbackService`
+* validated and normalized feedback before any provider request
+* kept the prompt, queue selection, and human-review rules in application code
+* translated expected `AIError` failures into
+  `FeedbackServiceUnavailable` while preserving the original cause
+* returned the toolkit request ID in the stable application result
+* linked the example from the gallery, complete learning path, README, and
+  request guide
+* added deterministic regression coverage for input validation, structured
+  parsing, prompt forwarding, routing, metadata, and error translation
+
+Completion verification:
+
+```text
+51 focused example and documentation tests passed
+322 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+217 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+149 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or
+architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-007 — Review and normalize all example descriptions
+```
+
 ### Exit Criteria
 
-* [ ] Important public APIs have examples
+* [x] Important public APIs have examples
 * [ ] Example naming and numbering are consistent
 * [ ] Example documentation follows one format
 * [ ] Examples use current public APIs

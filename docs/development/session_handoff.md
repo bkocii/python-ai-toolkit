@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-006 — Structured application service example`
+**Next task:** `EXAMPLE-007 — Review and normalize all example descriptions`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-006`.
+The next task is `EXAMPLE-007`.
 
 ---
 
@@ -1373,43 +1373,85 @@ changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-006
+# EXAMPLE-006 Completion
 
-Add one framework-independent structured application service example.
+`EXAMPLE-006 — Structured application service example` is complete.
 
-Required work:
+Completed work:
 
-1. inspect the current structured-request, Pydantic-model, client-injection,
-   deterministic-test, and example-numbering contracts before editing
-2. add the next numbered example without renaming existing examples
-3. keep the application service dependent on `AIClient`, not a provider SDK
-4. define a small application-owned input flow, prompt, and validated Pydantic
-   response model
-5. keep domain rules and decisions in application code rather than adding a
-   toolkit service abstraction
-6. demonstrate explicit dependency injection suitable for frameworks,
-   background jobs, or ordinary Python applications
-7. prove the complete service workflow deterministically without credentials
-   or network access
-8. update the gallery, learning path, request guide, and README
-9. run focused and full tests plus documentation/link checks
-10. update roadmap, project state, session handoff, and changelog
+1. added `examples/28_structured_application_service.py`
+2. defined constrained application-owned `FeedbackAnalysis` and
+   `FeedbackOutcome` Pydantic models
+3. injected `AIClient` into a framework-independent
+   `CustomerFeedbackService`
+4. validated and normalized application input before any provider request
+5. kept the prompt, queue selection, and human-review rules in application
+   code
+6. translated expected `AIError` failures into
+   `FeedbackServiceUnavailable` while preserving the original exception cause
+7. preserved the toolkit request ID in the stable application result
+8. linked example 28 from the gallery, complete learning path, README, and
+   request guide
+9. added deterministic regression coverage for structured execution, prompt
+   forwarding, input validation, routing, metadata, and error translation
+
+Completion verification:
+
+```text
+51 focused example and documentation tests passed
+322 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+217 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+149 repository-relative user-documentation links passed
+```
+
+No production runtime API, provider adapter, dependency, benchmark, or ADR
+changed.
 
 ---
 
-# EXAMPLE-005 Verification and Repository State
+# Exact Next Task — EXAMPLE-007
+
+Review and normalize all example descriptions.
+
+Required work:
+
+1. inspect every numbered and unnumbered example plus the current gallery
+   before editing
+2. define one concise description format covering the file or command,
+   demonstrated behavior, setup requirements, run command, and important
+   boundaries
+3. normalize gallery headings, wording, lists, and spacing without changing
+   example behavior
+4. reconcile every description with the implementation and focused public
+   guides
+5. identify naming or numbering inconsistencies explicitly; do not silently
+   renumber modules or mix the later current-API verification into this task
+6. preserve provider, credential, platform, and optional-capability
+   requirements
+7. keep descriptions application-focused and avoid claiming unsupported
+   capabilities
+8. update the README, verification record, roadmap, project state, session
+   handoff, and changelog as required
+9. run documentation, link, focused, and full-suite checks
+10. advance the active pointer to `EXAMPLE-008`
+
+---
+
+# EXAMPLE-006 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
-docs/retrieval.md
+docs/requests.md
 docs/development/example_verification.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
-examples/27_document_indexing_and_rag.py
+examples/28_structured_application_service.py
 examples/README.md
 tests/test_documentation_examples.py
 tests/test_examples.py
@@ -1424,18 +1466,18 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    docs\retrieval.md `
+    docs\requests.md `
     docs\development\example_verification.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md `
-    examples\27_document_indexing_and_rag.py `
+    examples\28_structured_application_service.py `
     examples\README.md `
     tests\test_documentation_examples.py `
     tests\test_examples.py
 
 git diff --cached
-git commit -m "docs: add end-to-end RAG example"
+git commit -m "docs: add structured service example"
 ```
 
 ---
@@ -1891,26 +1933,17 @@ Required:
 For the immediate next task, also provide:
 
 6. `README.md`
-7. `pyproject.toml`
-8. `ai/client.py`
-9. `ai/config.py`
-10. `ai/config_validator.py`
-11. `ai/executor.py`
-12. `ai/structured.py`
-13. `ai/schemas.py`
-14. `ai/providers/base.py`
-15. `docs/requests.md`
-16. `docs/api_reference.md`
-17. `docs/development/example_verification.md`
-18. the complete `examples/` directory
-19. `tests/test_client.py`
-20. `tests/test_executor.py`
-21. `tests/test_structured.py`
-22. `tests/test_examples.py`
+7. `CHANGELOG.md`
+8. all focused public guides under `docs/`
+9. `docs/api_reference.md`
+10. `docs/development/example_verification.md`
+11. the complete `examples/` directory
+12. `tests/test_documentation_examples.py`
+13. `tests/test_examples.py`
 
-Framework-specific integration changes, a new toolkit application-service
-abstraction, profiling evidence, and benchmark artifacts are not required for
-`EXAMPLE-006`.
+Production runtime changes, example renumbering, the final current-API
+verification assigned to `EXAMPLE-008`, profiling evidence, and benchmark
+artifacts are not required for `EXAMPLE-007`.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1924,8 +1957,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-006 is still the correct next task.
-4. Confirm that EXAMPLE-005 added explicit document preparation, stable IDs, one-request batch indexing, grounded RAG generation, and deterministic end-to-end verification.
+3. Verify the repository's current state and confirm that EXAMPLE-007 is still the correct next task.
+4. Confirm that EXAMPLE-006 added a framework-independent structured application service with injected AIClient, local input validation, application-owned routing, request traceability, expected-error mapping, and deterministic verification.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

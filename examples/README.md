@@ -567,6 +567,38 @@ rather than introducing a high-level indexing helper.
 See the [retrieval and RAG guide](../docs/retrieval.md) for document-preparation,
 grounding, source-context, and in-memory storage boundaries.
 
+## 28 – Structured Application Service
+
+**File**
+
+```text
+28_structured_application_service.py
+```
+
+Demonstrates:
+
+* injecting `AIClient` into a framework-independent application service
+* validating application input before making a provider request
+* requesting a constrained Pydantic `FeedbackAnalysis`
+* keeping prompts, routing, and human-review rules in application code
+* mapping expected toolkit failures to an application-owned exception
+* returning a stable `FeedbackOutcome` with the toolkit request ID
+
+Run with valid text-generation provider configuration:
+
+```bash
+python -m examples.28_structured_application_service
+```
+
+The automated regression substitutes a deterministic provider and verifies
+input validation, structured parsing, prompt contents, application routing,
+request metadata, and error translation without credentials or network access.
+The service does not perform a refund, update a database, or contact another
+system; authorization and side effects remain application responsibilities.
+
+See the [request guide](../docs/requests.md#put-structured-requests-behind-an-application-service)
+for the application-service boundary.
+
 ## Running
 ```bash
 python -m examples.01_plain_text
@@ -600,3 +632,4 @@ python -m examples.01_plain_text
 25. Testing with a Fake Provider
 26. Batch Embedding and Retrieval
 27. End-to-End Document Indexing and RAG
+28. Structured Application Service

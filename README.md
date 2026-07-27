@@ -485,6 +485,7 @@ The [example gallery](examples/README.md) provides a numbered learning path:
 | Testing application code with a fake provider | 25 |
 | Batch embedding and retrieval | 26 |
 | End-to-end document indexing and RAG | 27 |
+| Structured application service | 28 |
 
 Network-dependent examples require valid provider configuration. The examples
 remain application-focused and keep business logic intentionally small.

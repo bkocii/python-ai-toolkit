@@ -17,6 +17,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Framework-independent structured application service example with injected
+  `AIClient`, local input validation, application-owned routing, error mapping,
+  and request traceability
+* Deterministic regression coverage for the complete structured service
+  workflow without credentials or network access
 * End-to-end document indexing and grounded RAG example with explicit document
   preparation, stable IDs, batch-order restoration, retrieval, and source
   contexts

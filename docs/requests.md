@@ -217,6 +217,42 @@ refund policy, available balance, and whether human approval is required.
 Treat structured output as validated input to business logic—not as permission
 to perform an external action.
 
+## Put structured requests behind an application service
+
+In a real application, keep the prompt, input checks, domain rules, and
+application errors together in an application-owned service. Inject
+`AIClient` so a web framework, background worker, command, or test can choose
+how the client is constructed:
+
+```python
+from importlib import import_module
+
+from ai.client import AIClient
+
+
+service_module = import_module("examples.28_structured_application_service")
+
+
+def build_feedback_service(client: AIClient):
+    return service_module.CustomerFeedbackService(client)
+```
+
+The complete
+[structured application service example](../examples/28_structured_application_service.py)
+demonstrates this boundary:
+
+- Pydantic validates the provider response as `FeedbackAnalysis`.
+- The service rejects invalid application input before making a request.
+- Python code selects the routing queue and human-review requirement.
+- Expected `AIError` failures become an application-owned
+  `FeedbackServiceUnavailable`.
+- The returned `FeedbackOutcome` preserves the toolkit request ID for
+  application tracing.
+
+The toolkit does not need a generic `ApplicationService` abstraction. Service
+lifetime, dependency injection, HTTP or task-queue error mapping, persistence,
+authorization, and final business actions remain application responsibilities.
+
 ## Choosing plain or structured output
 
 Use plain text for:

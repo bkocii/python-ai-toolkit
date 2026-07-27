@@ -75,6 +75,7 @@ Completed PROD-004 example tasks:
 * EXAMPLE-003 Testing application code with a fake provider
 * EXAMPLE-004 Batch embedding and retrieval
 * EXAMPLE-005 End-to-end document indexing and RAG
+* EXAMPLE-006 Structured application service example
 
 Next active task:
 
@@ -85,7 +86,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-006 — Structured application service example
+EXAMPLE-007 — Review and normalize all example descriptions
 ```
 
 ---
@@ -714,15 +715,15 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-006 — Structured application service example`.
+Begin `EXAMPLE-007 — Review and normalize all example descriptions`.
 
-`EXAMPLE-005` added `examples/27_document_indexing_and_rag.py`. It loads the
-existing sample files, adds application-owned IDs and collection metadata,
-batch embeds and indexes them, retrieves the Redis document, and generates one
-grounded answer through `RAGPipeline`. The next task should demonstrate a
-small, framework-independent application service that returns a validated
-structured model while keeping prompts and business decisions in application
-code.
+`EXAMPLE-006` added `examples/28_structured_application_service.py`. It injects
+`AIClient` into a framework-independent customer-feedback service, validates
+input before the request, returns a constrained structured model, applies
+application-owned routing and human-review rules, preserves the request ID,
+and maps expected toolkit failures to a stable application exception. The next
+task should review the complete gallery and normalize example descriptions
+without mixing in the final API-verification task.
 
 ---
 

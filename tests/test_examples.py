@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from ai.config import AIConfig
 from ai.embeddings import EmbeddingResponse, EmbeddingVector
-from ai.exceptions import AIConfigurationError
+from ai.exceptions import AIConfigurationError, AIProviderError
 from ai.integrations.fastapi import get_async_ai_client
 from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse, TokenUsage
@@ -149,6 +149,19 @@ class DeterministicExampleProvider:
             )
 
         if (
+            "Analyze this customer feedback for internal routing." in prompt
+            and "Return valid JSON only." in prompt
+        ):
+            return json.dumps(
+                {
+                    "category": "billing",
+                    "sentiment": "negative",
+                    "urgency": 4,
+                    "summary": "Customer reports a duplicate charge.",
+                }
+            )
+
+        if (
             "using only the context below" in prompt
             and "Which technology should I use for caching?" in prompt
         ):
@@ -200,6 +213,7 @@ def deterministic_provider(monkeypatch):
         "examples.23_explicit_config",
         "examples.26_batch_embedding_and_retrieval",
         "examples.27_document_indexing_and_rag",
+        "examples.28_structured_application_service",
         "examples.hello_ai",
         "examples.drink_recommender",
     ],
@@ -476,3 +490,53 @@ def test_document_indexing_and_rag_runs_complete_grounded_workflow(
     assert "using only the context below" in deterministic_provider.text_prompts[0]
     assert "Redis is often used as a cache" in deterministic_provider.text_prompts[0]
     assert question in deterministic_provider.text_prompts[0]
+
+
+def test_structured_application_service_owns_validation_and_routing(
+    deterministic_provider,
+):
+    module = importlib.import_module("examples.28_structured_application_service")
+    service = module.CustomerFeedbackService(module.AIClient())
+    message = "I was charged twice for my order and need someone to check it."
+
+    outcome = service.analyze(message)
+
+    assert outcome.analysis == module.FeedbackAnalysis(
+        category="billing",
+        sentiment="negative",
+        urgency=4,
+        summary="Customer reports a duplicate charge.",
+    )
+    assert outcome.queue == "billing-team"
+    assert outcome.requires_human_review is True
+    assert outcome.request_id
+    assert len(deterministic_provider.text_prompts) == 1
+    assert "Analyze this customer feedback" in deterministic_provider.text_prompts[0]
+    assert message in deterministic_provider.text_prompts[0]
+    assert "Return valid JSON only." in deterministic_provider.text_prompts[0]
+
+    with pytest.raises(ValueError, match="between 10 and 2,000"):
+        service.analyze("   ")
+
+    assert len(deterministic_provider.text_prompts) == 1
+
+
+def test_structured_application_service_maps_expected_toolkit_errors(
+    monkeypatch,
+    deterministic_provider,
+):
+    module = importlib.import_module("examples.28_structured_application_service")
+    service = module.CustomerFeedbackService(module.AIClient())
+
+    def fail_request(_prompt):
+        raise AIProviderError("provider-specific detail")
+
+    monkeypatch.setattr(deterministic_provider, "ask_text", fail_request)
+
+    with pytest.raises(
+        module.FeedbackServiceUnavailable,
+        match="temporarily unavailable",
+    ) as captured:
+        service.analyze("The delivery status has not changed for several days.")
+
+    assert isinstance(captured.value.__cause__, AIProviderError)
