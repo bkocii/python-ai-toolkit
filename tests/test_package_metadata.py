@@ -70,6 +70,30 @@ def test_package_classifiers_do_not_overstate_unverified_or_unowned_metadata():
     assert "Development Status :: 5 - Production/Stable" not in classifiers
 
 
+def test_mit_license_metadata_matches_the_repository_license():
+    project = load_pyproject()["project"]
+    license_paths = [
+        PROJECT_ROOT / relative_path for relative_path in project["license-files"]
+    ]
+
+    assert project["license"] == "MIT"
+    assert project["license-files"] == ["LICENSE"]
+    assert license_paths == [PROJECT_ROOT / "LICENSE"]
+
+    license_text = license_paths[0].read_text(encoding="utf-8")
+
+    assert license_text.startswith("MIT License\n\nCopyright (c) 2026 Burim Koci\n")
+    assert "Permission is hereby granted, free of charge" in license_text
+    assert "The above copyright notice and this permission notice" in license_text
+    assert 'THE SOFTWARE IS PROVIDED "AS IS"' in license_text
+
+
+def test_build_backend_supports_current_license_metadata():
+    build_requirements = load_pyproject()["build-system"]["requires"]
+
+    assert build_requirements == ["setuptools>=77.0.3", "wheel"]
+
+
 def test_package_discovery_covers_every_ai_package():
     pyproject = load_pyproject()
     discovery = pyproject["tool"]["setuptools"]["packages"]["find"]

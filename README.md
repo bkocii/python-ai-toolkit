@@ -589,4 +589,9 @@ maintaining a second roadmap in this README.
 
 ## License
 
-MIT
+Python AI Toolkit is released under the [MIT License](LICENSE).
+
+This permissive license allows use, modification, redistribution, and
+commercial use, including inside closed-source applications. Copies or
+substantial portions of the toolkit must retain the copyright and license
+notice. The software is provided without warranty.

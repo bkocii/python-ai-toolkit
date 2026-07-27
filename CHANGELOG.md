@@ -21,6 +21,10 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* MIT license text and current SPDX license metadata for source and binary
+  distributions
+* Focused regressions keeping the declared license, distributed license file,
+  copyright owner, and compatible build backend aligned
 * PyPI classifiers for the beta development status, developer audience,
   console environment, framework integrations, platform, language, and project
   topics

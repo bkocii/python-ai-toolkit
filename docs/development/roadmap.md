@@ -2269,7 +2269,7 @@ Produce a valid, installable Python source distribution and wheel.
 
 * [x] PACKAGE-001 Review package metadata
 * [x] PACKAGE-002 Add package classifiers
-* [ ] PACKAGE-003 Confirm license metadata and license file
+* [x] PACKAGE-003 Confirm license metadata and license file
 * [ ] PACKAGE-004 Verify optional dependency groups
 * [ ] PACKAGE-005 Verify console entry points
 * [ ] PACKAGE-006 Build source distribution and wheel
@@ -2383,7 +2383,53 @@ changed.
 Next task:
 
 ```text
-PACKAGE-003 — Confirm license metadata and license file
+PACKAGE-004 — Verify optional dependency groups
+```
+
+#### PACKAGE-003 — Confirm License Metadata and License File
+
+Status: Completed
+
+Completed work:
+
+* confirmed MIT as the owner-selected license already named by the README and
+  appropriate for commercial, private, and open-source toolkit adoption
+* added the complete standard MIT text under
+  `Copyright (c) 2026 Burim Koci`
+* declared the current SPDX expression `license = "MIT"`
+* declared `license-files = ["LICENSE"]` so package distributions include the
+  complete legal terms
+* raised the build-backend floor to `setuptools>=77.0.3`, the first setuptools
+  release supporting the PEP 639 metadata form used by the project
+* preserved the ten existing classifiers without adding deprecated
+  `License ::` classifier metadata
+* explained the license permissions, notice requirement, warranty disclaimer,
+  and build-only setuptools requirement in the README and installation guide
+* added focused regressions proving that the declared SPDX license, repository
+  file, copyright owner, license-file pattern, and build backend agree
+
+Completion verification:
+
+```text
+8 focused package-metadata regressions passed
+29 package-metadata and documentation tests passed
+335 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the current complete environment
+setuptools 77.0.3 accepted the PEP 639 license metadata
+focused Black and Ruff checks passed
+184 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+181 repository-relative user-documentation links passed
+```
+
+No runtime API, provider implementation, runtime dependency, optional group,
+console entry point, benchmark, example, build output, or architectural
+decision changed.
+
+Next task:
+
+```text
+PACKAGE-004 — Verify optional dependency groups
 ```
 
 Clean-environment checks must verify:

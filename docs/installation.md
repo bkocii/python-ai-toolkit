@@ -54,9 +54,26 @@ the Version 1.0 CI matrix verifies the intended release range. The
 `requires-python = ">=3.11"` field remains the installer-enforced version
 boundary.
 
-No license classifier is declared. License metadata and the distributed license
-file are handled separately by `PACKAGE-003`; current packaging standards
-prefer a license expression over the older license classifiers.
+No license classifier is declared because current packaging standards use
+dedicated license metadata instead. The package declares the SPDX expression
+`MIT`, and `license-files = ["LICENSE"]` tells build tools to include the
+complete legal text in distributions.
+
+## License
+
+Python AI Toolkit uses the permissive MIT License. It permits private,
+commercial, and open-source use, modification, and redistribution. Anyone who
+copies or distributes the toolkit or a substantial portion of it must preserve
+the copyright and license notice.
+
+MIT does not require an application that uses the toolkit to publish its own
+source code. It also provides the toolkit without warranty. The complete terms
+are in the repository's [`LICENSE`](../LICENSE) file.
+
+The build backend requires `setuptools>=77.0.3` because that is the first
+setuptools release supporting the current PEP 639 license expression and
+`license-files` metadata used here. This affects package construction only; it
+does not add a runtime dependency for toolkit users.
 
 ## Create a virtual environment
 

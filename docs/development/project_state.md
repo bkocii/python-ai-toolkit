@@ -84,6 +84,7 @@ Completed PROD-005 package tasks:
 
 * PACKAGE-001 Review package metadata
 * PACKAGE-002 Add package classifiers
+* PACKAGE-003 Confirm license metadata and license file
 
 Next active task:
 
@@ -94,7 +95,7 @@ PROD-005 — PyPI Package
 Next roadmap task:
 
 ```text
-PACKAGE-003 — Confirm license metadata and license file
+PACKAGE-004 — Verify optional dependency groups
 ```
 
 ---
@@ -629,8 +630,9 @@ Remaining:
 
 ## PyPI Package Status
 
-`PACKAGE-001 — Review Package Metadata` and
-`PACKAGE-002 — Add Package Classifiers` are complete.
+`PACKAGE-001 — Review Package Metadata`,
+`PACKAGE-002 — Add Package Classifiers`, and
+`PACKAGE-003 — Confirm License Metadata and License File` are complete.
 
 The current metadata now:
 
@@ -647,12 +649,15 @@ The current metadata now:
   Python 3-only support, artificial intelligence, and Python modules
 * omits Python-minor classifiers until the Version 1.0 CI matrix verifies the
   intended release range
-* omits license classifiers because `PACKAGE-003` owns the license decision and
-  modern package metadata uses a separate license expression
+* applies the MIT License under Burim Koci's 2026 copyright
+* declares the current SPDX expression `MIT`
+* includes the complete `LICENSE` text through `license-files`
+* requires `setuptools>=77.0.3` for current PEP 639 metadata support
+* omits deprecated license classifiers
 
-Six focused metadata regressions, 62 exact-minimum dependency checks, and all
-333 normal tests pass. License metadata and the distributed license file are
-the next packaging concern.
+Eight focused metadata regressions, 62 exact-minimum dependency checks, and all
+335 normal tests pass. Optional dependency groups are the next packaging
+concern.
 
 ---
 
@@ -752,13 +757,12 @@ PROD-005 — PyPI Package
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-003 — Confirm license metadata and license file`.
+Begin `PACKAGE-004 — Verify optional dependency groups`.
 
-`PACKAGE-002` added ten canonical PyPI classifiers without claiming a stable
-release, specific unverified Python-minor support, or unresolved license
-metadata. The next task must choose and record the actual project license,
-include its text in distributions, and use current license-expression
-metadata.
+`PACKAGE-003` applied the MIT License consistently across the repository text,
+SPDX metadata, copyright owner, and license-file declaration. The next task
+must verify that the Django, FastAPI, development, and benchmark dependency
+groups install only what their documented workflows require.
 
 ---
 

@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-003 — Confirm license metadata and license file`
+**Next task:** `PACKAGE-004 — Verify optional dependency groups`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `PACKAGE-003`.
+The next task is `PACKAGE-004`.
 
 ---
 
@@ -1568,20 +1568,61 @@ changed.
 
 ---
 
-# Exact Next Task — PACKAGE-003
+# PACKAGE-003 — License Metadata and License File
 
-Confirm license metadata and the license file.
+**Status:** Completed
+
+Completed work:
+
+1. confirmed MIT as the owner-selected license already stated in the README
+2. added the complete standard MIT text under
+   `Copyright (c) 2026 Burim Koci`
+3. declared the SPDX expression `license = "MIT"`
+4. declared `license-files = ["LICENSE"]`
+5. raised the build-backend floor to `setuptools>=77.0.3` for current PEP 639
+   metadata support without changing runtime dependencies
+6. preserved the existing classifier set without deprecated `License ::`
+   values
+7. documented commercial use, closed-source use, redistribution, notice
+   preservation, and the warranty disclaimer
+8. added focused regressions keeping the metadata, repository file, owner, and
+   build backend aligned
+
+Final verification:
+
+```text
+8 focused package-metadata regressions passed
+29 package-metadata and documentation tests passed
+335 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the current complete environment
+setuptools 77.0.3 accepted the PEP 639 license metadata
+focused Black and Ruff checks passed
+184 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+181 repository-relative user-documentation links passed
+```
+
+No runtime API, provider implementation, runtime dependency, optional group,
+console entry point, benchmark, example, build output, or architectural
+decision changed.
+
+---
+
+# Exact Next Task — PACKAGE-004
+
+Verify optional dependency groups.
 
 Required work:
 
-1. confirm which license the project owner intends to apply
-2. add the complete corresponding license text to the repository
-3. add current SPDX license-expression and license-file metadata
-4. do not reintroduce deprecated `License ::` classifiers
-5. add focused tests proving the declared license and distributed file agree
+1. inspect the Django, FastAPI, development, and benchmark extras
+2. prove that each extra installs the dependencies needed by its documented
+   workflow
+3. prove that the core installation does not require optional frameworks
+4. correct only demonstrated missing, invalid, or misplaced dependencies
+5. add focused tests for optional-group boundaries
 6. update roadmap, project state, handoff, changelog, and package guidance
-7. do not change runtime behavior, dependencies, optional groups, console entry
-   points, or build outputs in this task
+7. do not change runtime behavior, console entry points, license metadata, or
+   build outputs in this task
 
 ---
 
@@ -2117,11 +2158,13 @@ For the immediate next task, also provide:
 9. `docs/installation.md`
 10. `docs/compatibility.md`
 11. `tests/test_package_metadata.py`
+12. framework integration tests relevant to the optional groups
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-003`. The current metadata, selected classifiers, and project-owner
-license choice are required so the repository text and SPDX metadata agree.
+`PACKAGE-004`. The current optional groups, integration imports, installation
+guidance, and package-metadata tests are required so dependency boundaries can
+be verified without changing runtime behavior.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2135,8 +2178,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-003 is still the correct next task.
-4. Confirm that PACKAGE-002 added canonical classifiers without claiming stable status, specific unverified Python minors, or a license decision.
+3. Verify the repository's current state and confirm that PACKAGE-004 is still the correct next task.
+4. Confirm that PACKAGE-003 applied the MIT license consistently across the repository file and package metadata.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
