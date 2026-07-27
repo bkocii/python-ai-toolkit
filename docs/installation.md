@@ -139,9 +139,9 @@ development workflow.
 
 | Extra | Install command | Adds |
 | --- | --- | --- |
-| Django | `python -m pip install ".[django]"` | Django integration dependencies |
-| FastAPI | `python -m pip install ".[fastapi]"` | FastAPI integration dependencies |
-| Development | `python -m pip install -e ".[dev]"` | Pytest, Black, Ruff, Django, FastAPI, and HTTPX2 |
+| Django | `python -m pip install ".[django]"` | `django>=5.0` |
+| FastAPI | `python -m pip install ".[fastapi]"` | `fastapi>=0.100,<1` |
+| Development | `python -m pip install -e ".[dev]"` | Pytest, Black, Ruff, both framework extras, and HTTPX2 |
 | Benchmark | `python -m pip install -e ".[benchmark]"` | Pytest and pytest-benchmark |
 
 Multiple extras can be installed together:
@@ -160,6 +160,23 @@ testing, and CLI behavior are documented in the
 [framework and CLI integration guide](integrations.md) and the existing
 [Django](../examples/README.md#19--django-integration) and
 [FastAPI](../examples/README.md#20--fastapi-integration) examples.
+
+### Verified installation boundaries
+
+Each installation shape was resolved and checked in a separate clean virtual
+environment on CPython 3.12.13:
+
+| Installation | Verified boundary |
+| --- | --- |
+| Core | The toolkit and CLI import without Django, FastAPI, HTTPX2, Pytest, or pytest-benchmark |
+| `django` | The Django adapter imports; FastAPI remains absent |
+| `fastapi` | The FastAPI adapter and an application instance import; Django remains absent |
+| `dev` | The complete normal test suite, Black, and Ruff run without the benchmark extra |
+| `benchmark` | Benchmark fixtures and the pytest-benchmark smoke test run without the development extra |
+
+All five environments passed `python -m pip check`. These checks prove the
+current dependency boundaries; they do not configure a provider, make a live
+provider request, or replace the planned multi-version release matrix.
 
 ## Install for contribution
 

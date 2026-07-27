@@ -1,3 +1,4 @@
+import ast
 import tomllib
 from pathlib import Path
 
@@ -15,6 +16,26 @@ EXPECTED_CLASSIFIERS = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+EXPECTED_OPTIONAL_DEPENDENCIES = {
+    "django": [
+        "django>=5.0",
+    ],
+    "fastapi": [
+        "fastapi>=0.100,<1",
+    ],
+    "dev": [
+        "pytest",
+        "black",
+        "ruff",
+        "django>=5.0",
+        "fastapi>=0.100,<1",
+        "httpx2",
+    ],
+    "benchmark": [
+        "pytest",
+        "pytest-benchmark",
+    ],
+}
 
 
 def load_pyproject() -> dict:
@@ -51,6 +72,61 @@ def test_core_dependencies_express_runtime_compatibility_boundaries():
         "pydantic>=2.4.2",
         "python-dotenv",
     ]
+
+
+def test_optional_dependency_groups_match_supported_workflows():
+    optional_dependencies = load_pyproject()["project"]["optional-dependencies"]
+
+    assert optional_dependencies == EXPECTED_OPTIONAL_DEPENDENCIES
+    assert set(optional_dependencies["django"]).issubset(optional_dependencies["dev"])
+    assert set(optional_dependencies["fastapi"]).issubset(optional_dependencies["dev"])
+    assert "httpx2" in optional_dependencies["dev"]
+    assert "httpx2" not in optional_dependencies["fastapi"]
+    assert optional_dependencies["benchmark"] == ["pytest", "pytest-benchmark"]
+
+
+def test_core_dependencies_exclude_optional_workflow_packages():
+    core_dependencies = load_pyproject()["project"]["dependencies"]
+    optional_package_names = {
+        "black",
+        "django",
+        "fastapi",
+        "httpx2",
+        "pytest",
+        "pytest-benchmark",
+        "ruff",
+    }
+
+    assert not any(
+        dependency.split("<", 1)[0].split(">", 1)[0].split("=", 1)[0]
+        in optional_package_names
+        for dependency in core_dependencies
+    )
+
+
+def test_optional_framework_imports_stay_within_integration_packages():
+    framework_directories = {
+        "django": PROJECT_ROOT / "ai" / "integrations" / "django",
+        "fastapi": PROJECT_ROOT / "ai" / "integrations" / "fastapi",
+    }
+
+    for source_path in (PROJECT_ROOT / "ai").rglob("*.py"):
+        tree = ast.parse(source_path.read_text(encoding="utf-8"), filename=source_path)
+        imported_roots = {
+            alias.name.split(".", 1)[0]
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        }
+        imported_roots.update(
+            node.module.split(".", 1)[0]
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom) and node.module
+        )
+
+        for framework, integration_directory in framework_directories.items():
+            if framework in imported_roots:
+                assert source_path.is_relative_to(integration_directory)
 
 
 def test_package_classifiers_describe_the_current_project():
