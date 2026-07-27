@@ -25,6 +25,7 @@ Completed Sprint 9 tasks:
 * PROD-001 Benchmark Suite
 * PROD-002 Performance Profiling
 * PROD-003 Complete Documentation
+* PROD-004 Additional Examples
 
 Completed PROD-001 benchmark tasks:
 
@@ -77,17 +78,18 @@ Completed PROD-004 example tasks:
 * EXAMPLE-005 End-to-end document indexing and RAG
 * EXAMPLE-006 Structured application service example
 * EXAMPLE-007 Review and normalize all example descriptions
+* EXAMPLE-008 Verify all examples against current APIs
 
 Next active task:
 
 ```text
-PROD-004 — Additional Examples
+PROD-005 — PyPI Package
 ```
 
 Next roadmap task:
 
 ```text
-EXAMPLE-008 — Verify all examples against current APIs
+PACKAGE-001 — Review package metadata
 ```
 
 ---
@@ -711,20 +713,19 @@ docs/development/performance_profiling.md
 The next active roadmap item is:
 
 ```text
-PROD-004 — Additional Examples
+PROD-005 — PyPI Package
 ```
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-008 — Verify all examples against current APIs`.
+Begin `PACKAGE-001 — Review package metadata`.
 
-`EXAMPLE-007` reviewed every numbered and supplementary example description,
-standardized the complete gallery around file or command, behavior,
-requirements, run instructions, and boundaries, and documented the intentional
-numbering compatibility exceptions. It added permanent catalog-coverage and
-format regressions without changing any example implementation or runtime API.
-The next task should execute and reconcile every example against the current
-public interfaces before `PROD-004` is closed.
+`EXAMPLE-008` executed every numbered, variant, framework, command, and
+supplementary example against the current public interfaces, added permanent
+coverage-completeness and supported-import regressions, and found no stale API
+usage requiring an implementation correction. `PROD-004` is complete. The
+next task should inspect the existing package metadata before any distribution
+or publishing work begins.
 
 ---
 

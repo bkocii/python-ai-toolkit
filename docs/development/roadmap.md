@@ -1891,7 +1891,7 @@ Fill important example gaps required for a Version 1.0 release.
 * [x] EXAMPLE-005 End-to-end document indexing and RAG
 * [x] EXAMPLE-006 Structured application service example
 * [x] EXAMPLE-007 Review and normalize all example descriptions
-* [ ] EXAMPLE-008 Verify all examples against current APIs
+* [x] EXAMPLE-008 Verify all examples against current APIs
 
 ### Example Rules
 
@@ -2201,12 +2201,61 @@ Next task:
 EXAMPLE-008 — Verify all examples against current APIs
 ```
 
+#### EXAMPLE-008 — Verify All Examples Against Current APIs
+
+Status: Completed
+
+Completed work:
+
+* inspected the current public API reference, runtime interfaces, and every
+  numbered, variant, framework, command, and supplementary example
+* executed all Python example workflows with deterministic substitutes where
+  live provider behavior would otherwise be required
+* verified Django, FastAPI, CLI, image, embedding, retrieval, RAG, agent,
+  workflow, orchestration, and structured-response paths through their real
+  public entry points
+* confirmed that all example imports resolve through documented public modules
+  and symbols
+* added a regression requiring every Python example module to retain
+  deterministic execution coverage
+* added a regression rejecting undocumented or unavailable toolkit imports in
+  example modules
+* preserved the normalized gallery format and intentional numbering
+  compatibility decisions from `EXAMPLE-007`
+* found no stale import, signature, return-value assumption, expected output,
+  or setup instruction requiring an example or runtime correction
+* retained live credential, account, region, network, cost, and model
+  capability checks as an explicit smoke-test boundary
+
+Completion verification:
+
+```text
+56 focused example and documentation tests passed
+67 focused tests passed including CLI workflows
+327 normal tests passed on Linux with CPython 3.12.13
+clean source installation with development and benchmark extras passed
+pip check passed in the clean environment
+focused Black and Ruff checks passed
+184 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+179 repository-relative user-documentation links passed
+```
+
+No production runtime API, example implementation, provider adapter,
+dependency, benchmark, or architectural decision changed.
+
+Next task:
+
+```text
+PACKAGE-001 — Review package metadata
+```
+
 ### Exit Criteria
 
 * [x] Important public APIs have examples
 * [x] Example naming and numbering are consistent
 * [x] Example documentation follows one format
-* [ ] Examples use current public APIs
+* [x] Examples use current public APIs
 
 ---
 

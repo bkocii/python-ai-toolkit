@@ -3,9 +3,9 @@
 ## Purpose
 
 This document records the `DOC-014` audit of user-facing examples and commands
-plus the later `PROD-004` example additions and description review. It
-distinguishes behavior verified without a network from behavior that still
-requires a real provider environment.
+plus the completed `PROD-004` additions, description review, and final
+current-public-API execution gate. It distinguishes behavior verified without
+a network from behavior that still requires a real provider environment.
 
 The audit covers:
 
@@ -17,7 +17,8 @@ The audit covers:
 - the Base64 image-helper variant
 - the command-line workflows
 
-It does not add the new example topics assigned to `PROD-004`.
+The original `DOC-014` audit did not add the example topics assigned to
+`PROD-004`; the inventory now includes the completed additions.
 
 ## Classification
 
@@ -72,9 +73,34 @@ The catalog preserves three intentional compatibility exceptions:
 
 Permanent documentation regressions fail if an example module is absent from
 the gallery, an entry loses one of the five fields, a documented Python file
-does not exist, or these numbering exceptions disappear. `EXAMPLE-007` changed
-descriptions and verification only; final execution against current public APIs
-remains assigned to `EXAMPLE-008`.
+does not exist, or these numbering exceptions disappear.
+
+## Current Public API Verification
+
+`EXAMPLE-008` executed every numbered, variant, framework, and supplementary
+example through deterministic tests. Command workflows 21 and 22 were executed
+through the real CLI dispatcher. Provider-dependent examples used controlled
+providers while retaining the real clients, executors, parsing, retrieval,
+agent, workflow, framework, and result-model paths.
+
+Two permanent completeness checks were added:
+
+- the complete set of Python modules under `examples/` must equal the set with
+  deterministic execution coverage
+- every `ai.*` module and symbol imported by an example must appear in the
+  public API reference and remain importable
+
+Execution found no stale import, signature, return-value assumption, expected
+output, or setup instruction. No example or production runtime change was
+required. The normalized descriptions and numbering compatibility decisions
+from `EXAMPLE-007` remain unchanged.
+
+A clean CPython 3.12 environment installed the source project with
+`.[dev,benchmark]`, passed `pip check`, passed the 67-test example,
+documentation, and CLI matrix, and passed all 327 normal tests. This proves the
+deterministic verification suite runs from a clean source installation; the
+later `PROD-005` tasks remain responsible for final distribution artifacts and
+separate optional-extra installation gates.
 
 ## Example Files
 
@@ -245,4 +271,10 @@ service without adding a toolkit service abstraction.
 
 Repository-wide quality cleanup remains later release work. Example
 description and catalog normalization completed in `EXAMPLE-007`; final
-current-public-API execution remains assigned to `EXAMPLE-008`.
+current-public-API execution completed in `EXAMPLE-008`.
+
+At `EXAMPLE-008` completion, focused Black and Ruff checks pass for both
+changed test files. Repository-wide Black still identifies the same two files,
+and repository-wide Ruff reports 68 findings, including the intentional
+numbered-example `N999` pattern. None of those findings is introduced by this
+task.

@@ -493,7 +493,9 @@ Every gallery entry identifies its file or command, demonstrated behavior,
 requirements, run instructions, and unsupported or application-owned
 boundaries. The catalog also explains why command workflows 21–22, the
 example-09 Base64 variant, and the two unnumbered legacy modules retain their
-existing names.
+existing names. All example modules and command workflows are covered by
+deterministic current-public-API regressions; live provider behavior remains a
+separate explicit smoke-test boundary.
 
 ## Documentation
 

@@ -5,8 +5,8 @@
 **Project:** Python AI Toolkit  
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
-**Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-008 — Verify all examples against current APIs`
+**Active roadmap item:** `PROD-005 — PyPI Package`  
+**Next task:** `PACKAGE-001 — Review package metadata`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-008`.
+The next task is `PACKAGE-001`.
 
 ---
 
@@ -1447,32 +1447,104 @@ focused Black and Ruff checks passed
 
 ---
 
-# Exact Next Task — EXAMPLE-008
+# EXAMPLE-008 Completion
 
-Verify all examples against current APIs.
+`EXAMPLE-008 — Verify all examples against current APIs` is complete.
+
+Completed work:
+
+1. inspected the current public API reference, runtime interfaces, and every
+   numbered, variant, framework, command, and supplementary example
+2. executed all Python workflows deterministically and both command workflows
+   through the real CLI dispatcher
+3. verified framework, image, embedding, retrieval, RAG, agent, workflow,
+   orchestration, and structured-response examples through real public entry
+   points
+4. confirmed that every toolkit import used by an example is documented and
+   importable
+5. added permanent execution-coverage and public-import completeness
+   regressions
+6. found no stale API use, return contract, expected output, or setup
+   instruction requiring correction
+7. preserved all example module paths, normalized descriptions, numbering
+   compatibility decisions, runtime APIs, dependencies, and architectural
+   decisions
+8. retained live-provider behavior as an explicit smoke-test boundary
+
+Focused verification:
+
+```text
+56 focused example and documentation tests passed
+67 focused tests passed including CLI workflows
+327 normal tests passed on Linux with CPython 3.12.13
+clean source installation with development and benchmark extras passed
+pip check passed in the clean environment
+focused Black and Ruff checks passed
+184 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+179 repository-relative user-documentation links passed
+```
+
+`PROD-004 — Additional Examples` is complete.
+
+---
+
+# Exact Next Task — PACKAGE-001
+
+Review package metadata.
 
 Required work:
 
-1. inspect the current public interfaces and every numbered, variant, command,
-   framework, and supplementary example before changing behavior
-2. execute offline examples directly and provider-dependent examples through
-   deterministic substitutes
-3. verify Django, FastAPI, CLI, image, embedding, RAG, agent, workflow, and
-   structured-response examples through their real public entry points
-4. correct stale imports, signatures, return-value assumptions, setup
-   instructions, or expected output discovered by execution
-5. preserve the normalized gallery format and intentional numbering
-   compatibility decisions from `EXAMPLE-007`
-6. keep live-provider authentication, account, region, network, cost, and
-   model-capability verification explicit rather than claiming deterministic
-   substitutes prove it
-7. avoid production runtime changes unless execution exposes a release-blocking
-   defect; document and review any such defect before modifying the API
-8. update the verification record, roadmap, project state, session handoff,
-   changelog, and regressions as required
-9. run focused, documentation, link, formatting, lint, full-suite, and clean
-   installation checks
-10. close `PROD-004` only if every exit criterion is satisfied
+1. inspect `pyproject.toml`, package discovery, README metadata, console entry
+   point, optional extras, and current source layout before editing
+2. compare the declared name, version, description, Python requirement,
+   authorship, dependencies, and URLs with the intended Version 1.0 package
+3. distinguish metadata corrections assigned to `PACKAGE-001` from
+   classifiers, licensing, extras, entry-point, build, and clean-install work
+   assigned to later `PACKAGE-002` through `PACKAGE-010`
+4. avoid building or publishing distributions before their roadmap tasks
+5. add focused metadata checks where they prevent release drift
+6. update roadmap, project state, handoff, changelog, and package guidance as
+   required
+
+---
+
+# EXAMPLE-008 Verification and Repository State
+
+Changed project files:
+
+```text
+README.md
+CHANGELOG.md
+docs/development/example_verification.md
+docs/development/roadmap.md
+docs/development/project_state.md
+docs/development/session_handoff.md
+examples/README.md
+tests/test_documentation_examples.py
+tests/test_examples.py
+```
+
+No production runtime API, example implementation, provider adapter, package
+dependency, benchmark, or ADR changed.
+
+Suggested focused commit:
+
+```powershell
+git add `
+    README.md `
+    CHANGELOG.md `
+    docs\development\example_verification.md `
+    docs\development\roadmap.md `
+    docs\development\project_state.md `
+    docs\development\session_handoff.md `
+    examples\README.md `
+    tests\test_documentation_examples.py `
+    tests\test_examples.py
+
+git diff --cached
+git commit -m "test: verify examples against public APIs"
+```
 
 ---
 
@@ -1966,19 +2038,19 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `CHANGELOG.md`
 8. `pyproject.toml`
-9. the complete `ai/` source directory
-10. all focused public guides under `docs/`
-11. `docs/api_reference.md`
-12. `docs/development/example_verification.md`
-13. the complete `examples/` directory, including `sample_docs` and
-    `sketch.jpg`
-14. `tests/test_documentation_examples.py`
-15. `tests/test_examples.py`
+9. `requirements.txt`
+10. `.gitignore`
+11. `docs/installation.md`
+12. `docs/compatibility.md`
+13. `docs/api_reference.md`
+14. the current package/source tree
+15. `ai/__init__.py`
+16. `ai/cli/main.py`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
-and future-backlog implementation files are not required for `EXAMPLE-008`.
-The current runtime source is required because the task must compare every
-example with the actual public interfaces.
+example media, and future-backlog implementation files are not required for
+`PACKAGE-001`. The package metadata and current source layout are required
+because the task must compare declarations with what is actually distributed.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1992,8 +2064,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-008 is still the correct next task.
-4. Confirm that EXAMPLE-007 normalized every example description around file or command, behavior, requirements, run instructions, and boundaries without changing example behavior or module paths.
+3. Verify the repository's current state and confirm that PACKAGE-001 is still the correct next task.
+4. Confirm that EXAMPLE-008 closed PROD-004 after verifying every example against the current public APIs without changing runtime behavior.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

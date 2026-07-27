@@ -17,6 +17,10 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Regression coverage requiring every example module to have a deterministic
+  execution path
+* Regression coverage preventing examples from importing undocumented toolkit
+  modules or symbols
 * Framework-independent structured application service example with injected
   `AIClient`, local input validation, application-owned routing, error mapping,
   and request traceability
@@ -114,6 +118,8 @@ The format loosely follows Keep a Changelog.
 
 
 ### Improved
+* Final current-public-API verification for every numbered, variant,
+  framework, command, and supplementary example
 * Normalized every numbered and supplementary example description around one
   file/command, behavior, requirements, run, and boundary format
 * Explicit example numbering guidance for CLI workflows 21–22, the example-09

@@ -1,3 +1,5 @@
+import ast
+import importlib
 import re
 from pathlib import Path
 
@@ -182,3 +184,50 @@ def test_numbered_example_modules_exist():
 
     for filename in expected_modules.values():
         assert (PROJECT_ROOT / "examples" / filename).is_file()
+
+
+def test_examples_import_only_documented_public_ai_symbols():
+    api_reference = (PROJECT_ROOT / "docs" / "api_reference.md").read_text(
+        encoding="utf-8"
+    )
+    surface_index = api_reference.split("## Surface index", 1)[1].split("\n## ", 1)[0]
+    supported_modules = set()
+    public_symbols = set()
+
+    for line in surface_index.splitlines():
+        cells = line.split("|")
+
+        if len(cells) < 5:
+            continue
+
+        supported_modules.update(re.findall(r"`(ai(?:\.[a-z_]+)+)`", cells[2]))
+        public_symbols.update(re.findall(r"`([A-Za-z_][A-Za-z0-9_]*)`", cells[3]))
+
+    assert supported_modules
+    assert public_symbols
+
+    for path in sorted((PROJECT_ROOT / "examples").glob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ImportFrom):
+                continue
+
+            if node.module is None or not node.module.startswith("ai."):
+                continue
+
+            assert (
+                node.module in supported_modules
+            ), f"{path.name} imports undocumented module {node.module}"
+
+            module = importlib.import_module(node.module)
+
+            for alias in node.names:
+                assert alias.name in public_symbols, (
+                    f"{path.name} imports undocumented symbol "
+                    f"{node.module}.{alias.name}"
+                )
+                assert hasattr(module, alias.name), (
+                    f"{path.name} imports unavailable symbol "
+                    f"{node.module}.{alias.name}"
+                )

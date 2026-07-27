@@ -565,6 +565,20 @@ instructions.
 **Boundary:** The model recommends only from prompt data; application code must
 still enforce price, availability, alcohol, age, safety, and business rules.
 
+## Verification
+
+Every Python module in this catalog has deterministic regression coverage
+through its real public entry point. Django and FastAPI examples run through
+their integration boundaries, CLI workflows run through the console
+dispatcher, and provider-dependent behavior uses controlled substitutes
+without credentials or network requests.
+
+The verification also checks that every `ai.*` import used by an example is
+listed in the [public API reference](../docs/api_reference.md) and remains
+importable. These checks prove toolkit control flow and return contracts; they
+do not prove live credentials, account access, regional availability, provider
+network behavior, cost, or model capabilities.
+
 ## Learning Path
 
 | Stage | Examples | Focus |

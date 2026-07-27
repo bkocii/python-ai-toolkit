@@ -2,6 +2,7 @@ import asyncio
 import importlib
 import inspect
 import json
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -14,6 +15,43 @@ from ai.integrations.fastapi import get_async_ai_client
 from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse, TokenUsage
 from ai.tools import ToolCall, ToolResponse
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+MAIN_EXAMPLE_MODULES = [
+    "examples.01_plain_text",
+    "examples.02_extract_structured_data",
+    "examples.03_builder_usage",
+    "examples.04_prompt_templates",
+    "examples.05_streaming_response",
+    "examples.06_async_client",
+    "examples.07_tool_calling",
+    "examples.08_image_inputs",
+    "examples.09_structured_image_input",
+    "examples.09_1_structured_image_with_helper",
+    "examples.10_embeddings",
+    "examples.11_vector_store",
+    "examples.12_retriever",
+    "examples.13_rag_pipeline",
+    "examples.14_document_loader_rag",
+    "examples.15_conversation_memory",
+    "examples.16_agent",
+    "examples.17_workflow_engine",
+    "examples.18_multi_agent_orchestration",
+    "examples.23_explicit_config",
+    "examples.26_batch_embedding_and_retrieval",
+    "examples.27_document_indexing_and_rag",
+    "examples.28_structured_application_service",
+    "examples.hello_ai",
+    "examples.drink_recommender",
+]
+
+SPECIAL_EXAMPLE_MODULES = {
+    "examples.19_django_integration",
+    "examples.20_fastapi_integration",
+    "examples.24_custom_provider",
+    "examples.25_testing_with_fake_provider",
+}
 
 
 class DeterministicExampleProvider:
@@ -190,33 +228,7 @@ def deterministic_provider(monkeypatch):
 
 @pytest.mark.parametrize(
     "module_name",
-    [
-        "examples.01_plain_text",
-        "examples.02_extract_structured_data",
-        "examples.03_builder_usage",
-        "examples.04_prompt_templates",
-        "examples.05_streaming_response",
-        "examples.06_async_client",
-        "examples.07_tool_calling",
-        "examples.08_image_inputs",
-        "examples.09_structured_image_input",
-        "examples.09_1_structured_image_with_helper",
-        "examples.10_embeddings",
-        "examples.11_vector_store",
-        "examples.12_retriever",
-        "examples.13_rag_pipeline",
-        "examples.14_document_loader_rag",
-        "examples.15_conversation_memory",
-        "examples.16_agent",
-        "examples.17_workflow_engine",
-        "examples.18_multi_agent_orchestration",
-        "examples.23_explicit_config",
-        "examples.26_batch_embedding_and_retrieval",
-        "examples.27_document_indexing_and_rag",
-        "examples.28_structured_application_service",
-        "examples.hello_ai",
-        "examples.drink_recommender",
-    ],
+    MAIN_EXAMPLE_MODULES,
 )
 def test_example_main_runs_offline(
     module_name,
@@ -231,6 +243,17 @@ def test_example_main_runs_offline(
         module.main()
 
     assert capsys.readouterr().out
+
+
+def test_every_example_module_has_deterministic_execution_coverage():
+    example_modules = {
+        f"examples.{path.stem}"
+        for path in (PROJECT_ROOT / "examples").glob("*.py")
+        if path.name != "__init__.py"
+    }
+    covered_modules = set(MAIN_EXAMPLE_MODULES) | SPECIAL_EXAMPLE_MODULES
+
+    assert covered_modules == example_modules
 
 
 def test_django_example_runs_offline(
