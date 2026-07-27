@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-009 — Test core installation without optional frameworks`
+**Next task:** `PACKAGE-010 — Test Django and FastAPI extras separately`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `PACKAGE-009`.
+The current next task is `PACKAGE-010`.
 
 ---
 
@@ -1829,20 +1829,68 @@ architectural decision changed.
 
 ---
 
-# Exact Next Task — PACKAGE-009
+# PACKAGE-009 — Core Installation Without Optional Frameworks
 
-Test the core installation without optional frameworks.
+**Status:** Completed
+
+Completed work:
+
+1. rebuilt and validated the current distribution artifacts
+2. installed only the wheel, without extras, in a new environment outside the
+   source checkout
+3. confirmed the installed core requirements are `openai`, `pydantic`, and
+   `python-dotenv`
+4. confirmed Django and FastAPI are neither installed nor importable
+5. imported all 35 non-framework toolkit modules from isolated `site-packages`
+6. exercised prompt templates and in-memory vector search offline
+7. passed `pip check` and inspected the resolved installation
+8. added `scripts/verify_core_installation.py` for repeatable release checks
+9. added regressions keeping the verifier aligned with core metadata and source
+   modules
+10. documented the Windows PowerShell workflow
+
+Verification evidence:
+
+```text
+core-only wheel installation passed on Linux with CPython 3.12.13
+python-ai-toolkit 0.7.0.dev0 imported from isolated site-packages
+core requirements matched openai, pydantic, and python-dotenv
+Django and FastAPI distributions and modules were absent
+35 non-framework toolkit modules imported successfully
+offline prompt and vector-store checks passed
+pip check passed
+17 focused package-metadata regressions passed
+38 package-metadata and documentation tests passed
+344 normal tests passed on Linux with CPython 3.12.13
+Twine strict and offline distribution validation passed
+focused Black and Ruff checks passed
+200 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, license, benchmark, example, or
+architectural decision changed.
+
+---
+
+# Exact Next Task — PACKAGE-010
+
+Test the Django and FastAPI extras separately.
 
 Required work:
 
-1. create a new isolated environment outside the source checkout
-2. install only the core wheel without extras
-3. confirm Django and FastAPI are not installed
-4. confirm core imports and representative offline behavior still work
-5. inspect installed requirements and run `pip check`
-6. correct only dependency-boundary defects demonstrated by the test
-7. update package guidance and project records
-8. leave separate framework-extra installation to `PACKAGE-010`
+1. create two isolated environments outside the source checkout
+2. install the wheel with only the Django extra in one environment
+3. verify the Django adapter and confirm FastAPI is absent
+4. install the wheel with only the FastAPI extra in the other environment
+5. verify the FastAPI adapter and confirm Django is absent
+6. run representative offline integration behavior and `pip check`
+7. correct only dependency or adapter defects demonstrated by the tests
+8. update package guidance and project records
 
 ---
 
@@ -2379,16 +2427,20 @@ For the immediate next task, also provide:
 10. `.gitignore`
 11. `docs/installation.md`
 12. `tests/test_package_metadata.py`
-13. `scripts/validate_distributions.py`
-14. `dist/python_ai_toolkit-0.7.0.dev0-py3-none-any.whl`
-15. `dist/python_ai_toolkit-0.7.0.dev0.tar.gz`
+13. `tests/test_django_integration.py`
+14. `tests/test_fastapi_integration.py`
+15. `scripts/verify_core_installation.py`
+16. `scripts/validate_distributions.py`
+17. `ai/integrations/django/`
+18. `ai/integrations/fastapi/`
+19. `dist/python_ai_toolkit-0.7.0.dev0-py3-none-any.whl`
+20. `dist/python_ai_toolkit-0.7.0.dev0.tar.gz`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-009`. The validated core wheel, package metadata, installation
-guidance, distribution validator, and package-metadata tests are required so
-the core dependency boundary can be verified against the exact validated
-artifact.
+`PACKAGE-010`. The validated wheel, optional-dependency metadata, framework
+adapters, integration tests, and installation guidance are required so the
+Django and FastAPI extras can each be verified without the other framework.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2402,8 +2454,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-009 is still the correct next task.
-4. Confirm that PACKAGE-008 installed both artifacts successfully and left core dependency isolation for PACKAGE-009.
+3. Verify the repository's current state and confirm that PACKAGE-010 is still the correct next task.
+4. Confirm that PACKAGE-009 proved the core installation works without Django or FastAPI.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

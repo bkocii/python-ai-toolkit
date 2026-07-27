@@ -2275,7 +2275,7 @@ Produce a valid, installable Python source distribution and wheel.
 * [x] PACKAGE-006 Build source distribution and wheel
 * [x] PACKAGE-007 Validate distributions
 * [x] PACKAGE-008 Test installation in a clean virtual environment
-* [ ] PACKAGE-009 Test core installation without optional frameworks
+* [x] PACKAGE-009 Test core installation without optional frameworks
 * [ ] PACKAGE-010 Test Django and FastAPI extras separately
 
 ### Required Package Checks
@@ -2695,6 +2695,62 @@ Next task:
 
 ```text
 PACKAGE-009 — Test core installation without optional frameworks
+```
+
+#### PACKAGE-009 — Test Core Installation Without Optional Frameworks
+
+Status: Completed
+
+Completed work:
+
+* rebuilt and validated the current wheel and source distribution before
+  installation testing
+* installed only the wheel, without extras, in a new environment outside the
+  source checkout
+* confirmed the distribution exposes exactly `openai`, `pydantic`, and
+  `python-dotenv` as core requirements
+* confirmed Django and FastAPI are neither installed nor importable
+* confirmed all 35 packaged modules outside the optional framework adapters
+  import successfully from the clean environment's `site-packages`
+* exercised `PromptTemplate` and `InMemoryVectorStore` offline
+* ran `pip check` successfully and inspected the complete resolved package list
+* added a reusable installed-environment verifier and regressions keeping it
+  aligned with core metadata and every non-framework module
+* documented the complete Windows PowerShell verification workflow
+* retained all runtime APIs, dependencies, optional groups, entry points, and
+  package metadata because the clean core installation demonstrated no defect
+* left installation of each framework extra to `PACKAGE-010`
+
+Completion verification:
+
+```text
+core-only wheel installation passed on Linux with CPython 3.12.13
+python-ai-toolkit 0.7.0.dev0 imported from isolated site-packages
+core requirements matched openai, pydantic, and python-dotenv
+Django and FastAPI distributions and modules were absent
+35 non-framework toolkit modules imported successfully
+offline prompt and vector-store checks passed
+pip check passed
+17 focused package-metadata regressions passed
+38 package-metadata and documentation tests passed
+344 normal tests passed
+Twine strict and offline distribution validation passed
+focused Black and Ruff checks passed
+200 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+183 repository-relative user-documentation links passed
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, license, benchmark, example, or
+architectural decision changed.
+
+Next task:
+
+```text
+PACKAGE-010 — Test Django and FastAPI extras separately
 ```
 
 Clean-environment checks must verify:

@@ -23,6 +23,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Core-only wheel installation verification proving that Django and FastAPI
+  remain absent while all 35 non-framework toolkit modules import successfully
+* Reusable installed-environment verifier covering core requirements, import
+  origin, optional-framework absence, and offline prompt and vector behavior
+* Windows PowerShell guidance for repeating the core-only installation check
 * Clean virtual-environment installation verification from both the wheel and
   source distribution, including installed-path, version, offline public API,
   console-command, configuration, and dependency checks

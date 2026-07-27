@@ -417,6 +417,52 @@ Both printed module paths must be inside their environment's
 report `No broken requirements found`. The environments can be deleted after
 the check.
 
+### Test the core installation without frameworks on Windows
+
+This release check is narrower than installing both artifact formats. It
+installs only the wheel without extras and proves that the core dependency
+boundary remains valid.
+
+Run from the project root after building and validating `dist\`:
+
+```powershell
+$projectRoot = (Get-Location).Path
+$testRoot = Join-Path (Split-Path $projectRoot) "python-ai-toolkit-package009"
+$wheel = (Resolve-Path "dist\*.whl").Path
+
+Remove-Item $testRoot -Recurse -Force -ErrorAction SilentlyContinue
+py -m venv "$testRoot\core-env"
+
+& "$testRoot\core-env\Scripts\python.exe" -m pip install $wheel
+
+Push-Location $testRoot
+& "$testRoot\core-env\Scripts\python.exe" `
+    "$projectRoot\scripts\verify_core_installation.py"
+& "$testRoot\core-env\Scripts\python.exe" -m pip check
+& "$testRoot\core-env\Scripts\python.exe" -m pip list
+Pop-Location
+```
+
+The verifier must report:
+
+```text
+Core installation verification: PASSED
+Optional frameworks absent: django, fastapi
+Core modules imported: 35
+Offline prompt and vector-store checks: PASSED
+```
+
+The printed import path must be inside
+`core-env\Lib\site-packages\ai\`, and `pip check` must report no broken
+requirements. `pip list` may include `httpx`, because it is a dependency of the
+core OpenAI SDK. It must not include Django or FastAPI.
+
+The wheel includes the toolkit's optional adapter source code so one
+distribution supports every extra. Importing
+`ai.integrations.django` or `ai.integrations.fastapi` without the corresponding
+extra is not a supported core operation. Normal core modules must remain
+importable without either framework; the verifier checks every one.
+
 ## Change an existing installation
 
 After changing extras or pulling package-metadata updates, rerun the appropriate

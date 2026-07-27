@@ -5,6 +5,13 @@ from pathlib import Path
 
 from ai.cli.main import main
 from scripts.validate_distributions import normalize_text_newlines
+from scripts.verify_core_installation import (
+    CORE_MODULES,
+    EXPECTED_CORE_REQUIREMENTS,
+    OPTIONAL_FRAMEWORKS,
+    core_requirement_names,
+    requirement_name,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
@@ -119,6 +126,16 @@ def test_core_dependencies_exclude_optional_workflow_packages():
     )
 
 
+def test_installed_core_requirement_names_match_project_metadata():
+    project_dependencies = load_pyproject()["project"]["dependencies"]
+
+    assert {requirement_name(item) for item in project_dependencies} == (
+        EXPECTED_CORE_REQUIREMENTS
+    )
+    assert core_requirement_names() == EXPECTED_CORE_REQUIREMENTS
+    assert not (core_requirement_names() & OPTIONAL_FRAMEWORKS)
+
+
 def test_optional_framework_imports_stay_within_integration_packages():
     framework_directories = {
         "django": PROJECT_ROOT / "ai" / "integrations" / "django",
@@ -142,6 +159,30 @@ def test_optional_framework_imports_stay_within_integration_packages():
         for framework, integration_directory in framework_directories.items():
             if framework in imported_roots:
                 assert source_path.is_relative_to(integration_directory)
+
+
+def test_core_installation_verifier_covers_every_non_framework_module():
+    excluded_directories = (
+        PROJECT_ROOT / "ai" / "integrations" / "django",
+        PROJECT_ROOT / "ai" / "integrations" / "fastapi",
+    )
+    core_source_paths = {
+        source_path
+        for source_path in (PROJECT_ROOT / "ai").rglob("*.py")
+        if not any(
+            source_path.is_relative_to(directory) for directory in excluded_directories
+        )
+    }
+
+    expected_modules = set()
+    for source_path in core_source_paths:
+        relative_path = source_path.relative_to(PROJECT_ROOT).with_suffix("")
+        module_parts = relative_path.parts
+        if module_parts[-1] == "__init__":
+            module_parts = module_parts[:-1]
+        expected_modules.add(".".join(module_parts))
+
+    assert set(CORE_MODULES) == expected_modules
 
 
 def test_package_classifiers_describe_the_current_project():
