@@ -1,418 +1,423 @@
 # Example Gallery
 
-This directory contains small, self-contained examples demonstrating how to use the Python AI Toolkit.
+This gallery is the numbered learning path for the Python AI Toolkit. Each
+entry uses the same description fields:
 
-The [documented example verification record](../docs/development/example_verification.md)
-explains which workflows run offline, which use deterministic provider
-substitutes, and which still require a real provider or platform-specific
-environment.
+- **File or command** identifies what to open.
+- **Demonstrates** states the toolkit behavior shown.
+- **Requirements** lists credentials, network access, optional dependencies,
+  or provider capabilities needed for a normal run.
+- **Run** gives the command or application entry point.
+- **Boundary** states what the example deliberately does not provide or prove.
 
-## 01 – Plain Text Request
+Run module commands from the repository root. Unless an entry says it is
+offline, valid [provider configuration](../docs/configuration.md) and network
+access are required. Never put a real credential in an example file.
 
-- file: `01_plain_text.py`
-- creating an AIClient
-- simple AI request
-- AIResult metadata
+The [verification record](../docs/development/example_verification.md) explains
+how provider-dependent examples are tested with deterministic substitutes.
 
-## 02 – Extract Structured Data
+## Catalog Conventions
 
-- file: `02_extract_structured_data.py`
-- Pydantic models
-- response_type
-- validated output
+- Entries 01–20 and 23–28 are Python modules.
+- Entries 21–22 are command workflows, so no Python module is missing between
+  20 and 23.
+- `09_1_structured_image_with_helper.py` is a local-file variant of example 09,
+  not a separate learning-path number.
+- `hello_ai.py` and `drink_recommender.py` are older supplementary examples.
+  They remain unnumbered to preserve existing module paths.
 
-The [request guide](../docs/requests.md) explains the difference between
-`ask()` and `ask_text()`, all `AIResult` fields, and the structured-response
-repair lifecycle used by these examples.
+These exceptions are explicit compatibility choices. Renaming them would
+change runnable module paths without improving toolkit behavior.
 
-## 03 – Builder Usage
-- fluent builder
-- method chaining
-- execute()
+## 01 — Plain Text Request
 
-## 04 – Prompt Templates
-- reusable prompts
-- variable substitution
+**File:** [`01_plain_text.py`](01_plain_text.py)
 
----
+**Demonstrates:** Creating `AIClient`, sending one plain-text request with
+`ask()`, and reading text plus model and request-ID metadata from `AIResult`.
 
-## 05 – Streaming Response
+**Requirements:** Core installation, valid text-generation provider
+configuration, and network access.
 
-Demonstrates:
+**Run:** `python -m examples.01_plain_text`
 
-- streaming plain text responses
-- consuming response chunks
-- printing streamed output immediately
+**Boundary:** Shows one synchronous request; it does not cover streaming,
+structured output, or retries.
 
-Examples 05 through 09 are supported by the
-[advanced request guide](../docs/advanced_requests.md), which documents their
-different return values, metadata boundaries, provider requirements, and
-current sync/async limits.
+## 02 — Extract Structured Data
 
----
+**File:** [`02_extract_structured_data.py`](02_extract_structured_data.py)
 
-## 06 – Async Client
+**Demonstrates:** Defining a Pydantic response model, passing `response_type`,
+and receiving validated structured data through `AIResult`.
 
-Demonstrates:
+**Requirements:** Core installation, valid text-generation provider
+configuration, network access, and a selected model that can follow
+structured-output instructions.
 
-- using AsyncAIClient
-- awaiting async AI requests
-- running async examples with asyncio.run()
+**Run:** `python -m examples.02_extract_structured_data`
 
----
+**Boundary:** Validates response shape; it does not verify whether extracted
+facts are true.
 
-## 07 – Tool Calling
+## 03 — Fluent Request Builder
 
-**File**
+**File:** [`03_builder_usage.py`](03_builder_usage.py)
 
-```text
-07_tool_calling.py
-```
+**Demonstrates:** Building a structured request through `request()`, chained
+builder methods, and `execute()`.
 
-Demonstrates:
+**Requirements:** Core installation, valid text-generation provider
+configuration, network access, and a model that can follow structured-output
+instructions.
 
-- defining provider-independent tools
-- passing tools to AIClient
-- receiving requested tool calls
-- keeping tool execution inside the application
+**Run:** `python -m examples.03_builder_usage`
 
----
+**Boundary:** The builder collects one request; it is not a reusable immutable
+request definition.
 
-## 08 – Image Inputs
+## 04 — Prompt Template
 
-**File**
+**File:** [`04_prompt_templates.py`](04_prompt_templates.py)
 
-```text
-08_image_inputs.py
-```
-Demonstrates:
+**Demonstrates:** Defining a reusable `PromptTemplate`, substituting named
+variables, and sending the rendered prompt through `AIClient`.
 
-- sending an image URL to the model
-- combining text and image input
-- receiving a plain text response
+**Requirements:** Core installation, valid text-generation provider
+configuration, and network access.
 
-## 09 – Structured Image Input
+**Run:** `python -m examples.04_prompt_templates`
 
-**File**
-```text
-09_structured_image_input.py
-```
-Demonstrates:
+**Boundary:** Template rendering formats strings; it does not sanitize,
+authorize, or validate untrusted prompt content.
 
-- sending image input
-- using response_type
-- validating structured image analysis with Pydantic
+Examples 01–04 are supported by the
+[plain and structured request guide](../docs/requests.md).
 
-The local-file variant is:
+## 05 — Streaming Response
 
-```text
-09_1_structured_image_with_helper.py
-```
+**File:** [`05_streaming_response.py`](05_streaming_response.py)
 
-It demonstrates converting a local JPEG, PNG, or WebP file into a Base64 data
-URL before constructing `ImageInput`, then validating a structured
-`ImageDescription`. Local-path reading is example application code, not a
-built-in `ImageInput` feature.
+**Demonstrates:** Requesting synchronous plain-text streaming, consuming chunks,
+and printing output as it arrives.
 
----
+**Requirements:** Core installation, valid provider configuration, network
+access, and a provider/model combination that supports streaming.
 
-## 10 – Embeddings
+**Run:** `python -m examples.05_streaming_response`
 
-**File**
+**Boundary:** `stream()` returns `Iterator[str]`, not `AIResult`, so final
+request metadata is not returned by this interface.
 
-```text
-10_embeddings.py
-```
-Demonstrates:
+## 06 — Async Client
 
-- embedding one text
-- embedding multiple texts
-- preserving metadata
-- reading vector length
-- using embeddings as preparation for RAG
+**File:** [`06_async_client.py`](06_async_client.py)
 
-Examples 10 through 14 are supported by the
-[retrieval and RAG guide](../docs/retrieval.md), which documents embedding
-ordering and metadata, vector-score semantics, the in-memory storage boundary,
-document preparation, RAG response metadata, and grounding limits.
+**Demonstrates:** Constructing `AsyncAIClient`, awaiting `ask()`, and starting
+the coroutine with `asyncio.run()`.
 
----
+**Requirements:** Core installation, valid text-generation provider
+configuration, network access, and asynchronous provider support.
 
-## 11 – Vector Store
+**Run:** `python -m examples.06_async_client`
 
-**File**
+**Boundary:** Uses the separate async client for one request; it does not make
+the synchronous client asynchronous.
 
-```text
-11_vector_store.py
-```
-Demonstrates:
+## 07 — Tool Calling
 
-- embedding multiple texts
-- converting embeddings into vector records
-- storing records in InMemoryVectorStore
-- embedding a search query
-- running similarity search
-- reading search scores and metadata
+**File:** [`07_tool_calling.py`](07_tool_calling.py)
 
----
+**Demonstrates:** Defining a provider-independent `ToolDefinition`, sending it
+with `ask_with_tools()`, and inspecting requested tool calls.
 
-## 12 – Retriever
+**Requirements:** Core installation, valid provider configuration, network
+access, and a provider/model combination that supports tool calling.
 
-**File**
+**Run:** `python -m examples.07_tool_calling`
 
-```text
-12_retriever.py
-```
-Demonstrates:
+**Boundary:** The toolkit returns `ToolResponse`; the application must
+authorize, execute, and return results for requested tools.
 
-- embedding knowledge text
-- storing vectors in InMemoryVectorStore
-- creating VectorStoreRetriever
-- retrieving relevant context for a query
-- formatting retrieved context for prompts
+## 08 — Image Input
 
----
+**File:** [`08_image_inputs.py`](08_image_inputs.py)
 
-## 13 – RAG Pipeline
+**Demonstrates:** Combining a prompt with a remote image URL and receiving a
+plain-text image description.
 
-**File**
+**Requirements:** Core installation, valid provider configuration, network
+access, an image-capable model, and a provider that can access the example URL.
 
-```text
-13_rag_pipeline.py
-```
-Demonstrates:
+**Run:** `python -m examples.08_image_inputs`
 
-- embedding knowledge text
-- storing embeddings in InMemoryVectorStore
-- retrieving relevant context
-- generating an answer with RAGPipeline
-- returning both answer and sources
+**Boundary:** A valid image URL does not prove that every provider or model can
+retrieve or analyze it.
 
----
+## 09 — Structured Image Input
 
-## 14 – Document Loader RAG
+**File:** [`09_structured_image_input.py`](09_structured_image_input.py)
 
-**File**
+**Demonstrates:** Sending a remote image URL, requesting a Pydantic
+`ImageDescription`, and reading validated structured image analysis.
 
-```text
-14_document_loader_rag.py
-```
-Demonstrates:
+**Requirements:** Core installation, valid provider configuration, network
+access, and a provider/model combination supporting image input and structured
+responses.
 
-- loading .txt and .md files from a directory
-- converting documents to embedding inputs
-- embedding loaded documents
-- storing document vectors
-- retrieving relevant context
-- answering with RAGPipeline
+**Run:** `python -m examples.09_structured_image_input`
 
----
+**Boundary:** Structured validation checks response shape, not the factual
+accuracy of the image analysis.
 
-## 15 – Conversation Memory
+### 09 Local Base64 Variant
 
-**File**
+**File:** [`09_1_structured_image_with_helper.py`](09_1_structured_image_with_helper.py)
 
-```text
-15_conversation_memory.py
-```
-Demonstrates:
+**Demonstrates:** Reading the included `sketch.jpg`, converting supported local
+image bytes to a Base64 data URL, and requesting the same structured response.
 
-- creating in-memory conversation memory
-- adding system, user, and assistant messages
-- retrieving all messages
-- retrieving recent messages
-- formatting memory for prompts
+**Requirements:** Core installation, valid provider configuration, network
+access, and a provider/model combination supporting Base64 image input and
+structured responses.
 
----
+**Run:** `python -m examples.09_1_structured_image_with_helper`
 
-## 16 – Agent
+**Boundary:** The conversion helper is application code. `ImageInput` does not
+read local paths, and the helper accepts only JPEG, PNG, and WebP files.
 
-**File**
+Examples 05–09 are supported by the
+[advanced request guide](../docs/advanced_requests.md).
 
-```text
-16_agent.py
-```
-Demonstrates:
+## 10 — Embeddings
 
-- creating an Agent
-- using system instructions
-- using conversation memory
-- running multiple turns
-- reading the updated conversation messages
+**File:** [`10_embeddings.py`](10_embeddings.py)
 
----
+**Demonstrates:** Embedding one text, embedding a batch, preserving metadata,
+and inspecting the returned model and vector dimensions.
 
-## 17 – Workflow Engine
+**Requirements:** Core installation, valid provider configuration, network
+access, and an embedding-capable provider/model.
 
-**File**
+**Run:** `python -m examples.10_embeddings`
 
-```text
-17_workflow_engine.py
-```
-Demonstrates:
+**Boundary:** Produces vectors only; it does not store, search, or evaluate
+them.
 
-- creating workflow steps
-- passing shared workflow state
-- composing retrieve and answer steps
-- running a sequential workflow
-- inspecting final output and workflow state
+## 11 — In-Memory Vector Store
 
+**File:** [`11_vector_store.py`](11_vector_store.py)
 
----
+**Demonstrates:** Embedding a small knowledge set, creating `VectorRecord`
+objects, storing them in `InMemoryVectorStore`, and running cosine-similarity
+search.
 
-## 18 – Multi-Agent Orchestration
+**Requirements:** Core installation, valid embedding-provider configuration,
+network access, and an embedding-capable model.
 
-**File**
+**Run:** `python -m examples.11_vector_store`
 
-```text
-18_multi_agent_orchestration.py
-```
-Demonstrates:
+**Boundary:** The store is process-local and non-persistent; similarity scores
+are ranking signals, not confidence probabilities.
 
-- creating multiple specialized agents
-- registering agents in MultiAgentOrchestrator
-- running agents sequentially
-- passing one agent's output to the next agent
-- inspecting multi-agent results
+## 12 — Retriever
 
-Examples 15 through 18 are supported by the
-[memory, agents, workflows, and orchestration guide](../docs/orchestration.md),
-which documents message and prompt behavior, memory persistence limits,
-workflow state and failure semantics, sequential agent handoffs, result
-contracts, and application-owned control.
+**File:** [`12_retriever.py`](12_retriever.py)
 
+**Demonstrates:** Building an in-memory knowledge index, embedding a query
+through `VectorStoreRetriever`, retrieving relevant contexts, and formatting
+them for a prompt.
 
-## 19 – Django Integration
+**Requirements:** Core installation, valid embedding-provider configuration,
+network access, and an embedding-capable model.
 
-**File**
+**Run:** `python -m examples.12_retriever`
 
-```text
-19_django_integration.py
-```
+**Boundary:** Retrieval returns context; it does not generate an answer or
+guarantee relevance.
 
-Demonstrates:
+## 13 — RAG Pipeline
 
-* configuring the toolkit through Django's `AI_TOOLKIT` setting
-* creating an `AIClient` with `get_ai_client()`
-* using the toolkit inside an existing Django application
-* analyzing a support ticket
-* returning a validated Pydantic model
-* keeping views, models, Celery tasks, and business logic outside the toolkit
+**File:** [`13_rag_pipeline.py`](13_rag_pipeline.py)
 
-Install the optional Django integration:
+**Demonstrates:** Composing embeddings, in-memory vector search, retrieval, and
+`RAGPipeline` to generate an answer with returned source contexts.
 
-```bash
-python -m pip install ".[django]"
-```
+**Requirements:** Core installation, valid provider configuration, network
+access, and models supporting both embeddings and text generation.
 
----
+**Run:** `python -m examples.13_rag_pipeline`
 
-## 20 – FastAPI Integration
+**Boundary:** Returned contexts provide traceability but are not verified
+citations, and the in-memory index is not persistent.
 
-**File**
+## 14 — Directory Loader RAG
 
-```text
-20_fastapi_integration.py
-```
+**File:** [`14_document_loader_rag.py`](14_document_loader_rag.py)
 
-Demonstrates:
+**Demonstrates:** Loading `.txt` and `.md` files, converting documents to
+embedding inputs, storing their vectors, retrieving context, and generating an
+answer through `RAGPipeline`.
 
-* injecting `AsyncAIClient` into a FastAPI endpoint
-* using `AsyncAIClientDependency`
-* accepting a validated API request model
-* returning a validated structured response
-* using asynchronous AI requests inside an endpoint
-* replacing the AI dependency during tests
-* keeping routes, schemas, prompts, and business logic inside the application
+**Requirements:** Run from the repository root with the included
+`examples/sample_docs` directory, valid provider configuration, network access,
+and models supporting embeddings and text generation.
 
-Install the optional FastAPI integration:
+**Run:** `python -m examples.14_document_loader_rag`
 
-```bash
-python -m pip install ".[fastapi]"
-```
+**Boundary:** Each file remains one document. The example does not add
+chunking, stable production IDs, persistent storage, or citation verification.
 
-The example's local `uvicorn` run command requires a separately installed ASGI
-server:
+Examples 10–14 are supported by the
+[retrieval and RAG guide](../docs/retrieval.md).
 
-```bash
-python -m pip install uvicorn
-```
+## 15 — Conversation Memory
 
----
+**File:** [`15_conversation_memory.py`](15_conversation_memory.py)
 
-## 21 – Command-Line Interface
+**Demonstrates:** Adding system, user, and assistant messages to
+`InMemoryConversationMemory`, reading all or recent messages, and formatting
+them for prompts.
 
-**Command**
+**Requirements:** Core installation only; no credential or network access.
 
-```text
-ai-toolkit ask "<prompt>"
-```
+**Run:** `python -m examples.15_conversation_memory`
 
-Demonstrates:
+**Boundary:** Memory is process-local, non-persistent, and not automatically
+trimmed by token count.
 
-* sending a plain-text prompt from the terminal
-* using the same environment configuration as `AIClient`
-* printing the AI response directly to standard output
-* returning predictable command exit codes
-* showing clean configuration and provider errors
-* using the toolkit without writing a Python script
+## 16 — Agent
 
-Example:
+**File:** [`16_agent.py`](16_agent.py)
 
-```bash
-ai-toolkit ask "Explain dependency injection simply."
-```
+**Demonstrates:** Combining `AIClient`, instructions, and conversation memory
+inside an `Agent`, then running two sequential turns.
 
-The initial CLI supports plain-text requests only. Read-only configuration
-inspection and structural validation are handled by the commands below.
+**Requirements:** Core installation, valid text-generation provider
+configuration, and network access.
 
+**Run:** `python -m examples.16_agent`
 
-## 22 – Configuration CLI
+**Boundary:** The agent wraps explicit request and memory behavior; it does not
+autonomously use tools, plan loops, or persist memory.
 
-**Commands**
+## 17 — Workflow Engine
 
-```text
-ai-toolkit config show
-ai-toolkit config validate
-```
+**File:** [`17_workflow_engine.py`](17_workflow_engine.py)
 
-Demonstrates:
+**Demonstrates:** Defining function-backed retrieve and answer steps, passing
+shared `WorkflowContext` state, and running a sequential workflow.
 
-* inspecting the resolved toolkit configuration
-* masking API keys in terminal output
-* showing provider, model, embedding, retry, and cost settings
-* validating configuration structure
-* reporting configuration errors with predictable exit codes
-* distinguishing structural validation from live credential verification
+**Requirements:** Core installation, valid provider configuration, network
+access, and models supporting embeddings and text generation.
 
-The commands do not modify `.env`, save secrets, or contact the configured provider.
+**Run:** `python -m examples.17_workflow_engine`
 
+**Boundary:** Execution is synchronous, sequential, fail-fast, and
+non-persistent.
 
+## 18 — Multi-Agent Orchestration
 
-Examples 19 through 22 are supported by the
-[Django, FastAPI, and CLI integration guide](../docs/integrations.md), which
-documents configuration sources, synchronous and asynchronous helpers,
-dependency overrides, client lifetimes, CLI output, exit codes, and live
-provider boundaries.
+**File:** [`18_multi_agent_orchestration.py`](18_multi_agent_orchestration.py)
 
-## 23 – Explicit Configuration
+**Demonstrates:** Registering specialized agents, running them in an explicit
+sequence, and passing each output to the next agent.
 
-**File**
+**Requirements:** Core installation, valid text-generation provider
+configuration, and network access.
 
-```text
-23_explicit_config.py
-```
+**Run:** `python -m examples.18_multi_agent_orchestration`
 
-Demonstrates:
+**Boundary:** Orchestration is explicit and sequential; it does not provide
+automatic routing, parallel execution, debate, or autonomous planning.
 
-* accepting an API key supplied by the application
-* constructing a complete `AIConfig`
-* calling `ConfigValidator.validate(config)` before client construction
-* injecting the validated configuration into `AIClient`
-* avoiding environment-based provider, model, retry, and logging resolution
-* disabling toolkit-managed file logging for this example
+Examples 15–18 are supported by the
+[memory, agent, workflow, and orchestration guide](../docs/orchestration.md).
 
-Set the example-specific environment variable before running:
+## 19 — Django Integration
+
+**File:** [`19_django_integration.py`](19_django_integration.py)
+
+**Demonstrates:** Resolving `AIConfig` from Django's `AI_TOOLKIT` setting,
+creating a synchronous client with `get_ai_client()`, and returning a validated
+support-ticket model from an application service function.
+
+**Requirements:** Install `.[django]`; use an existing configured Django
+application with valid text-generation provider settings and network access.
+
+**Run:** Import and call `analyze_support_ticket()` from a Django view, Celery
+task, management command, shell, or service.
+
+**Boundary:** This is an integration module, not a standalone Django project;
+the application owns views, persistence, authorization, tasks, and business
+logic.
+
+## 20 — FastAPI Integration
+
+**File:** [`20_fastapi_integration.py`](20_fastapi_integration.py)
+
+**Demonstrates:** Injecting `AsyncAIClient` with
+`AsyncAIClientDependency`, validating request and response models, and
+overriding the dependency in application tests.
+
+**Requirements:** Install `.[fastapi]` and a separate ASGI server such as
+Uvicorn; provide valid text-generation provider configuration and network
+access.
+
+**Run:** `uvicorn examples.20_fastapi_integration:app --reload`
+
+**Boundary:** The FastAPI extra does not choose or install an ASGI server and
+does not own application routes, client-lifetime policy, authorization, or
+business logic.
+
+## 21 — Command-Line Request
+
+**Command:** `ai-toolkit ask`
+
+**Demonstrates:** Sending a plain-text prompt with the installed console
+command, printing the response, and returning predictable exit codes.
+
+**Requirements:** Installed package, valid text-generation provider
+configuration, and network access.
+
+**Run:** `ai-toolkit ask "Explain dependency injection simply."`
+
+**Boundary:** The command supports plain text only; it does not expose
+structured responses, streaming, tools, images, embeddings, or interactive
+chat.
+
+## 22 — Configuration CLI
+
+**Commands:** `ai-toolkit config show` and `ai-toolkit config validate`
+
+**Demonstrates:** Inspecting resolved configuration with masked keys and
+validating configuration structure from the terminal.
+
+**Requirements:** Installed package. Provider credentials and network access
+are not required for read-only inspection itself.
+
+**Run:** `ai-toolkit config show`, then `ai-toolkit config validate`
+
+**Boundary:** These commands do not modify `.env`, save secrets, contact a
+provider, or prove that credentials and selected model capabilities work.
+
+Examples 19–22 are supported by the
+[Django, FastAPI, and CLI integration guide](../docs/integrations.md).
+
+## 23 — Explicit Configuration
+
+**File:** [`23_explicit_config.py`](23_explicit_config.py)
+
+**Demonstrates:** Constructing a complete `AIConfig` from an
+application-supplied secret, validating it explicitly, and injecting it into
+`AIClient` without merging toolkit environment settings.
+
+**Requirements:** Core installation, `EXAMPLE_AI_API_KEY` containing a
+restricted development credential, network access, and access to the model
+selected in the example.
+
+**Run:**
 
 ```bash
 export EXAMPLE_AI_API_KEY="replace_with_a_development_key"
@@ -424,212 +429,150 @@ $env:EXAMPLE_AI_API_KEY = "replace_with_a_development_key"
 python -m examples.23_explicit_config
 ```
 
-Use a restricted development credential. Do not commit the value, pass it as a
-command-line argument, or replace the example placeholder with a real key in
-source. A production application can pass a secret-manager value directly to
-`build_ai_client()`.
+**Boundary:** Manual `AIConfig` construction does not validate itself. The
+application owns secret lookup and must call `ConfigValidator.validate()`
+before client construction.
 
-The [configuration guide](../docs/configuration.md#explicit-aiconfig) explains
-why explicit values are not merged with `.env` and why manual validation is
-currently required.
+See the [explicit configuration guide](../docs/configuration.md#explicit-aiconfig).
 
-## 24 – Custom Provider Registration
+## 24 — Custom Provider Registration
 
-**File**
+**File:** [`24_custom_provider.py`](24_custom_provider.py)
 
-```text
-24_custom_provider.py
-```
+**Demonstrates:** Implementing the minimum `BaseAIProvider` contract,
+registering it before client construction, selecting it through validated
+explicit configuration, and using it through the normal client lifecycle.
 
-Demonstrates:
+**Requirements:** Core installation only; no credential or network access.
 
-* implementing the required `BaseAIProvider.ask_text()` method
-* accepting the factory's required `api_key` and `model` constructor arguments
-* registering an exact provider name before client construction
-* selecting the registered provider through an explicit `AIConfig`
-* validating configuration before passing it to `AIClient`
-* returning `ProviderResponse` and token-usage metadata
-* running deterministically without a credential or network request
+**Run:** `python -m examples.24_custom_provider`
 
-Run the example directly:
+**Boundary:** Registration is process-local. The example implements synchronous
+plain text only, so registration does not prove streaming, tools, images,
+embeddings, live connectivity, or model support.
 
-```bash
-python -m examples.24_custom_provider
-```
+See the [custom provider guide](../docs/providers.md).
 
-The example implements synchronous plain text only. A provider appearing in
-`ProviderFactory.available_providers()` is registered in the current Python
-process; it does not prove that optional capabilities or a live model are
-available. See the [provider guide](../docs/providers.md) for constructor,
-lifecycle, capability, and error boundaries.
+## 25 — Testing with a Fake Provider
 
-## 25 – Testing with a Fake Provider
+**File:** [`25_testing_with_fake_provider.py`](25_testing_with_fake_provider.py)
 
-**File**
+**Demonstrates:** Keeping application code dependent on `AIClient`, substituting
+a deterministic provider during test-client construction, capturing the
+prompt, and exercising real structured parsing.
 
-```text
-25_testing_with_fake_provider.py
-```
+**Requirements:** Core installation only; no real credential, live model, or
+network access.
 
-Demonstrates:
+**Run:** `python -m examples.25_testing_with_fake_provider`
 
-* keeping application code dependent on `AIClient`
-* replacing provider construction only inside a test
-* returning deterministic structured data from a `BaseAIProvider` fake
-* exercising the real request executor and response parser
-* asserting application output and the prompt received by the fake
-* restoring factory behavior automatically without changing the registry
-* running without credentials, network access, or a live model
+**Boundary:** The factory patch is test-only and scoped to client construction.
+It does not register a provider or create a general mocking framework.
 
-Run the self-check directly:
+See the
+[fake-provider testing guide](../docs/providers.md#testing-application-code-with-a-fake-provider).
 
-```bash
-python -m examples.25_testing_with_fake_provider
-```
+## 26 — Batch Embedding and Retrieval
 
-The placeholder key only satisfies structural configuration validation; it is
-never sent anywhere. In an application test suite, keep the factory patch
-inside a fixture or context manager and construct the client while that patch
-is active. The client retains the selected fake after construction.
+**File:** [`26_batch_embedding_and_retrieval.py`](26_batch_embedding_and_retrieval.py)
 
-See the [provider guide](../docs/providers.md#testing-application-code-with-a-fake-provider)
-for the production-versus-test boundary.
+**Demonstrates:** Sending several metadata-bearing texts in one embedding
+request, restoring input order from `EmbeddingVector.index`, preserving stable
+application IDs, storing vectors, and retrieving filtered contexts.
 
-## 26 – Batch Embedding and Retrieval
+**Requirements:** Core installation, valid embedding-provider configuration,
+network access, and an embedding-capable model.
 
-**File**
+**Run:** `python -m examples.26_batch_embedding_and_retrieval`
 
-```text
-26_batch_embedding_and_retrieval.py
-```
+**Boundary:** Indexes an in-code batch and returns contexts only; it does not
+load files, generate an answer, or provide persistent storage.
 
-Demonstrates:
+## 27 — End-to-End Document Indexing and RAG
 
-* submitting multiple metadata-bearing texts in one `AIClient.embed_texts()`
-  request
-* restoring input order from `EmbeddingVector.index`
-* preserving stable application IDs, source metadata, and topics
-* adding the resulting vectors to `InMemoryVectorStore`
-* embedding a query through `VectorStoreRetriever`
-* filtering and returning relevant prompt-ready contexts
+**File:** [`27_document_indexing_and_rag.py`](27_document_indexing_and_rag.py)
 
-Run with valid provider configuration and an embedding-capable model:
+**Demonstrates:** Loading sample files with a module-relative path, assigning
+stable application IDs, batch embedding with index restoration, storing and
+retrieving documents, and generating one grounded answer with returned source
+contexts.
 
-```bash
-python -m examples.26_batch_embedding_and_retrieval
-```
+**Requirements:** Core installation, the included sample documents, valid
+provider configuration, network access, and models supporting embeddings and
+text generation.
 
-The automated regression substitutes a deterministic provider, deliberately
-returns batch embeddings out of order, and makes no credentialed or network
-request. This example indexes an in-code knowledge batch only; file loading,
-document preparation, and answer generation remain in the following
-end-to-end RAG example.
+**Run:** `python -m examples.27_document_indexing_and_rag`
 
-See the [retrieval and RAG guide](../docs/retrieval.md) for embedding-index
-correlation, vector-store limits, retrieval scores, and provider capability
-boundaries.
+**Boundary:** Each file remains one document. Chunking, persistent storage,
+access policy, production ID design, and citation verification remain
+application responsibilities.
 
-## 27 – End-to-End Document Indexing and RAG
+Examples 26–27 are supported by the
+[retrieval and RAG guide](../docs/retrieval.md).
 
-**File**
+## 28 — Structured Application Service
 
-```text
-27_document_indexing_and_rag.py
-```
+**File:** [`28_structured_application_service.py`](28_structured_application_service.py)
 
-Demonstrates:
+**Demonstrates:** Injecting `AIClient` into a framework-independent service,
+validating input locally, requesting a constrained Pydantic result, applying
+application routing rules, translating expected toolkit failures, and
+preserving the request ID.
 
-* loading the existing `.txt` and `.md` sample files through `DirectoryLoader`
-* explicitly adding stable application IDs and collection metadata
-* converting prepared documents through `documents_to_embedding_inputs()`
-* embedding all documents in one batch and restoring input order by index
-* preserving loader and source metadata in `VectorRecord`
-* retrieving relevant documents through `VectorStoreRetriever`
-* generating one grounded answer and returning its source contexts through
-  `RAGPipeline`
+**Requirements:** Core installation, valid text-generation provider
+configuration, network access, and a model that can follow structured-output
+instructions.
 
-Run with valid provider configuration and models supporting both embeddings
-and text generation:
+**Run:** `python -m examples.28_structured_application_service`
 
-```bash
-python -m examples.27_document_indexing_and_rag
-```
+**Boundary:** The service does not authorize or perform refunds, write to a
+database, or contact another system; those side effects remain application
+responsibilities.
 
-The automated regression substitutes a deterministic provider, reverses the
-document embedding results, and verifies the complete loader-to-answer
-workflow without credentials or network access.
+See the
+[application-service request guide](../docs/requests.md#put-structured-requests-behind-an-application-service).
 
-Each sample file remains one document. Document chunking, persistent vector
-storage, access policy, and stable ID design for a production corpus are
-application responsibilities; this example keeps those boundaries visible
-rather than introducing a high-level indexing helper.
+## Supplementary Examples
 
-See the [retrieval and RAG guide](../docs/retrieval.md) for document-preparation,
-grounding, source-context, and in-memory storage boundaries.
+### Minimal `ask_text()` Check
 
-## 28 – Structured Application Service
+**File:** [`hello_ai.py`](hello_ai.py)
 
-**File**
+**Demonstrates:** Calling the convenience `ask_text()` method and printing its
+string result.
 
-```text
-28_structured_application_service.py
-```
+**Requirements:** Core installation, valid text-generation provider
+configuration, and network access.
 
-Demonstrates:
+**Run:** `python -m examples.hello_ai`
 
-* injecting `AIClient` into a framework-independent application service
-* validating application input before making a provider request
-* requesting a constrained Pydantic `FeedbackAnalysis`
-* keeping prompts, routing, and human-review rules in application code
-* mapping expected toolkit failures to an application-owned exception
-* returning a stable `FeedbackOutcome` with the toolkit request ID
+**Boundary:** Returns plain `str`, not `AIResult`, so it omits request metadata.
+Start with example 01 when learning the standard result contract.
 
-Run with valid text-generation provider configuration:
+### Structured Drink Recommendation
 
-```bash
-python -m examples.28_structured_application_service
-```
+**File:** [`drink_recommender.py`](drink_recommender.py)
 
-The automated regression substitutes a deterministic provider and verifies
-input validation, structured parsing, prompt contents, application routing,
-request metadata, and error translation without credentials or network access.
-The service does not perform a refund, update a database, or contact another
-system; authorization and side effects remain application responsibilities.
+**Demonstrates:** Supplying a small application-owned product list in a prompt,
+requesting one constrained Pydantic recommendation, and printing token usage.
 
-See the [request guide](../docs/requests.md#put-structured-requests-behind-an-application-service)
-for the application-service boundary.
+**Requirements:** Core installation, valid text-generation provider
+configuration, network access, and a model that can follow structured-output
+instructions.
 
-## Running
-```bash
-python -m examples.01_plain_text
-```
+**Run:** `python -m examples.drink_recommender`
+
+**Boundary:** The model recommends only from prompt data; application code must
+still enforce price, availability, alcohol, age, safety, and business rules.
 
 ## Learning Path
-1. Plain Text Request
-2. Extract Structured Data
-3. Builder Usage
-4. Prompt Templates
-5. Streaming Response
-6. Async Client
-7. Tool Calling
-8. Image Inputs
-9. Structured Image Input
-10. Embeddings
-11. Vector Store
-12. Retriever
-13. RAG Pipeline
-14. Document Loader RAG
-15. Conversation Memory
-16. Agent
-17. Workflow Engine
-18. Multi-Agent Orchestration
-19. Django Integration
-20. FastAPI Integration
-21. Command-Line Interface
-22. Configuration CLI
-23. Explicit Configuration
-24. Custom Provider Registration
-25. Testing with a Fake Provider
-26. Batch Embedding and Retrieval
-27. End-to-End Document Indexing and RAG
-28. Structured Application Service
+
+| Stage | Examples | Focus |
+| --- | --- | --- |
+| 1 | 01–04 | Plain requests, structured output, builder, and prompts |
+| 2 | 05–09 | Streaming, async, tools, and images |
+| 3 | 10–14 | Embeddings, vector search, retrieval, and RAG |
+| 4 | 15–18 | Memory, agents, workflows, and orchestration |
+| 5 | 19–22 | Django, FastAPI, requests from the CLI, and configuration inspection |
+| 6 | 23–25 | Explicit configuration, provider extension, and application testing |
+| 7 | 26–28 | Batch retrieval, document RAG, and an application service |

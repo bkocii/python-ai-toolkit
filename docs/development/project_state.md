@@ -76,6 +76,7 @@ Completed PROD-004 example tasks:
 * EXAMPLE-004 Batch embedding and retrieval
 * EXAMPLE-005 End-to-end document indexing and RAG
 * EXAMPLE-006 Structured application service example
+* EXAMPLE-007 Review and normalize all example descriptions
 
 Next active task:
 
@@ -86,7 +87,7 @@ PROD-004 — Additional Examples
 Next roadmap task:
 
 ```text
-EXAMPLE-007 — Review and normalize all example descriptions
+EXAMPLE-008 — Verify all examples against current APIs
 ```
 
 ---
@@ -715,15 +716,15 @@ PROD-004 — Additional Examples
 
 ### Next Recommended Focus
 
-Begin `EXAMPLE-007 — Review and normalize all example descriptions`.
+Begin `EXAMPLE-008 — Verify all examples against current APIs`.
 
-`EXAMPLE-006` added `examples/28_structured_application_service.py`. It injects
-`AIClient` into a framework-independent customer-feedback service, validates
-input before the request, returns a constrained structured model, applies
-application-owned routing and human-review rules, preserves the request ID,
-and maps expected toolkit failures to a stable application exception. The next
-task should review the complete gallery and normalize example descriptions
-without mixing in the final API-verification task.
+`EXAMPLE-007` reviewed every numbered and supplementary example description,
+standardized the complete gallery around file or command, behavior,
+requirements, run instructions, and boundaries, and documented the intentional
+numbering compatibility exceptions. It added permanent catalog-coverage and
+format regressions without changing any example implementation or runtime API.
+The next task should execute and reconcile every example against the current
+public interfaces before `PROD-004` is closed.
 
 ---
 

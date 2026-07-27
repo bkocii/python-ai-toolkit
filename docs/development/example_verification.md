@@ -2,8 +2,9 @@
 
 ## Purpose
 
-This document records the `DOC-014` audit of user-facing examples and commands.
-It distinguishes behavior verified without a network from behavior that still
+This document records the `DOC-014` audit of user-facing examples and commands
+plus the later `PROD-004` example additions and description review. It
+distinguishes behavior verified without a network from behavior that still
 requires a real provider environment.
 
 The audit covers:
@@ -29,19 +30,51 @@ It does not add the new example topics assigned to `PROD-004`.
 
 ## Documentation Inventory
 
-The 14 user-facing Markdown files contain 217 fenced blocks after
-`EXAMPLE-006`.
+The 14 user-facing Markdown files contain 184 fenced blocks after
+`EXAMPLE-007`. The lower count reflects the normalized gallery using inline
+run commands where a multi-line command block is unnecessary; no example
+workflow was removed.
 
 | Block type | Count | Verification |
 | --- | ---: | --- |
 | Python | 82 | Executed in document order; intentional failure examples asserted |
-| Shell | 48 | Safe commands executed in isolated Linux environments; provider commands substituted |
+| Shell | 38 | Safe commands executed in isolated Linux environments; provider commands substituted |
 | PowerShell | 5 | Classified as Windows-dependent and inspected against the corresponding Linux workflow |
 | Environment configuration | 8 | Parsed and exercised through configuration and CLI tests |
 | TOML | 1 | Matched against `pyproject.toml` |
-| Output, signatures, and diagrams | 73 | Compared with current behavior and public contracts |
+| Output, signatures, and diagrams | 50 | Compared with current behavior and public contracts |
 
 All repository-relative links in the user-facing documentation resolve.
+
+## Description Format and Catalog Coverage
+
+`EXAMPLE-007` reviewed every numbered module, both command workflows, the
+example-09 Base64 variant, and the unnumbered `hello_ai.py` and
+`drink_recommender.py` modules against their implementations and focused
+guides.
+
+Every gallery entry now states:
+
+1. the file or command
+2. demonstrated toolkit behavior
+3. normal-run requirements
+4. the run command or application entry point
+5. an important unsupported or application-owned boundary
+
+The catalog preserves three intentional compatibility exceptions:
+
+- 21 and 22 are CLI command workflows, so there are no corresponding Python
+  modules between examples 20 and 23.
+- `09_1_structured_image_with_helper.py` remains a local-file variant of
+  example 09 rather than receiving a new learning-path number.
+- `hello_ai.py` and `drink_recommender.py` remain unnumbered supplementary
+  modules so existing runnable module paths do not change.
+
+Permanent documentation regressions fail if an example module is absent from
+the gallery, an entry loses one of the five fields, a documented Python file
+does not exist, or these numbering exceptions disappear. `EXAMPLE-007` changed
+descriptions and verification only; final execution against current public APIs
+remains assigned to `EXAMPLE-008`.
 
 ## Example Files
 
@@ -210,5 +243,6 @@ Black and Ruff checks pass with `N999` excluded. The example composes the
 public structured-request and exception contracts inside an application-owned
 service without adding a toolkit service abstraction.
 
-Repository-wide cleanup and example naming normalization remain later roadmap
-work; they were not mixed into this documentation-verification task.
+Repository-wide quality cleanup remains later release work. Example
+description and catalog normalization completed in `EXAMPLE-007`; final
+current-public-API execution remains assigned to `EXAMPLE-008`.

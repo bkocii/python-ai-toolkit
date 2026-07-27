@@ -489,6 +489,11 @@ The [example gallery](examples/README.md) provides a numbered learning path:
 
 Network-dependent examples require valid provider configuration. The examples
 remain application-focused and keep business logic intentionally small.
+Every gallery entry identifies its file or command, demonstrated behavior,
+requirements, run instructions, and unsupported or application-owned
+boundaries. The catalog also explains why command workflows 21–22, the
+example-09 Base64 variant, and the two unnumbered legacy modules retain their
+existing names.
 
 ## Documentation
 

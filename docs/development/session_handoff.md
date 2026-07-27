@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-004 — Additional Examples`  
-**Next task:** `EXAMPLE-007 — Review and normalize all example descriptions`
+**Next task:** `EXAMPLE-008 — Verify all examples against current APIs`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `EXAMPLE-007`.
+The next task is `EXAMPLE-008`.
 
 ---
 
@@ -1411,54 +1411,88 @@ changed.
 
 ---
 
-# Exact Next Task — EXAMPLE-007
+# EXAMPLE-007 Completion
 
-Review and normalize all example descriptions.
+`EXAMPLE-007 — Review and normalize all example descriptions` is complete.
 
-Required work:
+Completed work:
 
-1. inspect every numbered and unnumbered example plus the current gallery
-   before editing
-2. define one concise description format covering the file or command,
-   demonstrated behavior, setup requirements, run command, and important
-   boundaries
-3. normalize gallery headings, wording, lists, and spacing without changing
-   example behavior
-4. reconcile every description with the implementation and focused public
-   guides
-5. identify naming or numbering inconsistencies explicitly; do not silently
-   renumber modules or mix the later current-API verification into this task
-6. preserve provider, credential, platform, and optional-capability
-   requirements
-7. keep descriptions application-focused and avoid claiming unsupported
-   capabilities
-8. update the README, verification record, roadmap, project state, session
-   handoff, and changelog as required
-9. run documentation, link, focused, and full-suite checks
-10. advance the active pointer to `EXAMPLE-008`
+1. inspected every numbered and unnumbered example, both CLI workflows, the
+   example-09 Base64 variant, and the existing gallery
+2. defined one description format covering file or command, behavior,
+   requirements, run instructions, and an important boundary
+3. normalized headings, wording, labels, links, lists, and spacing across the
+   complete catalog
+4. reconciled every description with its implementation and the focused
+   public guides
+5. documented the intentional numbering exceptions for CLI entries 21–22,
+   `09_1`, and the two unnumbered supplementary modules
+6. preserved provider, credential, network, optional-dependency, platform, and
+   model-capability requirements
+7. added permanent regressions requiring complete module coverage and all five
+   description fields
+8. preserved example behavior, runnable module paths, production runtime APIs,
+   dependencies, and architectural decisions
+
+Focused verification:
+
+```text
+54 focused example and documentation tests passed
+325 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+184 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+176 repository-relative user-documentation links passed
+```
 
 ---
 
-# EXAMPLE-006 Verification and Repository State
+# Exact Next Task — EXAMPLE-008
+
+Verify all examples against current APIs.
+
+Required work:
+
+1. inspect the current public interfaces and every numbered, variant, command,
+   framework, and supplementary example before changing behavior
+2. execute offline examples directly and provider-dependent examples through
+   deterministic substitutes
+3. verify Django, FastAPI, CLI, image, embedding, RAG, agent, workflow, and
+   structured-response examples through their real public entry points
+4. correct stale imports, signatures, return-value assumptions, setup
+   instructions, or expected output discovered by execution
+5. preserve the normalized gallery format and intentional numbering
+   compatibility decisions from `EXAMPLE-007`
+6. keep live-provider authentication, account, region, network, cost, and
+   model-capability verification explicit rather than claiming deterministic
+   substitutes prove it
+7. avoid production runtime changes unless execution exposes a release-blocking
+   defect; document and review any such defect before modifying the API
+8. update the verification record, roadmap, project state, session handoff,
+   changelog, and regressions as required
+9. run focused, documentation, link, formatting, lint, full-suite, and clean
+   installation checks
+10. close `PROD-004` only if every exit criterion is satisfied
+
+---
+
+# EXAMPLE-007 Verification and Repository State
 
 Changed project files:
 
 ```text
 README.md
 CHANGELOG.md
-docs/requests.md
 docs/development/example_verification.md
 docs/development/roadmap.md
 docs/development/project_state.md
 docs/development/session_handoff.md
-examples/28_structured_application_service.py
 examples/README.md
 tests/test_documentation_examples.py
-tests/test_examples.py
 ```
 
-No production runtime API, provider adapter, package dependency, benchmark, or
-ADR changed.
+No production runtime API, example implementation, provider adapter, package
+dependency, benchmark, or ADR changed.
 
 Suggested focused commit:
 
@@ -1466,18 +1500,15 @@ Suggested focused commit:
 git add `
     README.md `
     CHANGELOG.md `
-    docs\requests.md `
     docs\development\example_verification.md `
     docs\development\roadmap.md `
     docs\development\project_state.md `
     docs\development\session_handoff.md `
-    examples\28_structured_application_service.py `
     examples\README.md `
-    tests\test_documentation_examples.py `
-    tests\test_examples.py
+    tests\test_documentation_examples.py
 
 git diff --cached
-git commit -m "docs: add structured service example"
+git commit -m "docs: normalize example descriptions"
 ```
 
 ---
@@ -1934,16 +1965,20 @@ For the immediate next task, also provide:
 
 6. `README.md`
 7. `CHANGELOG.md`
-8. all focused public guides under `docs/`
-9. `docs/api_reference.md`
-10. `docs/development/example_verification.md`
-11. the complete `examples/` directory
-12. `tests/test_documentation_examples.py`
-13. `tests/test_examples.py`
+8. `pyproject.toml`
+9. the complete `ai/` source directory
+10. all focused public guides under `docs/`
+11. `docs/api_reference.md`
+12. `docs/development/example_verification.md`
+13. the complete `examples/` directory, including `sample_docs` and
+    `sketch.jpg`
+14. `tests/test_documentation_examples.py`
+15. `tests/test_examples.py`
 
-Production runtime changes, example renumbering, the final current-API
-verification assigned to `EXAMPLE-008`, profiling evidence, and benchmark
-artifacts are not required for `EXAMPLE-007`.
+Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
+and future-backlog implementation files are not required for `EXAMPLE-008`.
+The current runtime source is required because the task must compare every
+example with the actual public interfaces.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -1957,8 +1992,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that EXAMPLE-007 is still the correct next task.
-4. Confirm that EXAMPLE-006 added a framework-independent structured application service with injected AIClient, local input validation, application-owned routing, request traceability, expected-error mapping, and deterministic verification.
+3. Verify the repository's current state and confirm that EXAMPLE-008 is still the correct next task.
+4. Confirm that EXAMPLE-007 normalized every example description around file or command, behavior, requirements, run instructions, and boundaries without changing example behavior or module paths.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

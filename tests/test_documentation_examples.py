@@ -81,6 +81,75 @@ def test_gallery_references_existing_python_files():
         assert (PROJECT_ROOT / "examples" / filename).is_file()
 
 
+def test_gallery_describes_every_example_module():
+    gallery = (PROJECT_ROOT / "examples" / "README.md").read_text(encoding="utf-8")
+    example_files = {
+        path.name
+        for path in (PROJECT_ROOT / "examples").glob("*.py")
+        if path.name != "__init__.py"
+    }
+    referenced_files = set(re.findall(r"`([^`]+\.py)`", gallery))
+
+    assert referenced_files == example_files
+
+
+def test_gallery_entries_use_normalized_description_fields():
+    gallery = (PROJECT_ROOT / "examples" / "README.md").read_text(encoding="utf-8")
+    headings = [
+        "## 01 — Plain Text Request",
+        "## 02 — Extract Structured Data",
+        "## 03 — Fluent Request Builder",
+        "## 04 — Prompt Template",
+        "## 05 — Streaming Response",
+        "## 06 — Async Client",
+        "## 07 — Tool Calling",
+        "## 08 — Image Input",
+        "## 09 — Structured Image Input",
+        "### 09 Local Base64 Variant",
+        "## 10 — Embeddings",
+        "## 11 — In-Memory Vector Store",
+        "## 12 — Retriever",
+        "## 13 — RAG Pipeline",
+        "## 14 — Directory Loader RAG",
+        "## 15 — Conversation Memory",
+        "## 16 — Agent",
+        "## 17 — Workflow Engine",
+        "## 18 — Multi-Agent Orchestration",
+        "## 19 — Django Integration",
+        "## 20 — FastAPI Integration",
+        "## 21 — Command-Line Request",
+        "## 22 — Configuration CLI",
+        "## 23 — Explicit Configuration",
+        "## 24 — Custom Provider Registration",
+        "## 25 — Testing with a Fake Provider",
+        "## 26 — Batch Embedding and Retrieval",
+        "## 27 — End-to-End Document Indexing and RAG",
+        "## 28 — Structured Application Service",
+        "### Minimal `ask_text()` Check",
+        "### Structured Drink Recommendation",
+    ]
+
+    for heading in headings:
+        start = gallery.index(heading)
+        remaining = gallery[start + len(heading) :]
+        next_heading = re.search(r"\n#{2,3} ", remaining)
+        body = remaining[: next_heading.start()] if next_heading else remaining
+
+        assert re.search(r"\*\*(?:File|Command|Commands):\*\*", body), heading
+        assert "**Demonstrates:**" in body, heading
+        assert "**Requirements:**" in body, heading
+        assert "**Run:**" in body, heading
+        assert "**Boundary:**" in body, heading
+
+
+def test_gallery_documents_numbering_compatibility_exceptions():
+    gallery = (PROJECT_ROOT / "examples" / "README.md").read_text(encoding="utf-8")
+
+    assert "Entries 21–22 are command workflows" in gallery
+    assert "`09_1_structured_image_with_helper.py` is a local-file variant" in gallery
+    assert "`hello_ai.py` and `drink_recommender.py` are older supplementary" in gallery
+
+
 def test_numbered_example_modules_exist():
     expected_modules = {
         1: "01_plain_text.py",

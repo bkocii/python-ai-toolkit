@@ -114,6 +114,12 @@ The format loosely follows Keep a Changelog.
 
 
 ### Improved
+* Normalized every numbered and supplementary example description around one
+  file/command, behavior, requirements, run, and boundary format
+* Explicit example numbering guidance for CLI workflows 21–22, the example-09
+  Base64 variant, and preserved unnumbered module paths
+* Regression coverage requiring every example module to appear in the gallery
+  with the normalized description fields
 * Installation guidance for local users, optional integrations, contributors,
   and benchmark environments
 * Configuration reference for defaults, precedence, validation, and CLI checks

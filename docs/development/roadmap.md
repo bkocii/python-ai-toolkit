@@ -1890,7 +1890,7 @@ Fill important example gaps required for a Version 1.0 release.
 * [x] EXAMPLE-004 Batch embedding and retrieval
 * [x] EXAMPLE-005 End-to-end document indexing and RAG
 * [x] EXAMPLE-006 Structured application service example
-* [ ] EXAMPLE-007 Review and normalize all example descriptions
+* [x] EXAMPLE-007 Review and normalize all example descriptions
 * [ ] EXAMPLE-008 Verify all examples against current APIs
 
 ### Example Rules
@@ -2155,11 +2155,57 @@ Next task:
 EXAMPLE-007 — Review and normalize all example descriptions
 ```
 
+#### EXAMPLE-007 — Review and Normalize All Example Descriptions
+
+Status: Completed
+
+Completed work:
+
+* inspected every numbered and unnumbered example module, both CLI workflows,
+  the example-09 Base64 variant, and the existing gallery before editing
+* defined one catalog format covering the file or command, demonstrated
+  behavior, normal-run requirements, run instructions, and an important
+  boundary
+* normalized headings, wording, labels, lists, links, and spacing across the
+  complete gallery
+* reconciled descriptions with the implementations and focused request,
+  advanced-request, retrieval, orchestration, integration, configuration, and
+  provider guides
+* documented that 21–22 are command workflows, `09_1` is a compatibility
+  variant of example 09, and the two older supplementary modules remain
+  unnumbered
+* preserved provider credentials, network, optional-dependency, platform, and
+  model-capability requirements without adding undocumented setup
+* added regressions requiring every example module to appear in the gallery
+  and every entry to retain the normalized fields
+* kept example behavior, module paths, runtime APIs, and the final
+  current-public-API verification unchanged
+
+Completion verification:
+
+```text
+54 focused example and documentation tests passed
+325 normal tests passed on Linux with CPython 3.12.13
+focused Black and Ruff checks passed
+184 fenced documentation blocks inventoried
+82 Python documentation blocks compiled
+176 repository-relative user-documentation links passed
+```
+
+No production runtime API, example implementation, provider adapter,
+dependency, benchmark, or architectural decision changed.
+
+Next task:
+
+```text
+EXAMPLE-008 — Verify all examples against current APIs
+```
+
 ### Exit Criteria
 
 * [x] Important public APIs have examples
-* [ ] Example naming and numbering are consistent
-* [ ] Example documentation follows one format
+* [x] Example naming and numbering are consistent
+* [x] Example documentation follows one format
 * [ ] Examples use current public APIs
 
 ---
