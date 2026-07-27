@@ -21,6 +21,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Strict Twine validation for the wheel and source distribution, including the
+  rendered Markdown long description and modern license metadata
+* Reusable offline distribution validator covering archive safety, exact source
+  contents, metadata agreement, wheel RECORD hashes, and unintended files
+* Windows PowerShell guidance for validating both artifacts and removing an
+  older generated `python_ai_toolkit.egg-info/` directory from Git tracking
 * Reproducible local construction of the `0.7.0.dev0` wheel and source
   distribution with the standard `python -m build` workflow
 * Windows PowerShell guidance for cleaning older generated package output,

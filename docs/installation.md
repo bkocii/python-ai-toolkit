@@ -305,6 +305,63 @@ development artifacts to PyPI. Building proves that both files can be created;
 the separate distribution-validation step must still check their metadata,
 rendered README, archive contents, and installation behavior before release.
 
+If an `*.egg-info/` directory was committed before the ignore rule was added,
+the ignore rule does not remove it from Git automatically. Check and untrack it
+once from the project root:
+
+```powershell
+git ls-files python_ai_toolkit.egg-info
+git rm -r --cached python_ai_toolkit.egg-info
+git commit -m "chore: stop tracking generated package metadata"
+```
+
+The first command prints nothing when the directory is already untracked. The
+local directory may also be deleted safely; setuptools recreates it during a
+build or editable installation.
+
+Keep the wheel and source distribution together in the local `dist\` directory
+while validating them. They are ignored build outputs, not normal Git source
+files. A later release process uploads the final validated files to the package
+index or attaches them to a release.
+
+### Validate both distributions on Windows
+
+Install Twine in the active build environment, then run its strict metadata and
+long-description check:
+
+```powershell
+python -m pip install twine
+python -m twine check --strict dist\*
+```
+
+Both files must report `PASSED`. Then run the repository's offline archive
+validator:
+
+```powershell
+python scripts\validate_distributions.py
+```
+
+The validator does not install or execute toolkit code. It checks:
+
+* safe, normalized archive paths with no links or special filesystem entries
+* exact agreement between packaged `ai` modules and the reviewed source
+* source-distribution coverage for tests and required project files
+* matching wheel and source metadata, dependencies, extras, README, and license
+* the `ai-toolkit` console entry point and `py3-none-any` wheel tag
+* every file size and SHA-256 digest recorded by the wheel
+* absence of secrets, caches, compiled Python, logs, and nested build output
+
+It prints the final archive SHA-256 hashes so the exact validated files can be
+identified later. This validates archive construction only. Installation and
+imports from each artifact must still be tested in a clean virtual environment.
+
+Twine proves that the long description is valid, renderable Markdown; it does
+not visit link destinations. The current README intentionally uses
+repository-relative documentation links, while the canonical public repository
+URL is still unconfirmed. Before publishing Version 1.0 to PyPI, configure the
+confirmed project URLs and convert or otherwise verify those links for the PyPI
+page rather than inventing placeholder destinations during local validation.
+
 ## Change an existing installation
 
 After changing extras or pulling package-metadata updates, rerun the appropriate

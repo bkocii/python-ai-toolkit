@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-007 — Validate distributions`
+**Next task:** `PACKAGE-008 — Test installation in a clean virtual environment`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `PACKAGE-007`.
+The current next task is `PACKAGE-008`.
 
 ---
 
@@ -1747,20 +1747,59 @@ architectural decision changed.
 
 ---
 
-# Exact Next Task — PACKAGE-007
+# PACKAGE-007 — Distribution Validation
 
-Validate the built distributions.
+**Status:** Completed
+
+Completed work:
+
+1. ran strict Twine validation on the wheel and source distribution
+2. verified matching identity, version, dependency, extra, Python, README,
+   entry-point, and MIT license metadata
+3. confirmed the complete UTF-8 README and exact license text in both formats
+4. compared every packaged `ai` Python module with the reviewed source
+5. confirmed the source distribution contains the complete current test suite
+6. verified safe normalized paths, regular filesystem entries, wheel tag, and
+   all wheel `RECORD` hashes and sizes
+7. confirmed no secrets, environment files, caches, compiled Python, logs,
+   deliverables, or nested build output are packaged
+8. added a reusable offline archive validator and local Windows instructions
+9. documented how to untrack older generated `*.egg-info/` output safely
+10. recorded that Twine validates Markdown rendering but not link destinations;
+    canonical public project URLs and PyPI-page links remain unresolved until
+    a real public repository location is confirmed
+
+Validation evidence:
+
+```text
+twine 6.2.0 --strict: PASSED for wheel and source distribution
+wheel: 46 safe entries
+source distribution: 94 safe entries
+wheel SHA-256: 68cbc49d66523eb8473b19a73a4ecf2e8fe5f0281d850d330f651f08aa76eb06
+source SHA-256: 6c39b39402fb622770a271b1e69202485604618463fab65988434cbd508ca3d2
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, README, license, benchmark, example, build
+artifact, or architectural decision changed.
+
+---
+
+# Exact Next Task — PACKAGE-008
+
+Test installation from each built artifact in a clean virtual environment.
 
 Required work:
 
-1. run `python -m twine check dist/*`
-2. inspect wheel and source-distribution metadata in detail
-3. verify the rendered long description and declared license metadata
-4. compare packaged modules and required files with the reviewed source
-5. verify archive safety and absence of generated or unintended content
-6. correct only defects demonstrated by distribution validation
+1. create isolated environments outside the source checkout
+2. install the wheel and source distribution separately
+3. confirm imports resolve from the installed package rather than local source
+4. run representative offline API and console-command smoke checks
+5. run `pip check` in both environments
+6. correct only defects demonstrated by clean installation
 7. update package guidance and project records
-8. leave clean virtual-environment installation to `PACKAGE-008`
+8. leave core-versus-framework dependency separation to `PACKAGE-009` and
+   `PACKAGE-010`
 
 ---
 
@@ -2297,12 +2336,16 @@ For the immediate next task, also provide:
 10. `.gitignore`
 11. `docs/installation.md`
 12. `tests/test_package_metadata.py`
+13. `scripts/validate_distributions.py`
+14. `dist/python_ai_toolkit-0.7.0.dev0-py3-none-any.whl`
+15. `dist/python_ai_toolkit-0.7.0.dev0.tar.gz`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-007`. The built wheel and source distribution, package metadata,
-license, README, build guidance, and package-metadata tests are required so
-the archives can be validated without mixing in later installation work.
+`PACKAGE-008`. The validated wheel and source distribution, package metadata,
+license, README, installation guidance, distribution validator, and
+package-metadata tests are required so clean installation can be tested against
+the exact validated artifacts.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2316,8 +2359,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-007 is still the correct next task.
-4. Confirm that PACKAGE-006 built both standard distribution formats and left detailed validation for PACKAGE-007.
+3. Verify the repository's current state and confirm that PACKAGE-008 is still the correct next task.
+4. Confirm that PACKAGE-007 validated both standard distribution formats and left clean installation for PACKAGE-008.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

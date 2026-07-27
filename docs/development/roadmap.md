@@ -2273,7 +2273,7 @@ Produce a valid, installable Python source distribution and wheel.
 * [x] PACKAGE-004 Verify optional dependency groups
 * [x] PACKAGE-005 Verify console entry points
 * [x] PACKAGE-006 Build source distribution and wheel
-* [ ] PACKAGE-007 Validate distributions
+* [x] PACKAGE-007 Validate distributions
 * [ ] PACKAGE-008 Test installation in a clean virtual environment
 * [ ] PACKAGE-009 Test core installation without optional frameworks
 * [ ] PACKAGE-010 Test Django and FastAPI extras separately
@@ -2590,6 +2590,53 @@ Next task:
 
 ```text
 PACKAGE-007 — Validate distributions
+```
+
+#### PACKAGE-007 — Validate Distributions
+
+Status: Completed
+
+Completed work:
+
+* ran `python -m twine check --strict dist/*` against both standard artifacts
+* confirmed that the wheel and source distribution expose matching identity,
+  version, dependencies, extras, Python requirement, README content type,
+  console entry point, and MIT license metadata
+* confirmed that the complete UTF-8 README is the rendered long description in
+  both artifacts and that the packaged license text matches `LICENSE`
+* compared every packaged `ai` Python module byte-for-byte with the reviewed
+  source and confirmed all source tests are present in the source distribution
+* verified normalized archive paths, regular files/directories only, the
+  `py3-none-any` wheel tag, and every wheel `RECORD` size and SHA-256 digest
+* confirmed that neither artifact contains secrets, local environment files,
+  caches, compiled Python files, logs, deliverables, or nested build output
+* added `scripts/validate_distributions.py` as a reusable offline archive gate
+* documented Windows validation, the correct local `dist\` location, and the
+  one-time Git untracking command for previously committed `*.egg-info/` output
+* recorded that Twine validates README rendering but cannot validate link
+  destinations; canonical project URLs and PyPI-page links remain a required
+  pre-publication decision because no public repository URL is confirmed
+* left installation and import testing from each artifact to `PACKAGE-008`
+
+Completion verification:
+
+```text
+twine 6.2.0 strict validation passed for both distributions
+offline archive validation passed
+wheel contains 46 entries and all RECORD hashes and sizes are valid
+source distribution contains 94 safe entries
+wheel SHA-256: 68cbc49d66523eb8473b19a73a4ecf2e8fe5f0281d850d330f651f08aa76eb06
+source SHA-256: 6c39b39402fb622770a271b1e69202485604618463fab65988434cbd508ca3d2
+```
+
+No runtime API, CLI implementation, provider implementation, dependency,
+optional group, package metadata, README, license, benchmark, example, or
+architectural decision changed.
+
+Next task:
+
+```text
+PACKAGE-008 — Test installation in a clean virtual environment
 ```
 
 Clean-environment checks must verify:

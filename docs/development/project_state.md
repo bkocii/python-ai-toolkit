@@ -88,6 +88,7 @@ Completed PROD-005 package tasks:
 * PACKAGE-004 Verify optional dependency groups
 * PACKAGE-005 Verify console entry points
 * PACKAGE-006 Build source distribution and wheel
+* PACKAGE-007 Validate distributions
 
 Next active task:
 
@@ -98,7 +99,7 @@ PROD-005 — PyPI Package
 Next roadmap task:
 
 ```text
-PACKAGE-007 — Validate distributions
+PACKAGE-008 — Test installation in a clean virtual environment
 ```
 
 ---
@@ -638,7 +639,8 @@ Remaining:
 `PACKAGE-003 — Confirm License Metadata and License File`, and
 `PACKAGE-004 — Verify Optional Dependency Groups`, and
 `PACKAGE-005 — Verify Console Entry Points`, and
-`PACKAGE-006 — Build Source Distribution and Wheel` are complete.
+`PACKAGE-006 — Build Source Distribution and Wheel`, and
+`PACKAGE-007 — Validate Distributions` are complete.
 
 The current metadata now:
 
@@ -672,15 +674,25 @@ The current metadata now:
 * keeps reproducible `build/`, `dist/`, and `*.egg-info/` output outside source
   control
 
-The wheel and source distribution build successfully, and basic archive
-inspection confirms the expected package source, metadata, console entry point,
-README, and MIT license. Separate clean environments already prove the
-optional-dependency boundaries and that the core installation generates a
-console command which loads the supported `ai.cli.main:main` implementation.
-Fourteen focused package-metadata regressions and all 341 normal tests pass.
-Detailed distribution validation remains assigned to `PACKAGE-007`. The later
-full-quality release gate still owns two older Black formatting files and 68
-repository-wide Ruff findings; `PACKAGE-006` introduced none of them.
+The wheel and source distribution build successfully. Twine strict validation
+accepts both artifacts, including the UTF-8 Markdown long description and
+modern MIT metadata. The reusable offline validator confirms safe paths, exact
+agreement with all reviewed `ai` modules, matching metadata and required files,
+valid wheel `RECORD` hashes, and no secret, cache, compiled, log, deliverable,
+or nested build content.
+
+Twine proves that the packaged Markdown is renderable but does not visit link
+destinations. The README's repository-relative documentation links remain
+appropriate for the source checkout; confirmed public project URLs and
+PyPI-page link behavior must be resolved before Version 1.0 publication.
+
+Separate clean environments already prove the optional-dependency boundaries
+and that a source installation generates a console command which loads the
+supported `ai.cli.main:main` implementation. Installation and import testing
+from the actual wheel and source distribution now remains assigned to
+`PACKAGE-008`. The later full-quality release gate still owns the older
+repository-wide formatting and lint findings; `PACKAGE-007` introduced none of
+them.
 
 ---
 
@@ -780,12 +792,12 @@ PROD-005 — PyPI Package
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-007 — Validate distributions`.
+Begin `PACKAGE-008 — Test installation in a clean virtual environment`.
 
-`PACKAGE-006` built the actual source distribution and pure-Python wheel from
-the reviewed package recipe without finding a metadata or runtime defect. The
-next task must validate the resulting archives, metadata, and rendered package
-description before installation testing begins.
+`PACKAGE-007` validated the actual source distribution and pure-Python wheel
+without finding a package defect. The next task must install each artifact into
+an isolated environment and prove that the installed package imports and runs
+without resolving code from the source checkout.
 
 ---
 
