@@ -2267,7 +2267,7 @@ Produce a valid, installable Python source distribution and wheel.
 
 ### Tasks
 
-* [ ] PACKAGE-001 Review package metadata
+* [x] PACKAGE-001 Review package metadata
 * [ ] PACKAGE-002 Add package classifiers
 * [ ] PACKAGE-003 Confirm license metadata and license file
 * [ ] PACKAGE-004 Verify optional dependency groups
@@ -2283,6 +2283,57 @@ Produce a valid, installable Python source distribution and wheel.
 ```text
 python -m build
 python -m twine check dist/*
+```
+
+#### PACKAGE-001 — Review Package Metadata
+
+Status: Completed
+
+Completed work:
+
+* inspected the project metadata, README source, package discovery, current
+  source layout, console entry point, and all optional-dependency groups
+* retained the distribution name `python-ai-toolkit`, import package `ai`,
+  description, Python `>=3.11` floor, README source, and author name
+* corrected the machine-readable version from the misleading final-release
+  value `0.7.0` to the normalized development version `0.7.0.dev0`
+* declared `openai>=1.66.0` because the built-in adapter uses the Responses API
+* declared `pydantic>=2.4.2` because the toolkit uses Pydantic v2 validation
+  and schema methods and the exact floor provides a Python 3.12 wheel
+* retained the unbounded `python-dotenv` declaration because the toolkit uses
+  its long-standing `load_dotenv()` interface and no incompatible supported
+  version has been demonstrated
+* confirmed that `ai*` discovery covers the root package, providers, CLI, and
+  both optional framework integrations
+* recorded the distribution, import, and console-command names in the
+  installation guide
+* left project URLs absent instead of inventing repository, documentation, or
+  issue-tracker locations that have not been confirmed
+* added focused regressions for identity, version, README metadata, runtime
+  dependencies, and package-discovery coverage
+* inspected but did not change classifiers, licensing, optional dependencies,
+  the console entry point, build outputs, or installation behavior owned by
+  `PACKAGE-002` through `PACKAGE-010`
+
+Completion verification:
+
+```text
+4 focused package-metadata regressions passed
+25 package-metadata and documentation tests passed
+62 core and provider tests passed with exact minimum OpenAI and Pydantic versions
+331 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the current complete environment
+setuptools accepted the updated pyproject metadata
+focused Black and Ruff checks passed
+```
+
+No runtime API, provider implementation, optional dependency, console entry
+point, benchmark, example, or architectural decision changed.
+
+Next task:
+
+```text
+PACKAGE-002 — Add package classifiers
 ```
 
 Clean-environment checks must verify:

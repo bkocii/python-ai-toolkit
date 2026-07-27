@@ -11,6 +11,26 @@ installation floor from the versions currently verified by the full suite, the
 planned Version 1.0 test matrix, dependency compatibility, and live
 provider/model availability.
 
+## Package identity
+
+Python packaging uses different names for the distribution, import package,
+and terminal command:
+
+| Purpose | Name | Where it is used |
+| --- | --- | --- |
+| Distribution | `python-ai-toolkit` | `pip` and, after release, PyPI |
+| Import package | `ai` | Python imports such as `from ai.client import AIClient` |
+| Console command | `ai-toolkit` | Terminal commands such as `ai-toolkit --help` |
+
+The current machine-readable package version is `0.7.0.dev0`. Project
+documentation displays the same development line as `0.7.0-dev`;
+`0.7.0.dev0` is the normalized Python-package spelling that sorts before a
+future final `0.7.0` release.
+
+The author name is recorded in the package metadata. Canonical repository,
+documentation, and issue-tracker URLs have not yet been confirmed, so the
+metadata intentionally contains no placeholder links.
+
 ## Create a virtual environment
 
 Run these commands from the project root:

@@ -80,6 +80,10 @@ Completed PROD-004 example tasks:
 * EXAMPLE-007 Review and normalize all example descriptions
 * EXAMPLE-008 Verify all examples against current APIs
 
+Completed PROD-005 package tasks:
+
+* PACKAGE-001 Review package metadata
+
 Next active task:
 
 ```text
@@ -89,7 +93,7 @@ PROD-005 — PyPI Package
 Next roadmap task:
 
 ```text
-PACKAGE-001 — Review package metadata
+PACKAGE-002 — Add package classifiers
 ```
 
 ---
@@ -612,13 +616,33 @@ Completed:
 * PROD-001 Benchmark Suite
 * PROD-002 Performance Profiling
 * PROD-003 Complete Documentation
+* PROD-004 Additional Examples
 
 Remaining:
 
-* PROD-004 Additional Examples
 * PROD-005 PyPI Package
 * PROD-006 Release Automation
 * PROD-007 Version 1.0 Release
+
+---
+
+## PyPI Package Status
+
+`PACKAGE-001 — Review Package Metadata` is complete.
+
+The current metadata now:
+
+* identifies the distribution as `python-ai-toolkit`
+* identifies the development build as `0.7.0.dev0`
+* requires Python `>=3.11`
+* uses `README.md` as the long description
+* records Burim Koci as the author
+* declares `openai>=1.66.0`, `pydantic>=2.4.2`, and `python-dotenv`
+* discovers all six current `ai*` package directories
+* omits unconfirmed project URLs instead of publishing placeholders
+
+Four focused metadata regressions, 62 exact-minimum dependency checks, and all
+331 normal tests pass. Classifiers are the next packaging concern.
 
 ---
 
@@ -718,14 +742,13 @@ PROD-005 — PyPI Package
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-001 — Review package metadata`.
+Begin `PACKAGE-002 — Add package classifiers`.
 
-`EXAMPLE-008` executed every numbered, variant, framework, command, and
-supplementary example against the current public interfaces, added permanent
-coverage-completeness and supported-import regressions, and found no stale API
-usage requiring an implementation correction. `PROD-004` is complete. The
-next task should inspect the existing package metadata before any distribution
-or publishing work begins.
+`PACKAGE-001` corrected the development version and the proven OpenAI and
+Pydantic dependency floors, confirmed the package identity and complete `ai*`
+discovery, documented intentionally absent project URLs, and added focused
+metadata regressions. Classifiers remain deliberately unchanged for the next
+roadmap task.
 
 ---
 

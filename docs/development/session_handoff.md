@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-001 — Review package metadata`
+**Next task:** `PACKAGE-002 — Add package classifiers`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `PACKAGE-001`.
+The next task is `PACKAGE-002`.
 
 ---
 
@@ -1489,21 +1489,57 @@ focused Black and Ruff checks passed
 
 ---
 
-# Exact Next Task — PACKAGE-001
+# PACKAGE-001 — Package Metadata Review
 
-Review package metadata.
+**Status:** Completed
+
+Completed work:
+
+1. reviewed `pyproject.toml`, the README metadata source, package discovery,
+   source packages, console entry point, and optional groups
+2. retained the intended distribution name, `ai` import package, description,
+   Python floor, README source, and author name
+3. normalized the in-progress distribution version to `0.7.0.dev0`
+4. declared `openai>=1.66.0` for the Responses API and `pydantic>=2.4.2` for
+   Pydantic v2 validation and schema methods with Python 3.12 wheel support
+5. confirmed that `ai*` discovery covers all six current package directories
+6. documented the distribution, import, and terminal-command names
+7. left project URLs absent because no canonical repository, documentation,
+   or issue-tracker locations have been confirmed
+8. added focused metadata regressions
+9. preserved the classifiers, license, optional groups, console entry point,
+   build process, distribution validation, and installation checks for their
+   assigned later tasks
+
+Final verification:
+
+```text
+4 focused package-metadata regressions passed
+25 package-metadata and documentation tests passed
+62 core and provider tests passed with openai 1.66.0 and pydantic 2.4.2
+331 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the current complete environment
+setuptools accepted the updated pyproject metadata
+focused Black and Ruff checks passed
+```
+
+No runtime API, provider implementation, optional dependency, console entry
+point, benchmark, example, or architectural decision changed.
+
+---
+
+# Exact Next Task — PACKAGE-002
+
+Add package classifiers.
 
 Required work:
 
-1. inspect `pyproject.toml`, package discovery, README metadata, console entry
-   point, optional extras, and current source layout before editing
-2. compare the declared name, version, description, Python requirement,
-   authorship, dependencies, and URLs with the intended Version 1.0 package
-3. distinguish metadata corrections assigned to `PACKAGE-001` from
-   classifiers, licensing, extras, entry-point, build, and clean-install work
-   assigned to later `PACKAGE-002` through `PACKAGE-010`
-4. avoid building or publishing distributions before their roadmap tasks
-5. add focused metadata checks where they prevent release drift
+1. review the intended audience, development status, Python versions, topics,
+   and supported framework claims before editing
+2. add only valid PyPI Trove classifiers that describe the current project
+3. keep license metadata assigned to `PACKAGE-003`
+4. do not claim Python-version verification that belongs to the later CI matrix
+5. extend focused metadata tests for the selected classifiers
 6. update roadmap, project state, handoff, changelog, and package guidance as
    required
 
@@ -2038,19 +2074,15 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `CHANGELOG.md`
 8. `pyproject.toml`
-9. `requirements.txt`
-10. `.gitignore`
-11. `docs/installation.md`
-12. `docs/compatibility.md`
-13. `docs/api_reference.md`
-14. the current package/source tree
-15. `ai/__init__.py`
-16. `ai/cli/main.py`
+9. `docs/installation.md`
+10. `docs/compatibility.md`
+11. `tests/test_package_metadata.py`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-001`. The package metadata and current source layout are required
-because the task must compare declarations with what is actually distributed.
+`PACKAGE-002`. The current metadata review and compatibility claims are
+required so classifiers do not overstate the development status or verified
+Python support.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2064,8 +2096,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-001 is still the correct next task.
-4. Confirm that EXAMPLE-008 closed PROD-004 after verifying every example against the current public APIs without changing runtime behavior.
+3. Verify the repository's current state and confirm that PACKAGE-002 is still the correct next task.
+4. Confirm that PACKAGE-001 normalized the development version, added proven dependency floors, and added metadata regressions without changing runtime behavior.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-ai-toolkit"
-version = "0.7.0"
+version = "0.7.0.dev0"
 description = "Reusable infrastructure for integrating LLMs into Python applications."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -12,8 +12,8 @@ authors = [
     { name = "Burim Koci" }
 ]
 dependencies = [
-    "openai",
-    "pydantic",
+    "openai>=1.66.0",
+    "pydantic>=2.4.2",
     "python-dotenv",
 ]
 

@@ -71,8 +71,8 @@ installation interface.
 
 | Installation area | Declared constraint | Compatibility boundary |
 | --- | --- | --- |
-| Core provider SDK | `openai` | The resolver selects a release compatible with the active Python; the built-in adapter must still match its APIs |
-| Data models | `pydantic` | The toolkit currently uses Pydantic v2 APIs; resolved versions must pass the suite |
+| Core provider SDK | `openai>=1.66.0` | The minimum includes the Responses API used by the built-in adapter; resolved versions must still pass the suite |
+| Data models | `pydantic>=2.4.2` | The toolkit uses Pydantic v2 APIs; this floor also provides a Python 3.12 wheel, and resolved versions must pass the suite |
 | Environment files | `python-dotenv` | Used only for environment and `.env` loading |
 | Django extra | `django>=5.0` | The installed Django release must also support the active Python |
 | FastAPI extra | `fastapi>=0.100,<1` | FastAPI, Starlette, Pydantic, and the active Python must resolve compatibly |

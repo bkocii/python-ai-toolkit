@@ -7,6 +7,10 @@ The format loosely follows Keep a Changelog.
 ---
 ### Fixed
 
+* Normalized the development package version to `0.7.0.dev0` instead of
+  declaring the in-progress code as a final `0.7.0` distribution
+* Added minimum compatible OpenAI and Pydantic versions to the core dependency
+  metadata
 * Python 3.11-compatible multiple-exception handling in `RequestExecutor`
 * Structured parse and schema errors no longer include raw provider responses
   that could be copied into exception logs
@@ -17,6 +21,8 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Focused package-metadata regressions for project identity, README metadata,
+  runtime dependencies, and complete `ai*` package discovery
 * Regression coverage requiring every example module to have a deterministic
   execution path
 * Regression coverage preventing examples from importing undocumented toolkit
@@ -118,6 +124,9 @@ The format loosely follows Keep a Changelog.
 
 
 ### Improved
+* Installation and compatibility guidance for the distribution name, import
+  package, console command, development version, dependency floors, and
+  intentionally unconfirmed project URLs
 * Final current-public-API verification for every numbered, variant,
   framework, command, and supplementary example
 * Normalized every numbered and supplementary example description around one
