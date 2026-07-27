@@ -31,6 +31,33 @@ The author name is recorded in the package metadata. Canonical repository,
 documentation, and issue-tracker URLs have not yet been confirmed, so the
 metadata intentionally contains no placeholder links.
 
+## PyPI classifiers
+
+Classifiers are standardized labels that package indexes use to categorize a
+project. They help a developer understand what the package is before
+installing it; they do not install dependencies or change runtime behavior.
+
+The current classifiers describe the toolkit as:
+
+| Area | Classifier meaning |
+| --- | --- |
+| Maturity | Beta: the main feature set exists, but the Version 1.0 API and release are not yet final |
+| Audience | A library intended for developers |
+| Interface | A Python library that also supplies a console command |
+| Frameworks | Optional Django and FastAPI integrations are implemented |
+| Platform | Pure Python code without an operating-system-specific implementation |
+| Language | Python 3 only |
+| Topics | Artificial intelligence and reusable Python modules |
+
+The metadata intentionally omits individual Python 3.11–3.14 classifiers until
+the Version 1.0 CI matrix verifies the intended release range. The
+`requires-python = ">=3.11"` field remains the installer-enforced version
+boundary.
+
+No license classifier is declared. License metadata and the distributed license
+file are handled separately by `PACKAGE-003`; current packaging standards
+prefer a license expression over the older license classifiers.
+
 ## Create a virtual environment
 
 Run these commands from the project root:

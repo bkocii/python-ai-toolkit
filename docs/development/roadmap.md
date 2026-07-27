@@ -2268,7 +2268,7 @@ Produce a valid, installable Python source distribution and wheel.
 ### Tasks
 
 * [x] PACKAGE-001 Review package metadata
-* [ ] PACKAGE-002 Add package classifiers
+* [x] PACKAGE-002 Add package classifiers
 * [ ] PACKAGE-003 Confirm license metadata and license file
 * [ ] PACKAGE-004 Verify optional dependency groups
 * [ ] PACKAGE-005 Verify console entry points
@@ -2334,6 +2334,56 @@ Next task:
 
 ```text
 PACKAGE-002 — Add package classifiers
+```
+
+#### PACKAGE-002 — Add Package Classifiers
+
+Status: Completed
+
+Completed work:
+
+* classified the current project as Beta because its intended feature set is
+  largely complete while the Version 1.0 API, release checks, and publication
+  remain unfinished
+* identified developers as the intended audience and Python modules plus
+  artificial intelligence as the two focused project topics
+* recorded the console interface and the implemented optional Django and
+  FastAPI integrations
+* recorded Python 3-only and operating-system-independent behavior
+* added only generic Python 3 classifiers; individual 3.11–3.14 classifiers
+  remain deferred until the Version 1.0 CI matrix verifies the intended release
+  range
+* omitted `Production/Stable`, implementation-specific, typing, and
+  version-specific framework classifiers that the current evidence does not
+  justify
+* omitted all license classifiers because `PACKAGE-003` owns the license
+  decision and modern metadata uses a separate license expression
+* verified all ten selected values against PyPI's canonical Trove classifier
+  list
+* documented what classifiers communicate and what they do not change
+* added focused regressions for the exact classifier set and its non-overclaim
+  boundaries
+
+Completion verification:
+
+```text
+6 focused package-metadata regressions passed
+27 package-metadata and documentation tests passed
+10 selected classifiers passed canonical Trove validation
+333 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the current complete environment
+setuptools accepted the updated pyproject metadata
+focused Black and Ruff checks passed
+```
+
+No runtime API, provider implementation, dependency, optional group, console
+entry point, benchmark, example, license decision, or architectural decision
+changed.
+
+Next task:
+
+```text
+PACKAGE-003 — Confirm license metadata and license file
 ```
 
 Clean-environment checks must verify:

@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-005 — PyPI Package`  
-**Next task:** `PACKAGE-002 — Add package classifiers`
+**Next task:** `PACKAGE-003 — Confirm license metadata and license file`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The next task is `PACKAGE-002`.
+The next task is `PACKAGE-003`.
 
 ---
 
@@ -1528,20 +1528,60 @@ point, benchmark, example, or architectural decision changed.
 
 ---
 
-# Exact Next Task — PACKAGE-002
+# PACKAGE-002 — Package Classifiers
 
-Add package classifiers.
+**Status:** Completed
+
+Completed work:
+
+1. reviewed the intended audience, maturity, Python support, operating-system
+   scope, optional framework integrations, console interface, and project
+   topics against the current implementation and documentation
+2. classified the project as Beta rather than Alpha or Production/Stable
+3. added canonical classifiers for console use, Django, FastAPI, developers,
+   operating-system independence, Python 3-only support, artificial
+   intelligence, and Python modules
+4. deliberately omitted individual Python 3.11–3.14 classifiers until the
+   Version 1.0 release matrix verifies the intended range
+5. deliberately omitted license classifiers because `PACKAGE-003` owns the
+   license decision and current packaging metadata uses a license expression
+6. verified every selected value against the canonical PyPI classifier list
+7. documented classifier meaning and non-goals in the installation guide
+8. added focused regressions for the exact selected set and its non-overclaim
+   boundaries
+
+Final verification:
+
+```text
+6 focused package-metadata regressions passed
+27 package-metadata and documentation tests passed
+10 selected classifiers passed canonical Trove validation
+333 normal tests passed on Linux with CPython 3.12.13
+pip check passed in the current complete environment
+setuptools accepted the updated pyproject metadata
+focused Black and Ruff checks passed
+```
+
+No runtime API, provider implementation, dependency, optional group, console
+entry point, benchmark, example, license decision, or architectural decision
+changed.
+
+---
+
+# Exact Next Task — PACKAGE-003
+
+Confirm license metadata and the license file.
 
 Required work:
 
-1. review the intended audience, development status, Python versions, topics,
-   and supported framework claims before editing
-2. add only valid PyPI Trove classifiers that describe the current project
-3. keep license metadata assigned to `PACKAGE-003`
-4. do not claim Python-version verification that belongs to the later CI matrix
-5. extend focused metadata tests for the selected classifiers
-6. update roadmap, project state, handoff, changelog, and package guidance as
-   required
+1. confirm which license the project owner intends to apply
+2. add the complete corresponding license text to the repository
+3. add current SPDX license-expression and license-file metadata
+4. do not reintroduce deprecated `License ::` classifiers
+5. add focused tests proving the declared license and distributed file agree
+6. update roadmap, project state, handoff, changelog, and package guidance
+7. do not change runtime behavior, dependencies, optional groups, console entry
+   points, or build outputs in this task
 
 ---
 
@@ -2080,9 +2120,8 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`PACKAGE-002`. The current metadata review and compatibility claims are
-required so classifiers do not overstate the development status or verified
-Python support.
+`PACKAGE-003`. The current metadata, selected classifiers, and project-owner
+license choice are required so the repository text and SPDX metadata agree.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2096,8 +2135,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that PACKAGE-002 is still the correct next task.
-4. Confirm that PACKAGE-001 normalized the development version, added proven dependency floors, and added metadata regressions without changing runtime behavior.
+3. Verify the repository's current state and confirm that PACKAGE-003 is still the correct next task.
+4. Confirm that PACKAGE-002 added canonical classifiers without claiming stable status, specific unverified Python minors, or a license decision.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

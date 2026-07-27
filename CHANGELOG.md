@@ -21,6 +21,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* PyPI classifiers for the beta development status, developer audience,
+  console environment, framework integrations, platform, language, and project
+  topics
+* Focused regressions preventing package classifiers from overstating stable
+  status, unverified Python-minor support, or unresolved license metadata
 * Focused package-metadata regressions for project identity, README metadata,
   runtime dependencies, and complete `ai*` package discovery
 * Regression coverage requiring every example module to have a deterministic

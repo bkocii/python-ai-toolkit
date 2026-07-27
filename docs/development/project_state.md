@@ -83,6 +83,7 @@ Completed PROD-004 example tasks:
 Completed PROD-005 package tasks:
 
 * PACKAGE-001 Review package metadata
+* PACKAGE-002 Add package classifiers
 
 Next active task:
 
@@ -93,7 +94,7 @@ PROD-005 — PyPI Package
 Next roadmap task:
 
 ```text
-PACKAGE-002 — Add package classifiers
+PACKAGE-003 — Confirm license metadata and license file
 ```
 
 ---
@@ -628,7 +629,8 @@ Remaining:
 
 ## PyPI Package Status
 
-`PACKAGE-001 — Review Package Metadata` is complete.
+`PACKAGE-001 — Review Package Metadata` and
+`PACKAGE-002 — Add Package Classifiers` are complete.
 
 The current metadata now:
 
@@ -640,9 +642,17 @@ The current metadata now:
 * declares `openai>=1.66.0`, `pydantic>=2.4.2`, and `python-dotenv`
 * discovers all six current `ai*` package directories
 * omits unconfirmed project URLs instead of publishing placeholders
+* uses ten valid PyPI classifiers for beta status, console use, optional Django
+  and FastAPI integrations, developer audience, operating-system independence,
+  Python 3-only support, artificial intelligence, and Python modules
+* omits Python-minor classifiers until the Version 1.0 CI matrix verifies the
+  intended release range
+* omits license classifiers because `PACKAGE-003` owns the license decision and
+  modern package metadata uses a separate license expression
 
-Four focused metadata regressions, 62 exact-minimum dependency checks, and all
-331 normal tests pass. Classifiers are the next packaging concern.
+Six focused metadata regressions, 62 exact-minimum dependency checks, and all
+333 normal tests pass. License metadata and the distributed license file are
+the next packaging concern.
 
 ---
 
@@ -742,13 +752,13 @@ PROD-005 — PyPI Package
 
 ### Next Recommended Focus
 
-Begin `PACKAGE-002 — Add package classifiers`.
+Begin `PACKAGE-003 — Confirm license metadata and license file`.
 
-`PACKAGE-001` corrected the development version and the proven OpenAI and
-Pydantic dependency floors, confirmed the package identity and complete `ai*`
-discovery, documented intentionally absent project URLs, and added focused
-metadata regressions. Classifiers remain deliberately unchanged for the next
-roadmap task.
+`PACKAGE-002` added ten canonical PyPI classifiers without claiming a stable
+release, specific unverified Python-minor support, or unresolved license
+metadata. The next task must choose and record the actual project license,
+include its text in distributions, and use current license-expression
+metadata.
 
 ---
 

@@ -3,6 +3,18 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
+EXPECTED_CLASSIFIERS = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: Django",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 
 def load_pyproject() -> dict:
@@ -39,6 +51,23 @@ def test_core_dependencies_express_runtime_compatibility_boundaries():
         "pydantic>=2.4.2",
         "python-dotenv",
     ]
+
+
+def test_package_classifiers_describe_the_current_project():
+    project = load_pyproject()["project"]
+
+    assert project["classifiers"] == EXPECTED_CLASSIFIERS
+
+
+def test_package_classifiers_do_not_overstate_unverified_or_unowned_metadata():
+    classifiers = load_pyproject()["project"]["classifiers"]
+
+    assert not any(classifier.startswith("License ::") for classifier in classifiers)
+    assert not any(
+        classifier.startswith("Programming Language :: Python :: 3.")
+        for classifier in classifiers
+    )
+    assert "Development Status :: 5 - Production/Stable" not in classifiers
 
 
 def test_package_discovery_covers_every_ai_package():
