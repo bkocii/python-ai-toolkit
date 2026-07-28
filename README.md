@@ -546,10 +546,10 @@ python -m pytest
 ```
 
 The same installation and test boundary runs automatically on every GitHub
-push and pull request through `.github/workflows/ci.yml`. The initial workflow
-uses Python `3.11`, installs `.[dev]` from `pyproject.toml`, runs
-`python -m pip check`, disables toolkit-managed file logging, and runs the
-normal test suite.
+push and pull request through `.github/workflows/ci.yml`. Independent jobs use
+Python `3.11`, `3.12`, `3.13`, and `3.14`; each installs `.[dev]` from
+`pyproject.toml`, runs `python -m pip check`, disables toolkit-managed file
+logging, and runs the normal test suite.
 
 Run its current functional equivalent locally:
 
@@ -559,10 +559,11 @@ python -m pip check
 python -m pytest -q
 ```
 
-The supported Python-version matrix, Black and Ruff enforcement, distribution
-building, artifact validation, and publishing are separate release-automation
-tasks. The initial CI workflow does not publish packages and requires only
-read access to repository contents.
+See the [compatibility guide](docs/compatibility.md) for the tested-version
+matrix and local multi-version procedure. Black and Ruff enforcement,
+distribution building, artifact validation, and publishing remain separate
+release-automation tasks. The CI workflow does not publish packages and
+requires only read access to repository contents.
 
 Format and lint:
 

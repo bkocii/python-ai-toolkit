@@ -7,9 +7,8 @@ published on PyPI, so commands such as `pip install python-ai-toolkit` are
 reserved for the later package-release milestone.
 
 The [compatibility guide](compatibility.md) distinguishes this declared
-installation floor from the versions currently verified by the full suite, the
-planned Version 1.0 test matrix, dependency compatibility, and live
-provider/model availability.
+installation floor from the Python 3.11–3.14 versions continuously tested for
+Version 1.0, dependency compatibility, and live provider/model availability.
 
 ## Package identity
 
@@ -46,13 +45,13 @@ The current classifiers describe the toolkit as:
 | Interface | A Python library that also supplies a console command |
 | Frameworks | Optional Django and FastAPI integrations are implemented |
 | Platform | Pure Python code without an operating-system-specific implementation |
-| Language | Python 3 only |
+| Language | Python 3 only; versions 3.11 through 3.14 are tested |
 | Topics | Artificial intelligence and reusable Python modules |
 
-The metadata intentionally omits individual Python 3.11–3.14 classifiers until
-the Version 1.0 CI matrix verifies the intended release range. The
+The metadata includes individual Python 3.11–3.14 classifiers because the
+Version 1.0 CI matrix now tests the complete range. The
 `requires-python = ">=3.11"` field remains the installer-enforced version
-boundary.
+boundary; accepting a newer version is not the same as having tested it.
 
 No license classifier is declared because current packaging standards use
 dedicated license metadata instead. The package declares the SPDX expression
@@ -228,7 +227,7 @@ environment on CPython 3.12.13:
 
 All five environments passed `python -m pip check`. These checks prove the
 current dependency boundaries; they do not configure a provider, make a live
-provider request, or replace the planned multi-version release matrix.
+provider request, or replace the independent Python-version CI jobs.
 
 ## Install for contribution
 

@@ -34,7 +34,7 @@ This is the authoritative installation floor:
 
 - Python 3.10 and earlier are unsupported and should be rejected by installers.
 - Python 3.11 and newer satisfy the current package metadata.
-- The planned Version 1.0 continuous-integration matrix is Python 3.11 through
+- The Version 1.0 continuous-integration matrix tests Python 3.11 through
   Python 3.14.
 - A newer Python version being accepted by the open-ended metadata is not, by
   itself, evidence that the project has verified that version.
@@ -50,18 +50,48 @@ The current evidence must be read precisely:
 
 | Python | Current status | Evidence |
 | --- | --- | --- |
-| 3.11 | Declared and planned for Version 1.0 CI | Source parsed with Python 3.11 grammar; runtime suite not run during `DOC-012` |
-| 3.12 | Declared and verified | Full `DOC-012` suite on Linux with CPython 3.12.13 |
-| 3.13 | Declared and planned for Version 1.0 CI | Not run during `DOC-012` |
-| 3.14 | Declared and planned for Version 1.0 CI | Historical deterministic benchmark evidence on Windows with CPython 3.14.4; not the full current suite |
+| 3.11 | Declared and continuously tested | Full normal suite and dependency validation in the CI matrix |
+| 3.12 | Declared and continuously tested | Full normal suite and dependency validation in the CI matrix |
+| 3.13 | Declared and continuously tested | Full normal suite and dependency validation in the CI matrix |
+| 3.14 | Declared and continuously tested | Full normal suite and dependency validation in the CI matrix |
 
 Only CPython environments are currently recorded. The package metadata does not
 exclude another Python implementation, but compatibility with PyPy or another
 implementation is unverified.
 
-`RELEASE-002 — Test supported Python versions` owns the automated 3.11–3.14
-matrix. Until that task is complete, documentation should not describe all four
-versions as continuously tested.
+`RELEASE-002 — Test supported Python versions` established the automated
+3.11–3.14 matrix. The workflow uses independent jobs with fail-fast disabled,
+so a failure on one interpreter does not hide results from the others.
+
+The release-task verification used fresh editable `dev` installations and
+passed `pip check` plus all 351 normal tests on CPython 3.11.15, 3.12.13,
+3.13.14, and 3.14.6. Python 3.11 resolved Django 5.2.16; Python 3.12 through
+3.14 resolved Django 6.0.7. The remaining direct development dependencies
+resolved compatibly across all four environments.
+
+### Repeat the matrix locally on Windows
+
+Install each Python version from python.org, then run:
+
+```powershell
+$projectRoot = (Get-Location).Path
+$versions = "3.11", "3.12", "3.13", "3.14"
+
+foreach ($version in $versions) {
+    $environment = Join-Path (Split-Path $projectRoot) `
+        "python-ai-toolkit-py$($version.Replace('.', ''))"
+
+    Remove-Item $environment -Recurse -Force -ErrorAction SilentlyContinue
+    py "-$version" -m venv $environment
+
+    & "$environment\Scripts\python.exe" -m pip install --upgrade pip
+    & "$environment\Scripts\python.exe" -m pip install -e "${projectRoot}[dev]"
+    & "$environment\Scripts\python.exe" -m pip check
+    & "$environment\Scripts\python.exe" -m pytest -q $projectRoot
+}
+```
+
+Every environment should report `351 passed` and no broken requirements.
 
 ## Dependency compatibility
 

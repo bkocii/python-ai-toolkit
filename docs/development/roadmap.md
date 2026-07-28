@@ -2844,7 +2844,7 @@ Automate testing, package validation, and publishing.
 ### Tasks
 
 * [x] RELEASE-001 Add continuous-integration workflow
-* [ ] RELEASE-002 Test supported Python versions
+* [x] RELEASE-002 Test supported Python versions
 * [ ] RELEASE-003 Run tests, Black, and Ruff in CI
 * [ ] RELEASE-004 Build package distributions in CI
 * [ ] RELEASE-005 Validate built distributions
@@ -2902,9 +2902,69 @@ Next task:
 RELEASE-002 — Test supported Python versions
 ```
 
+#### RELEASE-002 — Test Supported Python Versions
+
+Status: Completed
+
+Implementation:
+
+* expanded the test job into independent Python 3.11, 3.12, 3.13, and 3.14
+  matrix jobs
+* disabled matrix fail-fast so one incompatible interpreter cannot hide the
+  results of the remaining versions
+* retained one authoritative installation and verification path in every job:
+  editable `.[dev]`, `pip check`, and the complete normal test suite
+* reviewed current core, framework, and development dependencies against the
+  target range
+* verified fresh dependency resolution for all four Python versions
+* added Python 3.11–3.14 package classifiers after full-suite verification
+* added regression coverage for the exact matrix and metadata contract
+* documented the verified matrix and a repeatable Windows procedure
+
+Dependency review:
+
+Python 3.11 correctly resolves Django 5.2 because Django 6 requires Python
+3.12 or newer. Python 3.12 through 3.14 resolve Django 6.0. The OpenAI SDK,
+Pydantic v2, FastAPI, pytest, Black, Ruff, and `httpx2` resolve compatibly
+through Python 3.14. No dependency constraint needed changing.
+
+Scope decision:
+
+`RELEASE-003` continues to own Black and Ruff execution in CI. `RELEASE-004`
+and `RELEASE-005` continue to own distribution construction and validation.
+No provider request, API key, write permission, release artifact, or publishing
+credential is used.
+
+Completion verification:
+
+```text
+Python 3.11.15: pip check passed; 351 normal tests passed
+Python 3.12.13: pip check passed; 351 normal tests passed
+Python 3.13.14: pip check passed; 351 normal tests passed
+Python 3.14.6: pip check passed; 351 normal tests passed
+all four fresh dev dependency resolutions passed
+workflow YAML parsed successfully
+5 CI-workflow regressions passed
+19 package-metadata regressions passed
+45 focused CI, package-metadata, and documentation tests passed
+focused Black and Ruff checks passed
+strict Twine and offline distribution validation passed
+repository-wide Black retained 2 older files for RELEASE-003
+repository-wide Ruff retained 68 existing findings for RELEASE-003
+```
+
+No runtime API, provider behavior, dependency constraint, package build,
+publishing permission, benchmark, example, or architectural decision changed.
+
+Next task:
+
+```text
+RELEASE-003 — Run tests, Black, and Ruff in CI
+```
+
 ### Python Test Matrix
 
-The initial supported matrix should match:
+The supported matrix is:
 
 ```text
 Python 3.11
@@ -2913,7 +2973,9 @@ Python 3.13
 Python 3.14
 ```
 
-The matrix must be reviewed against actual dependency support before release.
+The matrix was reviewed against current dependency support during
+`RELEASE-002`. Every version performs a fresh dependency resolution, validates
+the resulting environment, and runs the complete normal test suite.
 
 ### Release Security
 
@@ -2926,7 +2988,7 @@ The matrix must be reviewed against actual dependency support before release.
 ### Exit Criteria
 
 * [ ] Pull requests run automated quality checks
-* [ ] Supported Python versions are tested
+* [x] Supported Python versions are tested
 * [ ] Package builds and validation run automatically
 * [ ] Publishing is restricted to release tags
 * [ ] Release steps are documented

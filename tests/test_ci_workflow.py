@@ -2,6 +2,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CI_WORKFLOW_PATH = PROJECT_ROOT / ".github" / "workflows" / "ci.yml"
+SUPPORTED_PYTHON_VERSIONS = ("3.11", "3.12", "3.13", "3.14")
 
 
 def workflow_text() -> str:
@@ -27,13 +28,16 @@ def test_ci_workflow_uses_read_only_repository_access():
     assert "id-token: write" not in text
 
 
-def test_initial_ci_uses_one_explicit_supported_python_version():
+def test_ci_uses_the_complete_supported_python_matrix():
     text = workflow_text()
 
     assert "actions/checkout@v7" in text
     assert "actions/setup-python@v7" in text
-    assert text.count('python-version: "3.11"') == 1
-    assert "matrix:" not in text
+    assert "name: Tests (Python ${{ matrix.python-version }})" in text
+    assert "fail-fast: false" in text
+    assert 'python-version: ["3.11", "3.12", "3.13", "3.14"]' in text
+    assert "python-version: ${{ matrix.python-version }}" in text
+    assert all(f'"{version}"' in text for version in SUPPORTED_PYTHON_VERSIONS)
 
 
 def test_ci_installs_from_package_metadata_and_runs_existing_checks():

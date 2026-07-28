@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-002 — Test supported Python versions`
+**Next task:** `RELEASE-003 — Run tests, Black, and Ruff in CI`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-002`.
+The current next task is `RELEASE-003`.
 
 ---
 
@@ -1541,8 +1541,9 @@ Completed work:
 3. added canonical classifiers for console use, Django, FastAPI, developers,
    operating-system independence, Python 3-only support, artificial
    intelligence, and Python modules
-4. deliberately omitted individual Python 3.11–3.14 classifiers until the
-   Version 1.0 release matrix verifies the intended range
+4. initially omitted individual Python 3.11–3.14 classifiers until the
+   Version 1.0 release matrix verified the intended range; `RELEASE-002`
+   subsequently added them
 5. deliberately omitted license classifiers because `PACKAGE-003` owns the
    license decision and current packaging metadata uses a license expression
 6. verified every selected value against the canonical PyPI classifier list
@@ -1978,18 +1979,59 @@ repository-wide Ruff retained 68 pre-existing findings outside this task
 
 ---
 
-# Exact Next Task — RELEASE-002
+# RELEASE-002 — Supported Python Versions
 
-Test supported Python versions.
+**Status:** Completed
+
+Implemented:
+
+1. expanded the CI test job into independent Python 3.11, 3.12, 3.13, and
+   3.14 matrix jobs
+2. disabled matrix fail-fast so every supported interpreter reports its result
+3. retained one authoritative `.[dev]` installation, `pip check`, and normal
+   test command in every job
+4. reviewed and freshly resolved all core and development dependencies across
+   the target range
+5. added Python 3.11–3.14 package classifiers after full-suite verification
+6. added workflow and metadata regressions
+7. documented the verified matrix and Windows test procedure
+
+Completion verification:
+
+```text
+Python 3.11.15: pip check passed; 351 normal tests passed
+Python 3.12.13: pip check passed; 351 normal tests passed
+Python 3.13.14: pip check passed; 351 normal tests passed
+Python 3.14.6: pip check passed; 351 normal tests passed
+workflow YAML parsed successfully
+5 CI-workflow regressions passed
+19 package-metadata regressions passed
+45 focused CI, package-metadata, and documentation tests passed
+focused Black and Ruff checks passed
+strict Twine and offline distribution validation passed
+```
+
+Python 3.11 resolved Django 5.2.16; Python 3.12–3.14 resolved Django 6.0.7.
+No runtime dependency constraint, API, provider behavior, build workflow,
+publishing permission, or ADR changed.
+
+The repository-wide `RELEASE-003` starting scope remains 2 files requiring
+Black formatting and 68 Ruff findings.
+
+---
+
+# Exact Next Task — RELEASE-003
+
+Run tests, Black, and Ruff in CI.
 
 Required work:
 
-1. review current dependency support for Python 3.11 through 3.14
-2. expand the test job into the roadmap's supported Python matrix
-3. keep one authoritative dependency installation path
-4. confirm every matrix environment runs independently
-5. preserve later ownership of Black/Ruff enforcement, package builds,
-   artifact validation, and publishing
+1. inspect the recorded repository-wide Black and Ruff findings
+2. resolve or explicitly scope every current formatting and lint failure
+3. add Black check and Ruff execution to CI
+4. keep the Python test matrix operational
+5. preserve later ownership of package builds, artifact validation, and
+   publishing
 6. update CI regression coverage, documentation, and project records
 
 ---
@@ -2459,8 +2501,8 @@ The historical benchmark baseline used Windows with CPython 3.14.4. The
 transferred project used for `DOC-012` verification ran on Linux with CPython
 3.12.13.
 
-Package metadata accepts Python `>=3.11`; the planned Version 1.0 test matrix is
-Python 3.11 through 3.14.
+Package metadata accepts Python `>=3.11`; the Version 1.0 CI matrix tests Python
+3.11 through 3.14 independently.
 
 `ripgrep` (`rg`) is not installed in the recorded Windows environment.
 
@@ -2525,14 +2567,14 @@ For the immediate next task, also provide:
 8. `pyproject.toml`
 9. `.github/workflows/ci.yml`
 10. `tests/test_ci_workflow.py`
-11. `tests/`
-12. `ai/`
+11. the Python files currently reported by Black or Ruff
+12. the relevant quality-tool configuration and tests
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`RELEASE-002`. The package metadata, complete normal test suite, and initial CI
-workflow are required so the supported Python-version matrix can be added
-without taking over later quality, build, validation, or publishing tasks.
+`RELEASE-003`. The current CI workflow, complete quality-tool output, and files
+reported by Black or Ruff are required so enforcement can be added without
+taking over later build, validation, or publishing tasks.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2546,8 +2588,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-002 is still the correct next task.
-4. Confirm that RELEASE-001 added the initial Python 3.11 push and pull-request CI job.
+3. Verify the repository's current state and confirm that RELEASE-003 is still the correct next task.
+4. Confirm that RELEASE-002 added independent Python 3.11–3.14 CI jobs.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

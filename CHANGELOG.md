@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Python 3.11–3.14 continuous-integration matrix with independent jobs,
+  fail-fast disabled, full tests, and dependency validation on every supported
+  interpreter
+* Python 3.11–3.14 package classifiers backed by full-suite verification
+* Windows PowerShell instructions for repeating the supported-version matrix
+  locally
 * Initial read-only GitHub Actions continuous-integration workflow for pushes
   and pull requests, installing the project from `pyproject.toml`, validating
   dependencies, and running the normal test suite on Python 3.11

@@ -31,6 +31,7 @@ Completed Sprint 9 tasks:
 Completed PROD-006 release-automation tasks:
 
 * RELEASE-001 Add continuous-integration workflow
+* RELEASE-002 Test supported Python versions
 
 Completed PROD-001 benchmark tasks:
 
@@ -107,7 +108,7 @@ PROD-006 — Release Automation
 Next roadmap task:
 
 ```text
-RELEASE-002 — Test supported Python versions
+RELEASE-003 — Run tests, Black, and Ruff in CI
 ```
 
 ---
@@ -641,6 +642,7 @@ Remaining:
 Completed release-automation tasks:
 
 * RELEASE-001 Add continuous-integration workflow
+* RELEASE-002 Test supported Python versions
 
 ---
 
@@ -667,11 +669,10 @@ The current metadata now:
 * declares `openai>=1.66.0`, `pydantic>=2.4.2`, and `python-dotenv`
 * discovers all six current `ai*` package directories
 * omits unconfirmed project URLs instead of publishing placeholders
-* uses ten valid PyPI classifiers for beta status, console use, optional Django
-  and FastAPI integrations, developer audience, operating-system independence,
-  Python 3-only support, artificial intelligence, and Python modules
-* omits Python-minor classifiers until the Version 1.0 CI matrix verifies the
-  intended release range
+* uses fourteen valid PyPI classifiers for beta status, console use, optional
+  Django and FastAPI integrations, developer audience, operating-system
+  independence, Python 3-only support, the verified Python 3.11–3.14 range,
+  artificial intelligence, and Python modules
 * keeps Django, FastAPI, development, and benchmark dependencies in separate
   additive groups
 * keeps optional framework imports isolated from core modules
@@ -724,11 +725,10 @@ destinations. The README's repository-relative documentation links remain
 appropriate for the source checkout; confirmed public project URLs and
 PyPI-page link behavior must be resolved before Version 1.0 publication.
 
-`PROD-005 — PyPI Package` is complete. `RELEASE-001` subsequently added the
-continuous-integration workflow that repeats the normal tests automatically.
-The next task expands that initial Python 3.11 job into the supported-version
-matrix. The later full-quality release gate still owns the older repository-wide
-formatting and lint findings; `PACKAGE-010` introduced none of them.
+`PROD-005 — PyPI Package` is complete. `RELEASE-001` added the initial
+continuous-integration workflow, and `RELEASE-002` expanded it into the
+supported Python 3.11–3.14 matrix. The next task adds Black and Ruff to CI and
+owns the older repository-wide formatting and lint findings.
 
 `PACKAGE-010` completion verification passed the separate Django and FastAPI
 wheel installations, 19 focused package-metadata regressions, 40
@@ -743,29 +743,34 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 
 ## Continuous Integration Status
 
-`RELEASE-001 — Add Continuous-Integration Workflow` is complete.
+`RELEASE-001 — Add Continuous-Integration Workflow` and
+`RELEASE-002 — Test Supported Python Versions` are complete.
 
-The initial `.github/workflows/ci.yml`:
+The current `.github/workflows/ci.yml`:
 
 * runs for pushes and pull requests
-* uses Python 3.11, the package's declared minimum version
-* installs `.[dev]` from `pyproject.toml`
-* validates the installed environment with `python -m pip check`
-* disables toolkit-managed file logging during tests
-* runs the complete normal test suite
+* creates independent Python 3.11, 3.12, 3.13, and 3.14 jobs
+* disables matrix fail-fast so every interpreter reports its result
+* installs `.[dev]` from `pyproject.toml` in every job
+* validates every installed environment with `python -m pip check`
+* disables toolkit-managed file logging during every test run
+* runs the complete normal test suite on every supported Python version
 * grants only read access to repository contents
 * persists no checkout credential
 * has no provider credentials, write permission, build step, or publishing step
 
-Completion verification passed YAML parsing, 5 workflow regressions, 45 focused
-CI/documentation/package-metadata tests, all 351 normal tests, the clean
-editable development installation, dependency validation, and focused Black
-and Ruff checks. The same 2 older Black files and 68 pre-existing Ruff findings
-remain assigned to the later full-quality task.
+Completion verification used fresh editable development installations on
+CPython 3.11.15, 3.12.13, 3.13.14, and 3.14.6. Every environment passed
+`pip check` and all 351 normal tests. Python 3.11 correctly resolved Django
+5.2.16, while Python 3.12–3.14 resolved Django 6.0.7. The remaining current
+dependencies resolved compatibly throughout the range. Workflow YAML parsing,
+5 workflow regressions, 19 package-metadata regressions, 45 focused tests,
+focused Black and Ruff checks, strict Twine validation, and the offline
+distribution validator also passed.
 
-`RELEASE-002` must expand the single Python 3.11 job into the reviewed Python
-3.11, 3.12, 3.13, and 3.14 matrix without taking over the later quality,
-distribution, or publishing tasks.
+The next task adds Black and Ruff to CI without taking over the later
+distribution or publishing tasks. The recorded scope remains 2 files requiring
+Black formatting and 68 Ruff findings.
 
 ---
 
@@ -865,13 +870,13 @@ PROD-006 — Release Automation
 
 ### Next Recommended Focus
 
-Begin `RELEASE-002 — Test supported Python versions`.
+Begin `RELEASE-003 — Run tests, Black, and Ruff in CI`.
 
-`RELEASE-001` added a read-only GitHub Actions workflow for pushes and pull
-requests. It installs the project from the `dev` extra on Python 3.11, validates
-the installed dependencies, and runs the normal test suite without provider
-credentials or toolkit-managed file logging. The next task must expand that
-single-version proof into the reviewed Python 3.11–3.14 matrix.
+`RELEASE-002` expanded the read-only GitHub Actions workflow into independent
+Python 3.11–3.14 jobs. Each installs the project from the `dev` extra, validates
+the resolved dependencies, and runs the normal test suite without provider
+credentials or toolkit-managed file logging. The next task must add Black and
+Ruff enforcement and resolve the recorded repository-wide quality backlog.
 
 ---
 
