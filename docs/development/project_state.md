@@ -28,6 +28,10 @@ Completed Sprint 9 tasks:
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
 
+Completed PROD-006 release-automation tasks:
+
+* RELEASE-001 Add continuous-integration workflow
+
 Completed PROD-001 benchmark tasks:
 
 * BENCH-000 Test-safe and benchmark-safe logging
@@ -103,7 +107,7 @@ PROD-006 — Release Automation
 Next roadmap task:
 
 ```text
-RELEASE-001 — Add continuous-integration workflow
+RELEASE-002 — Test supported Python versions
 ```
 
 ---
@@ -634,6 +638,10 @@ Remaining:
 * PROD-006 Release Automation
 * PROD-007 Version 1.0 Release
 
+Completed release-automation tasks:
+
+* RELEASE-001 Add continuous-integration workflow
+
 ---
 
 ## PyPI Package Status
@@ -716,11 +724,11 @@ destinations. The README's repository-relative documentation links remain
 appropriate for the source checkout; confirmed public project URLs and
 PyPI-page link behavior must be resolved before Version 1.0 publication.
 
-`PROD-005 — PyPI Package` is complete. The next milestone item must add the
-continuous-integration workflow that will repeat the supported checks
-automatically. The later full-quality release gate still owns the older
-repository-wide formatting and lint findings; `PACKAGE-010` introduced none of
-them.
+`PROD-005 — PyPI Package` is complete. `RELEASE-001` subsequently added the
+continuous-integration workflow that repeats the normal tests automatically.
+The next task expands that initial Python 3.11 job into the supported-version
+matrix. The later full-quality release gate still owns the older repository-wide
+formatting and lint findings; `PACKAGE-010` introduced none of them.
 
 `PACKAGE-010` completion verification passed the separate Django and FastAPI
 wheel installations, 19 focused package-metadata regressions, 40
@@ -730,6 +738,34 @@ environments loaded only their selected framework, imported every corresponding
 adapter module, completed an offline integration request, and passed dependency
 validation. Documentation verification inventoried 202 fenced blocks, compiled
 82 Python blocks, and validated 183 repository-relative links.
+
+---
+
+## Continuous Integration Status
+
+`RELEASE-001 — Add Continuous-Integration Workflow` is complete.
+
+The initial `.github/workflows/ci.yml`:
+
+* runs for pushes and pull requests
+* uses Python 3.11, the package's declared minimum version
+* installs `.[dev]` from `pyproject.toml`
+* validates the installed environment with `python -m pip check`
+* disables toolkit-managed file logging during tests
+* runs the complete normal test suite
+* grants only read access to repository contents
+* persists no checkout credential
+* has no provider credentials, write permission, build step, or publishing step
+
+Completion verification passed YAML parsing, 5 workflow regressions, 45 focused
+CI/documentation/package-metadata tests, all 351 normal tests, the clean
+editable development installation, dependency validation, and focused Black
+and Ruff checks. The same 2 older Black files and 68 pre-existing Ruff findings
+remain assigned to the later full-quality task.
+
+`RELEASE-002` must expand the single Python 3.11 job into the reviewed Python
+3.11, 3.12, 3.13, and 3.14 matrix without taking over the later quality,
+distribution, or publishing tasks.
 
 ---
 
@@ -829,11 +865,13 @@ PROD-006 — Release Automation
 
 ### Next Recommended Focus
 
-Begin `RELEASE-001 — Add continuous-integration workflow`.
+Begin `RELEASE-002 — Test supported Python versions`.
 
-`PROD-005` proved that the distribution builds, validates, installs in core and
-framework-specific forms, and preserves its optional dependency boundaries.
-The next task must automate the first release checks in continuous integration.
+`RELEASE-001` added a read-only GitHub Actions workflow for pushes and pull
+requests. It installs the project from the `dev` extra on Python 3.11, validates
+the installed dependencies, and runs the normal test suite without provider
+credentials or toolkit-managed file logging. The next task must expand that
+single-version proof into the reviewed Python 3.11–3.14 matrix.
 
 ---
 

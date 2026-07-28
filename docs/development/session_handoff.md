@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-001 — Add continuous-integration workflow`
+**Next task:** `RELEASE-002 — Test supported Python versions`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-001`.
+The current next task is `RELEASE-002`.
 
 ---
 
@@ -1931,20 +1931,66 @@ architectural decision changed.
 
 ---
 
-# Exact Next Task — RELEASE-001
+# RELEASE-001 — Continuous-Integration Workflow
 
-Add a continuous-integration workflow.
+**Status:** Completed
+
+Implemented:
+
+1. added `.github/workflows/ci.yml`
+2. configured push and pull-request triggers
+3. restricted the workflow to read-only repository-content permission
+4. disabled checkout credential persistence
+5. selected Python 3.11 as the single initial interpreter because it is the
+   package's declared minimum
+6. installed the editable `dev` extra from authoritative `pyproject.toml`
+7. ran `python -m pip check` and the existing normal test suite
+8. disabled toolkit-managed file logging during CI tests
+9. added regression coverage for triggers, permissions, action versions,
+   package installation, checks, and exclusions owned by later release tasks
+10. documented the equivalent local commands
+
+Scope retained for later tasks:
+
+* `RELEASE-002` — Python 3.11, 3.12, 3.13, and 3.14 matrix
+* `RELEASE-003` — test, Black, and Ruff enforcement
+* `RELEASE-004` — distribution builds
+* `RELEASE-005` — built-distribution validation
+* `RELEASE-006` through `RELEASE-009` — tags, secure publishing,
+  documentation, and non-production workflow rehearsal
+
+No runtime API, dependency metadata, provider behavior, package build,
+publishing permission, credential, benchmark, or ADR changed.
+
+Completion verification:
+
+```text
+workflow YAML parsed successfully
+5 CI-workflow regressions passed
+45 focused CI, documentation, and package-metadata tests passed
+351 normal tests passed
+clean editable dev installation passed
+pip check passed
+changed Python test passed Black and Ruff
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+---
+
+# Exact Next Task — RELEASE-002
+
+Test supported Python versions.
 
 Required work:
 
-1. inspect the roadmap's release-automation scope and repository layout
-2. decide the smallest correct initial CI trigger and job structure
-3. install the project from authoritative package metadata
-4. run the appropriate existing test and package checks automatically
-5. preserve later ownership of the Python-version matrix, complete Black/Ruff
-   enforcement, distribution building, and release publishing
-6. add tests or static validation for the workflow where practical
-7. document local equivalents and update project records
+1. review current dependency support for Python 3.11 through 3.14
+2. expand the test job into the roadmap's supported Python matrix
+3. keep one authoritative dependency installation path
+4. confirm every matrix environment runs independently
+5. preserve later ownership of Black/Ruff enforcement, package builds,
+   artifact validation, and publishing
+6. update CI regression coverage, documentation, and project records
 
 ---
 
@@ -2477,24 +2523,16 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `CHANGELOG.md`
 8. `pyproject.toml`
-9. `LICENSE`
-10. `.gitignore`
-11. `docs/installation.md`
-12. `tests/test_package_metadata.py`
-13. `tests/test_django_integration.py`
-14. `tests/test_fastapi_integration.py`
-15. `scripts/verify_core_installation.py`
-16. `scripts/validate_distributions.py`
-17. `ai/integrations/django/`
-18. `ai/integrations/fastapi/`
-19. `dist/python_ai_toolkit-0.7.0.dev0-py3-none-any.whl`
-20. `dist/python_ai_toolkit-0.7.0.dev0.tar.gz`
+9. `.github/workflows/ci.yml`
+10. `tests/test_ci_workflow.py`
+11. `tests/`
+12. `ai/`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`RELEASE-001`. The package metadata, tests, existing validation scripts,
-roadmap, and installation guidance are required so the first CI workflow can
-automate current checks without taking over later release tasks.
+`RELEASE-002`. The package metadata, complete normal test suite, and initial CI
+workflow are required so the supported Python-version matrix can be added
+without taking over later quality, build, validation, or publishing tasks.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2508,8 +2546,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-001 is still the correct next task.
-4. Confirm that PROD-005 completed all ten package tasks, including separate core, Django, and FastAPI installations.
+3. Verify the repository's current state and confirm that RELEASE-002 is still the correct next task.
+4. Confirm that RELEASE-001 added the initial Python 3.11 push and pull-request CI job.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

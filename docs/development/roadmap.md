@@ -2843,7 +2843,7 @@ Automate testing, package validation, and publishing.
 
 ### Tasks
 
-* [ ] RELEASE-001 Add continuous-integration workflow
+* [x] RELEASE-001 Add continuous-integration workflow
 * [ ] RELEASE-002 Test supported Python versions
 * [ ] RELEASE-003 Run tests, Black, and Ruff in CI
 * [ ] RELEASE-004 Build package distributions in CI
@@ -2852,6 +2852,55 @@ Automate testing, package validation, and publishing.
 * [ ] RELEASE-007 Configure secure PyPI publishing
 * [ ] RELEASE-008 Document release procedure
 * [ ] RELEASE-009 Test release workflow without publishing production artifacts
+
+#### RELEASE-001 — Add Continuous-Integration Workflow
+
+Status: Completed
+
+Implementation:
+
+* added `.github/workflows/ci.yml`
+* runs on pushes and pull requests
+* grants read-only repository-content permission
+* disables checkout credential persistence
+* uses the minimum declared Python version, `3.11`
+* installs the editable `dev` extra from authoritative `pyproject.toml`
+* validates the resolved environment with `python -m pip check`
+* disables toolkit-managed file logging during tests
+* runs the existing normal test suite
+* adds regression coverage for the workflow's security and roadmap boundaries
+* documents the local equivalent commands
+
+Scope decision:
+
+This first workflow intentionally uses one Python version and one test job.
+`RELEASE-002` owns the complete Python matrix. `RELEASE-003` owns Black and
+Ruff enforcement, `RELEASE-004` and `RELEASE-005` own distribution construction
+and validation, and `RELEASE-006` through `RELEASE-009` own tagged release and
+publishing behavior.
+
+No API key, provider request, write permission, package build, release artifact,
+or publishing credential is used.
+
+Completion verification:
+
+```text
+workflow YAML parsed successfully
+5 CI-workflow regressions passed
+45 focused CI, documentation, and package-metadata tests passed
+351 normal tests passed
+clean editable dev installation passed
+pip check passed
+changed Python test passed Black and Ruff
+repository-wide Black retained 2 older files outside this task
+repository-wide Ruff retained 68 pre-existing findings outside this task
+```
+
+Next task:
+
+```text
+RELEASE-002 — Test supported Python versions
+```
 
 ### Python Test Matrix
 

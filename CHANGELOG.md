@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Initial read-only GitHub Actions continuous-integration workflow for pushes
+  and pull requests, installing the project from `pyproject.toml`, validating
+  dependencies, and running the normal test suite on Python 3.11
+* Regression coverage preserving the initial CI triggers, permissions,
+  installation source, checks, and separation from later release tasks
+* Local commands equivalent to the initial continuous-integration checks
 * Separate clean-wheel verification for the Django and FastAPI extras, proving
   each adapter works while the unselected framework remains absent
 * Reusable installed-extra verifier covering metadata, import origin, complete
