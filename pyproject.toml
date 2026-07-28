@@ -1,0 +1,84 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-ai-toolkit"
+version = "0.7.0.dev0"
+description = "Reusable infrastructure for integrating LLMs into Python applications."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [
+    { name = "Burim Koci" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: Django",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "openai>=1.66.0",
+    "pydantic>=2.4.2",
+    "python-dotenv",
+]
+
+[project.scripts]
+ai-toolkit = "ai.cli.main:main"
+
+[project.optional-dependencies]
+django = [
+    "django>=5.0",
+]
+fastapi = [
+    "fastapi>=0.100,<1",
+]
+
+dev = [
+    "pytest",
+    "black",
+    "ruff",
+    "django>=5.0",
+    "fastapi>=0.100,<1",
+    "httpx2",
+]
+
+benchmark = [
+    "pytest",
+    "pytest-benchmark",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ai*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint.per-file-ignores]
+"examples/[0-9]*.py" = ["N999"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.pytest-benchmark]
+disable_gc = false
+min_rounds = 5
+warmup = false

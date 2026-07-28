@@ -1,0 +1,232 @@
+import math
+from abc import ABC, abstractmethod
+
+from pydantic import BaseModel, Field
+
+
+class VectorRecord(BaseModel):
+    """
+    One item stored in a vector store.
+
+    id:
+        Stable application-level identifier.
+
+    text:
+        Original text represented by the vector.
+
+    vector:
+        Embedding vector.
+
+    metadata:
+        Extra information such as source file, table name, row ID, chunk ID,
+        user ID, or document type.
+    """
+
+    id: str
+    text: str
+    vector: list[float]
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+class VectorSearchResult(BaseModel):
+    """
+    One search result returned from a vector store.
+    """
+
+    id: str
+    text: str
+    vector: list[float]
+    score: float
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+class BaseVectorStore(ABC):
+    """
+    Provider-independent vector store interface.
+    """
+
+    @abstractmethod
+    def add(
+        self,
+        records: list[VectorRecord],
+    ) -> None:
+        """
+        Add records to the vector store.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def similarity_search(
+        self,
+        query_vector: list[float],
+        limit: int = 5,
+        metadata_filter: dict[str, str] | None = None,
+    ) -> list[VectorSearchResult]:
+        """
+        Return records most similar to the query vector.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def count(self) -> int:
+        """
+        Return number of records in the vector store.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def clear(self) -> None:
+        """
+        Remove all records from the vector store.
+        """
+        raise NotImplementedError
+
+
+class InMemoryVectorStore(BaseVectorStore):
+    """
+    Simple in-memory vector store.
+
+    Useful for tests, demos, small local apps, and as the reference
+    implementation for the vector store interface.
+    """
+
+    def __init__(self):
+        self._records: dict[str, VectorRecord] = {}
+
+    def add(
+        self,
+        records: list[VectorRecord],
+    ) -> None:
+        """
+        Add or replace records by ID.
+        """
+        for record in records:
+            self._records[record.id] = record
+
+    def similarity_search(
+        self,
+        query_vector: list[float],
+        limit: int = 5,
+        metadata_filter: dict[str, str] | None = None,
+    ) -> list[VectorSearchResult]:
+        """
+        Return records ranked by cosine similarity.
+        """
+        if limit <= 0:
+            return []
+
+        candidates = [
+            record
+            for record in self._records.values()
+            if self._matches_metadata_filter(
+                record,
+                metadata_filter,
+            )
+        ]
+
+        query_norm = self._vector_norm(query_vector)
+
+        results = [
+            VectorSearchResult(
+                id=record.id,
+                text=record.text,
+                vector=record.vector,
+                score=self._cosine_similarity_with_first_norm(
+                    first=query_vector,
+                    first_norm=query_norm,
+                    second=record.vector,
+                ),
+                metadata=record.metadata,
+            )
+            for record in candidates
+        ]
+
+        return sorted(
+            results,
+            key=lambda result: result.score,
+            reverse=True,
+        )[:limit]
+
+    def count(self) -> int:
+        """
+        Return number of stored records.
+        """
+        return len(self._records)
+
+    def clear(self) -> None:
+        """
+        Remove all stored records.
+        """
+        self._records.clear()
+
+    def _matches_metadata_filter(
+        self,
+        record: VectorRecord,
+        metadata_filter: dict[str, str] | None,
+    ) -> bool:
+        if metadata_filter is None:
+            return True
+
+        return all(
+            record.metadata.get(key) == value for key, value in metadata_filter.items()
+        )
+
+    def _vector_norm(
+        self,
+        vector: list[float],
+    ) -> float:
+        squared_norm = sum(value * value for value in vector)
+
+        return math.sqrt(squared_norm)
+
+    def _cosine_similarity(
+        self,
+        first: list[float],
+        second: list[float],
+    ) -> float:
+        """
+        Calculate cosine similarity between two vectors.
+
+        This method retains the original two-vector helper interface.
+        Similarity searches use the precomputed-query-norm helper to avoid
+        recalculating the same query norm for every stored record.
+        """
+        first_norm = self._vector_norm(first)
+
+        return self._cosine_similarity_with_first_norm(
+            first=first,
+            first_norm=first_norm,
+            second=second,
+        )
+
+    def _cosine_similarity_with_first_norm(
+        self,
+        first: list[float],
+        first_norm: float,
+        second: list[float],
+    ) -> float:
+        """
+        Calculate cosine similarity using a precomputed first-vector norm.
+        """
+        if len(first) != len(second):
+            raise ValueError(
+                "Vectors must have the same dimensions for similarity search."
+            )
+
+        dot_product = 0.0
+        second_squared_norm = 0.0
+
+        for first_value, second_value in zip(
+            first,
+            second,
+            strict=True,
+        ):
+            dot_product += first_value * second_value
+            second_squared_norm += second_value * second_value
+
+        if first_norm == 0 or second_squared_norm == 0:
+            return 0.0
+
+        second_norm = math.sqrt(second_squared_norm)
+
+        return dot_product / (first_norm * second_norm)

@@ -1,0 +1,182 @@
+from collections.abc import Iterator
+from typing import TypeVar, overload
+
+from pydantic import BaseModel
+
+from ai.config import AIConfig, get_ai_config
+from ai.embeddings import EmbeddingInput, EmbeddingResponse
+from ai.executor import RequestExecutor
+from ai.images import ImageInput
+from ai.logger import get_ai_logger
+from ai.providers.factory import ProviderFactory
+from ai.request_builder import AIRequestBuilder
+from ai.schemas import AIResult
+from ai.tools import ToolDefinition, ToolResponse
+
+T = TypeVar("T", bound=BaseModel)
+
+
+class AIClient:
+    """
+    Main public client used by applications.
+
+    AIClient is intentionally small.
+
+    Responsibilities:
+    - Resolve supplied or environment-based configuration
+    - Select provider
+    - Expose public ask() and ask_text() methods
+
+    Request execution, retry, parsing, logging, timing, and cost tracking
+    are handled by RequestExecutor.
+    """
+
+    def __init__(self, config: AIConfig | None = None):
+        resolved_config = config or get_ai_config()
+
+        self.model = resolved_config.model
+
+        self.provider = ProviderFactory.create(resolved_config)
+
+        logger = get_ai_logger(
+            level=resolved_config.log_level,
+            file_path=resolved_config.log_file_path,
+            file_logging_enabled=resolved_config.file_logging_enabled,
+        )
+
+        self.executor = RequestExecutor(
+            provider=self.provider,
+            model=self.model,
+            max_retries=resolved_config.max_retries,
+            logger=logger,
+            input_cost_per_1m_tokens=(resolved_config.input_cost_per_1m_tokens),
+            output_cost_per_1m_tokens=(resolved_config.output_cost_per_1m_tokens),
+        )
+
+    @overload
+    def ask(self, prompt: str) -> AIResult[str]: ...
+
+    @overload
+    def ask(self, prompt: str, response_type: type[T]) -> AIResult[T]: ...
+
+    def ask(
+        self,
+        prompt: str,
+        response_type: type[T] | None = None,
+    ) -> AIResult[str] | AIResult[T]:
+        """
+        Send a prompt to the configured provider.
+
+        If response_type is provided, RequestExecutor handles structured JSON
+        parsing and Pydantic validation.
+        """
+        return self.executor.execute(
+            prompt=prompt,
+            response_type=response_type,
+        )
+
+    def ask_text(self, prompt: str) -> str:
+        """
+        Backward-compatible shortcut for plain text responses.
+        """
+        return self.ask(prompt).data
+
+    def request(self) -> AIRequestBuilder:
+        """
+        Create a fluent request builder for advanced AI requests.
+        """
+        return AIRequestBuilder(self.executor)
+
+    def stream(self, prompt: str) -> Iterator[str]:
+        """
+        Stream a plain text response from the configured provider.
+        """
+        return self.executor.stream(prompt)
+
+    def ask_with_tools(
+        self,
+        prompt: str,
+        tools: list[ToolDefinition],
+    ) -> ToolResponse:
+        """
+        Send a prompt with available tool definitions.
+
+        The model may return plain text, tool calls, or both.
+        Tool execution is intentionally left to the application.
+        """
+        return self.executor.execute_with_tools(
+            prompt=prompt,
+            tools=tools,
+        )
+
+    @overload
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+    ) -> AIResult[str]: ...
+
+    @overload
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+        response_type: type[T],
+    ) -> AIResult[T]: ...
+
+    def ask_with_images(
+        self,
+        prompt: str,
+        images: list[ImageInput],
+        response_type: type[T] | None = None,
+    ) -> AIResult[str] | AIResult[T]:
+        """
+        Send a prompt with image inputs.
+
+        Supports plain text responses and structured Pydantic responses.
+        """
+        return self.executor.execute_with_images(
+            prompt=prompt,
+            images=images,
+            response_type=response_type,
+        )
+
+    def embed_text(
+        self,
+        text: str,
+        metadata: dict[str, str] | None = None,
+    ) -> EmbeddingResponse:
+        """
+        Embed one text input.
+
+        Returns an EmbeddingResponse containing one EmbeddingVector.
+        """
+        return self.embed_texts(
+            [
+                EmbeddingInput(
+                    text=text,
+                    metadata=metadata or {},
+                )
+            ]
+        )
+
+    def embed_texts(
+        self,
+        inputs: list[str] | list[EmbeddingInput],
+    ) -> EmbeddingResponse:
+        """
+        Embed multiple text inputs.
+
+        Inputs may be plain strings or EmbeddingInput objects.
+        Use EmbeddingInput when you need to attach metadata.
+        """
+        normalized_inputs = [
+            (
+                input_item
+                if isinstance(input_item, EmbeddingInput)
+                else EmbeddingInput(text=input_item)
+            )
+            for input_item in inputs
+        ]
+
+        return self.provider.embed_texts(normalized_inputs)
