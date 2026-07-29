@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-008 — Document release procedure`
+**Next task:** `RELEASE-009 — Test release workflow without publishing production artifacts`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-008`.
+The current next task is `RELEASE-009`.
 
 ---
 
@@ -2205,18 +2205,59 @@ benchmark contract, example behavior, or architectural decision changed.
 
 ---
 
-# Exact Next Task — RELEASE-008
+# RELEASE-008 — Document Release Procedure
 
-Document the complete release procedure.
+**Status:** Completed
+
+Implemented:
+
+1. added `docs/releasing.md` as the authoritative maintainer checklist
+2. documented one-time GitHub and PyPI trusted-publisher configuration
+3. documented version/changelog preparation, local quality, clean builds,
+   validation, artifact installation, review, and final-main verification
+4. documented annotated tag creation and exact tag-to-commit comparison
+5. documented protected publishing approval and clean PyPI installation smoke
+   testing
+6. documented recovery without moving pushed tags or reusing PyPI filenames
+7. linked the guide from the README and installation documentation
+8. added permanent release-documentation regressions
+
+Completion verification:
+
+```text
+6 release-documentation regressions passed
+57 focused release, CI, and documentation tests passed
+76 focused release, CI, package-metadata, and documentation tests passed
+382 normal tests passed
+both workflow YAML files parsed successfully
+all 129 Python files passed Black
+repository-wide Ruff check passed
+strict Twine and offline archive validation passed for the clean-source build
+```
+
+No tag, workflow release run, GitHub deployment approval, PyPI project
+creation, distribution upload, or GitHub Release occurred.
+
+No runtime API, dependency declaration, package metadata, workflow permission,
+provider behavior, benchmark contract, example behavior, or architectural
+decision changed.
+
+---
+
+# Exact Next Task — RELEASE-009
+
+Test the release workflow without publishing production artifacts.
 
 Required work:
 
-1. define the authoritative pre-release checklist
-2. document version and changelog updates
-3. document local validation, commit, push, tag, approval, and verification
-4. document failure recovery without reusing an immutable PyPI version
-5. preserve the trusted-publishing and validated-artifact security boundaries
-6. add documentation regressions and update project records
+1. inspect the completed release guide and exact current workflow
+2. design a safe rehearsal that cannot upload a production artifact
+3. verify tag validation and the Python 3.11–3.14 quality matrix
+4. verify tagged wheel/source construction and both artifact validators
+5. verify the protected publishing boundary without approving a production
+   upload
+6. document evidence, cleanup, limitations, and the remaining Version 1.0 gate
+7. update project records without skipping into the Version 1.0 release
 
 ---
 
@@ -2757,13 +2798,15 @@ For the immediate next task, also provide:
 14. `scripts/validate_release_tag.py`
 15. `scripts/validate_distributions.py`
 16. `docs/installation.md`
+17. `docs/releasing.md`
+18. `tests/test_release_documentation.py`
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`RELEASE-008`. The release and CI workflows, workflow regressions, release-tag
-and distribution validators, installation guidance, changelog, and
-authoritative package metadata are required so the procedure can describe the
-real verified release path.
+`RELEASE-009`. The release and CI workflows, their regressions, the release
+procedure, release-tag and distribution validators, installation guidance,
+changelog, and authoritative package metadata are required so the rehearsal
+can test the real verified release path without production publication.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2777,8 +2820,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-008 is still the correct next task.
-4. Confirm that the tag workflow validates the package version, tagged commit, Python 3.11–3.14 quality matrix, and both distributions before passing them to the isolated trusted-publishing job.
+3. Verify the repository's current state and confirm that RELEASE-009 is still the correct next task.
+4. Read docs/releasing.md and confirm the rehearsal design cannot publish a production artifact.
+5. Confirm that the tag workflow validates the package version, tagged commit, Python 3.11–3.14 quality matrix, and both distributions before reaching the isolated trusted-publishing boundary.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

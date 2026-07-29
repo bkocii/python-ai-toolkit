@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Complete maintainer release procedure covering one-time trusted-publisher
+  setup, version preparation, local and CI gates, exact tagged-commit
+  verification, protected PyPI approval, clean installation smoke testing, and
+  failure recovery
+* Release-documentation regressions preserving the tag, quality, artifact,
+  identity, approval, and immutable-version safety boundaries
 * Tokenless PyPI trusted publishing from validated version-tag artifacts,
   isolated in a protected `pypi` environment with identity-token permission
   granted only to the publishing job

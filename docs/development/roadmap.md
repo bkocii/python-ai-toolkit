@@ -2850,7 +2850,7 @@ Automate testing, package validation, and publishing.
 * [x] RELEASE-005 Validate built distributions
 * [x] RELEASE-006 Add release workflow for version tags
 * [x] RELEASE-007 Configure secure PyPI publishing
-* [ ] RELEASE-008 Document release procedure
+* [x] RELEASE-008 Document release procedure
 * [ ] RELEASE-009 Test release workflow without publishing production artifacts
 
 #### RELEASE-001 — Add Continuous-Integration Workflow
@@ -3226,6 +3226,67 @@ Next task:
 RELEASE-008 — Document release procedure
 ```
 
+#### RELEASE-008 — Document Release Procedure
+
+Status: Completed
+
+Implementation:
+
+* added `docs/releasing.md` as the authoritative maintainer release checklist
+* documented the exact GitHub `pypi` environment and PyPI trusted-publisher
+  identity required before the first release
+* separated reversible source preparation from the immutable pushed-tag and
+  published-version boundaries
+* documented version and changelog preparation, exact tag validation, local
+  quality checks, clean package builds, both distribution validators, artifact
+  installation checks, review, and final-main verification
+* documented annotated tag creation, exact tag-to-commit comparison, and
+  single-tag push without broad `--tags` behavior
+* documented release-workflow monitoring and protected-environment approval
+  only after the tag, commit, Python matrix, validators, and artifacts match
+* added a clean exact-version PyPI installation smoke test covering dependency
+  validation, an offline public API check, and the console command
+* documented recovery for local failures, unpushed and pushed tags, account
+  identity failures, partial uploads, defective releases, yanking, and
+  irreversible PyPI deletion
+* linked the procedure from the README and installation guide
+* added permanent documentation regressions for lifecycle coverage, publisher
+  identity, command order, tagged-commit verification, approval, and immutable
+  recovery rules
+
+Scope decision:
+
+The guide documents the release automation exactly as implemented and does not
+create a tag, run the tagged workflow, approve a deployment, create a PyPI
+project, upload a distribution, or create a GitHub Release. `RELEASE-009`
+continues to own the non-production workflow rehearsal. A production release
+remains reserved for the later roadmap milestone that approves its version and
+source.
+
+No runtime API, dependency declaration, package metadata, workflow permission,
+provider behavior, benchmark contract, example behavior, or architectural
+decision changed.
+
+Completion verification:
+
+```text
+6 release-documentation regressions passed
+57 focused release, CI, and documentation tests passed
+76 focused release, CI, package-metadata, and documentation tests passed
+382 normal tests passed
+both workflow YAML files parsed successfully
+all 129 Python files passed Black
+repository-wide Ruff check passed
+clean source build produced exactly one wheel and one source distribution
+strict Twine and offline archive validation passed for both distributions
+```
+
+Next task:
+
+```text
+RELEASE-009 — Test release workflow without publishing production artifacts
+```
+
 ### Python Test Matrix
 
 The supported matrix is:
@@ -3255,7 +3316,7 @@ the resulting environment, and runs the complete normal test suite.
 * [x] Supported Python versions are tested
 * [x] Package builds and validation run automatically
 * [ ] Publishing is restricted to release tags
-* [ ] Release steps are documented
+* [x] Release steps are documented
 
 ---
 

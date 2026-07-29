@@ -519,6 +519,7 @@ concerns in focused documents:
 | [Exception and error-handling guide](docs/error_handling.md) | Toolkit exception hierarchy, retry decisions, ordinary Python failures, failed result objects, and application catch boundaries |
 | [Security and secret-handling guide](docs/security.md) | Credentials, sensitive data, logging, provider governance, tool authorization, and incident response |
 | [Compatibility guide](docs/compatibility.md) | Python versions, dependency resolution, provider SDKs and models, optional frameworks, and verification evidence |
+| [Release procedure](docs/releasing.md) | Maintainer preflight, version tags, protected PyPI approval, verification, and recovery |
 | [Example gallery](examples/README.md) | Numbered, runnable usage examples |
 | [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
 | [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |
@@ -584,8 +585,10 @@ and publishes them through PyPI trusted publishing. Only that job can request a
 short-lived identity token; the repository stores no PyPI password or API
 token. The protected `pypi` environment can require manual approval before
 upload. See the [installation guide](docs/installation.md#configure-trusted-pypi-publishing)
-for the one-time account configuration. Do not create a production release tag
-until the documented rehearsal task is complete.
+for the one-time account configuration and the
+[release procedure](docs/releasing.md) for the complete maintainer checklist,
+verification, and recovery path. Do not create a production release tag until
+the documented rehearsal task is complete.
 
 Format and lint:
 

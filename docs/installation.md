@@ -393,6 +393,12 @@ publisher after the first successful upload. Do not add `PYPI_API_TOKEN`,
 `password`, or username inputs to the workflow: trusted publishing creates a
 short-lived credential only when the protected publishing job runs.
 
+Complete account setup is only the prerequisite. The
+[release procedure](releasing.md) covers the maintainer preflight, version
+change, tag creation, protected approval, PyPI smoke test, and failure recovery.
+Do not create a production tag until that checklist and the roadmap-authorized
+rehearsal are complete.
+
 The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
 they are reproducible outputs rather than source files. Do not upload these
 development artifacts to PyPI. Building proves that both files can be created;

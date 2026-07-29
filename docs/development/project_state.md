@@ -37,6 +37,7 @@ Completed PROD-006 release-automation tasks:
 * RELEASE-005 Validate built distributions
 * RELEASE-006 Add release workflow for version tags
 * RELEASE-007 Configure secure PyPI publishing
+* RELEASE-008 Document release procedure
 
 Completed PROD-001 benchmark tasks:
 
@@ -113,7 +114,7 @@ PROD-006 — Release Automation
 Next roadmap task:
 
 ```text
-RELEASE-008 — Document release procedure
+RELEASE-009 — Test release workflow without publishing production artifacts
 ```
 
 ---
@@ -757,7 +758,8 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 `RELEASE-004 — Build Package Distributions in CI`, and
 `RELEASE-005 — Validate Built Distributions`, and
 `RELEASE-006 — Add Release Workflow for Version Tags`, and
-`RELEASE-007 — Configure Secure PyPI Publishing` are complete.
+`RELEASE-007 — Configure Secure PyPI Publishing`, and
+`RELEASE-008 — Document Release Procedure` are complete.
 
 The current `.github/workflows/ci.yml`:
 
@@ -834,6 +836,25 @@ combined CI and release-workflow regressions, 69 focused release/CI/package
 documentation checks, 375 normal tests, both workflow YAML parses,
 repository-wide Black and Ruff checks, and a clean-source build. The wheel and
 source distribution both passed strict Twine and offline archive validation.
+
+`docs/releasing.md` now defines the complete maintainer path from
+roadmap-authorized version preparation through local quality and artifact
+checks, release-commit review, exact annotated tag creation, tagged-workflow
+inspection, protected `pypi` approval, PyPI verification, and a clean
+exact-version installation smoke test. It also distinguishes safe unpushed-tag
+correction from immutable pushed tags and published versions, including
+recovery for identity failures, partial uploads, yanking, and permanent PyPI
+deletion.
+
+No production tag, GitHub deployment approval, PyPI project creation, upload,
+or GitHub Release occurred during `RELEASE-008`.
+
+Final `RELEASE-008` verification passed 6 release-documentation regressions,
+57 focused release/CI/documentation checks, 76 focused
+release/CI/package-metadata/documentation checks, 382 normal tests, both
+workflow YAML parses, repository-wide Black and Ruff checks, and a clean-source
+build. The wheel and source distribution both passed strict Twine and offline
+archive validation.
 
 ---
 
@@ -933,13 +954,14 @@ PROD-006 — Release Automation
 
 ### Next Recommended Focus
 
-Begin `RELEASE-008 — Document release procedure`.
+Begin `RELEASE-009 — Test release workflow without publishing production
+artifacts`.
 
-`RELEASE-007` now passes only independently tested and validated tagged
-artifacts to an isolated, protected PyPI trusted-publishing job. The next task
-should document the complete human release procedure, including version
-updates, changelog review, account-side prerequisites, tag creation, approvals,
-verification, and failure handling.
+`RELEASE-008` documents the complete human and automated release path and its
+recovery boundaries. The next task should design and execute the
+roadmap-authorized non-production rehearsal while proving that tag validation,
+the Python matrix, artifact construction, both validators, and the protected
+publishing boundary work without uploading production artifacts.
 
 ---
 
