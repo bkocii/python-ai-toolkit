@@ -23,6 +23,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* CI validation gates that run strict Twine and project-specific offline
+  archive checks against the exact built wheel and source distribution before
+  artifact upload
+* CI regressions preserving build-before-validation, validation-before-upload,
+  read-only permissions, and separation from package publishing
 * CI distribution-build job that waits for every supported-version quality job,
   builds the wheel and source distribution, and retains both as a GitHub Actions
   artifact without publishing

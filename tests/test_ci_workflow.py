@@ -58,11 +58,22 @@ def test_ci_builds_distributions_after_all_quality_jobs_pass():
     assert "name: Build distributions" in text
     assert "needs: tests" in text
     assert 'python-version: "3.11"' in text
-    assert "python -m pip install build" in text
+    assert "python -m pip install build twine" in text
     assert "python -m build" in text
 
 
-def test_ci_retains_only_the_expected_distribution_artifacts():
+def test_ci_validates_the_exact_built_distributions_before_upload():
+    text = workflow_text()
+
+    build_position = text.index("run: python -m build")
+    twine_position = text.index("run: python -m twine check --strict dist/*")
+    archive_position = text.index("run: python scripts/validate_distributions.py")
+    upload_position = text.index("uses: actions/upload-artifact@v7")
+
+    assert build_position < twine_position < archive_position < upload_position
+
+
+def test_ci_retains_only_validated_distribution_artifacts():
     text = workflow_text()
 
     assert "actions/upload-artifact@v7" in text
@@ -72,10 +83,8 @@ def test_ci_retains_only_the_expected_distribution_artifacts():
     assert "if-no-files-found: error" in text
 
 
-def test_ci_does_not_take_over_validation_or_publishing_tasks():
+def test_ci_does_not_publish_distributions():
     text = workflow_text().lower()
 
-    assert "twine" not in text
-    assert "validate_distributions.py" not in text
     assert "publish" not in text
     assert "pypi" not in text

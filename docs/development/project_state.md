@@ -34,6 +34,7 @@ Completed PROD-006 release-automation tasks:
 * RELEASE-002 Test supported Python versions
 * RELEASE-003 Run tests, Black, and Ruff in CI
 * RELEASE-004 Build package distributions in CI
+* RELEASE-005 Validate built distributions
 
 Completed PROD-001 benchmark tasks:
 
@@ -110,7 +111,7 @@ PROD-006 — Release Automation
 Next roadmap task:
 
 ```text
-RELEASE-005 — Validate built distributions
+RELEASE-006 — Add release workflow for version tags
 ```
 
 ---
@@ -647,6 +648,7 @@ Completed release-automation tasks:
 * RELEASE-002 Test supported Python versions
 * RELEASE-003 Run tests, Black, and Ruff in CI
 * RELEASE-004 Build package distributions in CI
+* RELEASE-005 Validate built distributions
 
 ---
 
@@ -749,8 +751,9 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 
 `RELEASE-001 — Add Continuous-Integration Workflow`,
 `RELEASE-002 — Test Supported Python Versions`, and
-`RELEASE-003 — Run Tests, Black, and Ruff in CI`, and
-`RELEASE-004 — Build Package Distributions in CI` are complete.
+`RELEASE-003 — Run Tests, Black, and Ruff in CI`,
+`RELEASE-004 — Build Package Distributions in CI`, and
+`RELEASE-005 — Validate Built Distributions` are complete.
 
 The current `.github/workflows/ci.yml`:
 
@@ -765,25 +768,30 @@ The current `.github/workflows/ci.yml`:
 * runs the complete normal test suite on every supported Python version
 * waits for every matrix job before building package distributions
 * constructs the wheel and source distribution with `python -m build`
-* retains both files as the `python-package-distributions` workflow artifact
+* validates both files with strict Twine metadata and README checks
+* validates archive paths, contents, metadata agreement, and wheel RECORD data
+  with `scripts/validate_distributions.py`
+* uploads both files as the `python-package-distributions` workflow artifact
+  only after both validation gates pass
 * grants only read access to repository contents
 * persists no checkout credential
-* has no provider credentials, write permission, validation, or publishing step
+* has no provider credentials, write permission, or publishing step
 
 Matrix compatibility verification used fresh editable development installations
 on CPython 3.11.15, 3.12.13, 3.13.14, and 3.14.6. Every environment passed
 `pip check` and all then-current 351 normal tests. Python 3.11 correctly resolved Django
 5.2.16, while Python 3.12–3.14 resolved Django 6.0.7. The remaining current
 dependencies resolved compatibly throughout the range. The final
-`RELEASE-004` source passed 353 normal tests, 7 workflow regressions, workflow
-YAML parsing, and repository-wide Black and Ruff checks. The former baseline of
-2 Black files and 68 Ruff findings is fully resolved.
+`RELEASE-005` source passed 354 normal tests, 8 workflow regressions, workflow
+YAML parsing, repository-wide Black and Ruff checks, strict Twine validation,
+and the offline archive validator. The former baseline of 2 Black files and 68
+Ruff findings is fully resolved.
 
-The build job uses Python 3.11 after the complete matrix succeeds and uploads
-only `dist/*.whl` and `dist/*.tar.gz`. Distribution construction passed locally
-from the final source state. Strict distribution validation remains owned by
-`RELEASE-005`, and publishing remains reserved for the later tagged-release
-tasks.
+The build job uses Python 3.11 after the complete matrix succeeds. It constructs
+exactly one wheel and one source distribution, validates those exact files, and
+uploads only `dist/*.whl` and `dist/*.tar.gz`. The final clean-source execution
+passed both validation gates. Publishing remains reserved for the later
+tagged-release tasks.
 
 ---
 
@@ -883,12 +891,12 @@ PROD-006 — Release Automation
 
 ### Next Recommended Focus
 
-Begin `RELEASE-005 — Validate built distributions`.
+Begin `RELEASE-006 — Add release workflow for version tags`.
 
-`RELEASE-004` added a read-only build job that waits for the complete quality
-matrix, constructs both distribution formats, and retains them as a workflow
-artifact. The next task should apply strict Twine and offline archive validation
-to those exact built files without taking over tagged publishing responsibility.
+`RELEASE-005` made strict Twine and offline archive validation mandatory before
+the CI-built files are retained. The next task should add a version-tag release
+workflow while preserving the existing quality, construction, and validation
+gates. PyPI credentials and publishing remain owned by later roadmap tasks.
 
 ---
 

@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-005 — Validate built distributions`
+**Next task:** `RELEASE-006 — Add release workflow for version tags`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-005`.
+The current next task is `RELEASE-006`.
 
 ---
 
@@ -2085,17 +2085,54 @@ changed.
 
 ---
 
-# Exact Next Task — RELEASE-005
+# RELEASE-005 — Validate Built Distributions
 
-Validate built distributions.
+**Status:** Completed
+
+Implemented:
+
+1. installed `build` and Twine together in the existing build job
+2. ran strict Twine validation against the exact files produced by
+   `python -m build`
+3. ran the existing offline archive validator against those same files
+4. ordered both validation gates before artifact upload
+5. retained the complete quality-matrix dependency, read-only repository
+   access, disabled checkout credentials, and publishing exclusion
+6. added CI regressions and local validation documentation
+
+Completion verification:
+
+```text
+clean source build produced python_ai_toolkit-0.7.0.dev0-py3-none-any.whl
+clean source build produced python_ai_toolkit-0.7.0.dev0.tar.gz
+strict Twine validation passed for both distributions
+offline archive validation passed for both distributions
+8 CI-workflow regressions passed
+354 normal tests passed
+workflow YAML parsed successfully
+repository-wide Black check passed
+repository-wide Ruff check passed
+```
+
+No runtime API, dependency declaration, package metadata, provider behavior,
+publishing permission, credential, benchmark contract, or architectural
+decision changed.
+
+---
+
+# Exact Next Task — RELEASE-006
+
+Add a release workflow for version tags.
 
 Required work:
 
-1. validate the exact CI-built wheel and source distribution
-2. run strict Twine checks and the existing offline archive validator
-3. keep validation dependent on successful quality and build jobs
-4. preserve read-only pull requests and exclude publishing
-5. update CI regression coverage, documentation, and project records
+1. add a separate workflow triggered only by explicit version tags
+2. preserve the supported-version quality gates or depend on equivalent
+   verified source state
+3. build and validate artifacts from the tagged commit
+4. keep production PyPI credentials and publishing excluded for
+   `RELEASE-007`
+5. add regression coverage, documentation, and project records
 
 ---
 
@@ -2636,9 +2673,9 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`RELEASE-005`. The current CI workflow, distribution validator, and
-authoritative package metadata are required so validation can be applied to the
-exact CI-built files without taking over publishing tasks.
+`RELEASE-006`. The current CI workflow, its regression tests, distribution
+validator, and authoritative package metadata are required so the tag workflow
+can reuse the verified release gates without taking over publishing tasks.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2652,8 +2689,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-005 is still the correct next task.
-4. Confirm that RELEASE-004 builds and retains both distributions only after every Python 3.11–3.14 CI job succeeds.
+3. Verify the repository's current state and confirm that RELEASE-006 is still the correct next task.
+4. Confirm that CI builds, validates, and retains both distributions only after every Python 3.11–3.14 quality job succeeds.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

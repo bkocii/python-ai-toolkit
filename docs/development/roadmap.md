@@ -2847,7 +2847,7 @@ Automate testing, package validation, and publishing.
 * [x] RELEASE-002 Test supported Python versions
 * [x] RELEASE-003 Run tests, Black, and Ruff in CI
 * [x] RELEASE-004 Build package distributions in CI
-* [ ] RELEASE-005 Validate built distributions
+* [x] RELEASE-005 Validate built distributions
 * [ ] RELEASE-006 Add release workflow for version tags
 * [ ] RELEASE-007 Configure secure PyPI publishing
 * [ ] RELEASE-008 Document release procedure
@@ -3056,6 +3056,58 @@ Next task:
 
 ```text
 RELEASE-005 — Validate built distributions
+```
+
+#### RELEASE-005 — Validate Built Distributions
+
+Status: Completed
+
+Implementation:
+
+* installed Twine beside the build frontend in the existing read-only build job
+* ran `python -m twine check --strict dist/*` against the exact wheel and source
+  distribution produced by `python -m build`
+* ran `python scripts/validate_distributions.py` against those same files
+* ordered both validation gates before `actions/upload-artifact`, so invalid
+  distributions cannot be retained for later release work
+* preserved the existing dependency on the complete Python 3.11–3.14 quality
+  matrix
+* retained only `dist/*.whl` and `dist/*.tar.gz` under the established artifact
+  name
+* added regression coverage for exact commands and
+  build-before-validation-before-upload ordering
+* documented the equivalent local validation sequence
+
+Scope decision:
+
+Validation stays inside the existing build job so it examines the exact files
+that job created; a separate validation job would require downloading or
+rebuilding artifacts and could weaken identity between construction and
+validation. The workflow remains read-only and performs no provider request,
+tag handling, release creation, credential use, or package publishing.
+`RELEASE-006` and later tasks continue to own those responsibilities.
+
+Completion verification:
+
+```text
+clean source build produced exactly one .whl and one .tar.gz file
+strict Twine validation passed for both distributions
+offline archive validation passed for both distributions
+8 CI-workflow regressions passed
+354 normal tests passed
+workflow YAML parsed successfully
+repository-wide Black check passed
+repository-wide Ruff check passed
+```
+
+No runtime API, dependency declaration, package metadata, provider behavior,
+publishing permission, credential, benchmark contract, or architectural
+decision changed.
+
+Next task:
+
+```text
+RELEASE-006 — Add release workflow for version tags
 ```
 
 ### Python Test Matrix

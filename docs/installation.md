@@ -302,7 +302,15 @@ source distribution.
 
 Every push and pull request runs the supported Python quality matrix first.
 Only after all four Python jobs succeed, the `Build distributions` job runs
-`python -m build` from the checked-out source and uploads:
+`python -m build` from the checked-out source. It then validates the exact
+built files with:
+
+```text
+python -m twine check --strict dist/*
+python scripts/validate_distributions.py
+```
+
+Only after both validation commands pass does the job upload:
 
 ```text
 dist/*.whl
@@ -313,15 +321,15 @@ The files are retained together under the GitHub Actions artifact name
 `python-package-distributions`. They can be downloaded from the completed
 workflow run's summary page.
 
-This job has read-only repository access and does not publish anything.
-Successful construction alone is not release approval: strict Twine and
-project-specific distribution validation remain separate required checks.
+This job has read-only repository access and does not publish anything. A
+failed build, Twine check, or archive check prevents artifact upload.
 
 The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
 they are reproducible outputs rather than source files. Do not upload these
 development artifacts to PyPI. Building proves that both files can be created;
-the separate distribution-validation step must still check their metadata,
-rendered README, archive contents, and installation behavior before release.
+the validation gates check their metadata, rendered README, and archive
+contents before CI retains them. Clean-environment installation behavior
+remains a separate release check.
 
 If an `*.egg-info/` directory was committed before the ignore rule was added,
 the ignore rule does not remove it from Git automatically. Check and untrack it
