@@ -23,6 +23,13 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Manual non-production release-workflow rehearsal that runs tag-shaped version
+  validation, the Python 3.11–3.14 matrix, distribution construction, both
+  artifact validators, and artifact retention while structurally skipping the
+  PyPI publishing job
+* Rehearsal documentation and regressions covering the expected GitHub job
+  results, validated artifact identity, cleanup, limitations, and the
+  production-only OIDC boundary
 * Complete maintainer release procedure covering one-time trusted-publisher
   setup, version preparation, local and CI gates, exact tagged-commit
   verification, protected PyPI approval, clean installation smoke testing, and

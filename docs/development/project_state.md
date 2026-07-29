@@ -27,6 +27,7 @@ Completed Sprint 9 tasks:
 * PROD-003 Complete Documentation
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
+* PROD-006 Release Automation
 
 Completed PROD-006 release-automation tasks:
 
@@ -38,6 +39,7 @@ Completed PROD-006 release-automation tasks:
 * RELEASE-006 Add release workflow for version tags
 * RELEASE-007 Configure secure PyPI publishing
 * RELEASE-008 Document release procedure
+* RELEASE-009 Test release workflow without publishing production artifacts
 
 Completed PROD-001 benchmark tasks:
 
@@ -108,13 +110,13 @@ Completed PROD-005 package tasks:
 Next active task:
 
 ```text
-PROD-006 — Release Automation
+PROD-007 — Version 1.0.0 Release
 ```
 
 Next roadmap task:
 
 ```text
-RELEASE-009 — Test release workflow without publishing production artifacts
+V1-001 — Freeze the Version 1.0 public API
 ```
 
 ---
@@ -759,7 +761,9 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 `RELEASE-005 — Validate Built Distributions`, and
 `RELEASE-006 — Add Release Workflow for Version Tags`, and
 `RELEASE-007 — Configure Secure PyPI Publishing`, and
-`RELEASE-008 — Document Release Procedure` are complete.
+`RELEASE-008 — Document Release Procedure`, and
+`RELEASE-009 — Test Release Workflow Without Publishing Production Artifacts`
+are complete.
 
 The current `.github/workflows/ci.yml`:
 
@@ -856,6 +860,33 @@ workflow YAML parses, repository-wide Black and Ruff checks, and a clean-source
 build. The wheel and source distribution both passed strict Twine and offline
 archive validation.
 
+`RELEASE-009` added a manual rehearsal to the same release workflow. A
+maintainer selects a reviewed commit and supplies a tag-shaped label that must
+match the package version. The workflow then runs the existing validator,
+Python 3.11–3.14 matrix, build, strict Twine validation, offline archive
+validation, and artifact upload without creating a Git tag.
+
+The PyPI job still requires both a `push` event and a `refs/tags/v` ref.
+Consequently, manual rehearsals skip the complete job before the protected
+`pypi` environment or its sole `id-token: write` permission can be used. The
+validated identity is passed between jobs so tagged and rehearsal artifacts
+share one deterministic naming contract.
+
+The release guide now records the exact Actions UI steps, expected green jobs,
+required skipped publishing result, artifact inspection, cleanup, and the
+intentional limitation that the rehearsal does not invoke PyPI's real
+trusted-publisher exchange.
+
+Final `RELEASE-009` verification passed 23 release-workflow regressions, 8
+release-documentation regressions, 80 focused release/CI/package-metadata/
+documentation checks, and 386 normal tests independently on CPython 3.11.15,
+3.12.13, 3.13.14, and 3.14.6. Every environment passed dependency validation,
+Black, and Ruff. Both workflows parsed successfully, and the clean-source wheel
+and source distribution passed strict Twine and offline archive validation.
+
+No Git tag, GitHub deployment approval, PyPI project creation, distribution
+upload, or GitHub Release occurred during `RELEASE-009`.
+
 ---
 
 ## Benchmark Suite Status
@@ -949,19 +980,18 @@ docs/development/performance_profiling.md
 The next active roadmap item is:
 
 ```text
-PROD-006 — Release Automation
+PROD-007 — Version 1.0.0 Release
 ```
 
 ### Next Recommended Focus
 
-Begin `RELEASE-009 — Test release workflow without publishing production
-artifacts`.
+Begin `V1-001 — Freeze the Version 1.0 public API`.
 
-`RELEASE-008` documents the complete human and automated release path and its
-recovery boundaries. The next task should design and execute the
-roadmap-authorized non-production rehearsal while proving that tag validation,
-the Python matrix, artifact construction, both validators, and the protected
-publishing boundary work without uploading production artifacts.
+`PROD-006` is complete. The next task should review and explicitly approve the
+stable public surface already inventoried by the API reference and roadmap,
+resolve each recorded Version 1.0 API decision, and avoid changing the package
+version, creating a release commit, or publishing until their later authorized
+tasks.
 
 ---
 

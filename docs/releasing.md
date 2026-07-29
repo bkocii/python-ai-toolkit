@@ -42,14 +42,64 @@ The automated workflow:
 
 - publishes from `.github/workflows/release.yml`
 - accepts tags matching `v*.*.*`
+- accepts a manual rehearsal with a tag-shaped label but creates no Git tag
 - requires the tag to equal `v` plus the version in `pyproject.toml`
-- rebuilds from the exact tagged commit
+- rebuilds from the exact selected commit
 - publishes no GitHub Release
 - uses no stored PyPI API token or password
 
+## Non-production workflow rehearsal
+
+Run this rehearsal after the rehearsal support is present on the repository's
+default branch and before the first real release:
+
+1. Open the repository's **Actions** tab.
+2. Select **Release candidate**.
+3. Select **Run workflow**.
+4. Select the reviewed `main` branch.
+5. Enter a rehearsal label that exactly matches the current package version:
+
+   ```text
+   v0.7.0.dev0
+   ```
+
+6. Select **Run workflow**.
+
+The label is input to the existing release-tag validator. It does not create or
+push a Git tag. The run must show:
+
+- **Validate release identity** — passed
+- **Tests (Python 3.11)** — passed
+- **Tests (Python 3.12)** — passed
+- **Tests (Python 3.13)** — passed
+- **Tests (Python 3.14)** — passed
+- **Build release distributions** — passed
+- **Publish distributions to PyPI** — skipped
+
+Download `python-package-distributions-v0.7.0.dev0` from the run summary and
+confirm that it contains exactly one wheel and one source distribution. The
+build job has already run strict Twine validation and the offline archive
+validator against those exact files.
+
+The skipped publishing job is the critical result. Manual runs cannot satisfy
+the job's tag-push condition, so they do not enter the `pypi` environment,
+request an OIDC identity token, or contact PyPI. Do not approve a deployment:
+a rehearsal should not create one.
+
+The rehearsal creates no tag, PyPI project, package version, GitHub Release, or
+stored credential. Its temporary workflow artifact can expire normally or be
+deleted from the run after inspection.
+
+This proves the GitHub-hosted quality, build, validation, artifact, and
+event-gating path. It intentionally does not prove the PyPI trusted-publisher
+identity or upload, because invoking those production capabilities would defeat
+the rehearsal's safety goal. Those checks remain part of the first
+roadmap-authorized release.
+
 ## One-time account setup
 
-Complete this setup once before the first rehearsal or real release.
+Complete this setup once before the first real release. The non-production
+rehearsal above does not require it because its publishing job is skipped.
 
 ### GitHub environment
 

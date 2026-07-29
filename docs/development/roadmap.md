@@ -2851,7 +2851,7 @@ Automate testing, package validation, and publishing.
 * [x] RELEASE-006 Add release workflow for version tags
 * [x] RELEASE-007 Configure secure PyPI publishing
 * [x] RELEASE-008 Document release procedure
-* [ ] RELEASE-009 Test release workflow without publishing production artifacts
+* [x] RELEASE-009 Test release workflow without publishing production artifacts
 
 #### RELEASE-001 — Add Continuous-Integration Workflow
 
@@ -3287,6 +3287,75 @@ Next task:
 RELEASE-009 — Test release workflow without publishing production artifacts
 ```
 
+#### RELEASE-009 — Test Release Workflow Without Publishing Production Artifacts
+
+Status: Completed
+
+Implementation:
+
+* added an explicit manual `workflow_dispatch` rehearsal to the existing
+  `.github/workflows/release.yml`
+* required a tag-shaped rehearsal label that must exactly match `v` plus the
+  package version without creating or pushing a Git tag
+* reused the same release-identity validator, exact event commit checkout,
+  Python 3.11–3.14 quality matrix, distribution build, strict Twine check,
+  offline archive validator, and artifact retention used by tagged releases
+* passed the validated release identity between jobs so manual and tagged runs
+  retain artifacts under the same deterministic naming contract
+* kept the PyPI job restricted to a real `push` event whose ref starts with
+  `refs/tags/v`, causing every manual rehearsal to skip the complete publishing
+  job before environment access or OIDC token issuance
+* preserved read-only repository permissions for validation, test, and build
+  jobs and the existing isolated publishing permission
+* documented the exact GitHub Actions rehearsal, expected job results,
+  artifact inspection, cleanup, and deliberate exclusion of real PyPI identity
+  and upload testing
+* added regressions for manual-event inputs, safe shell input handling,
+  validated artifact identity, event-gated publication, evidence, and
+  rehearsal limitations
+
+Scope decision:
+
+The rehearsal is part of the real release workflow instead of a duplicated
+second workflow, so future changes cannot silently leave the rehearsal testing
+a stale approximation. A manual run exercises every non-publishing job but
+cannot satisfy the production job's tag-push condition. This task does not test
+PyPI's live trusted-publisher exchange because doing so would create a
+production publication path; that remains part of the first
+roadmap-authorized release.
+
+Completion verification:
+
+```text
+23 release-workflow regressions passed
+8 release-documentation regressions passed
+80 focused release, CI, package-metadata, and documentation tests passed
+Python 3.11.15: pip check, Black, Ruff, and 386 normal tests passed
+Python 3.12.13: pip check, Black, Ruff, and 386 normal tests passed
+Python 3.13.14: pip check, Black, Ruff, and 386 normal tests passed
+Python 3.14.6: pip check, Black, Ruff, and 386 normal tests passed
+both workflow YAML files parsed successfully
+clean source build produced exactly one wheel and one source distribution
+strict Twine and offline archive validation passed for both distributions
+manual rehearsals remain structurally unable to enter the PyPI publishing job
+```
+
+The local execution environment injects a SOCKS proxy and restricts process
+worker sockets. The final matrix therefore removed the workspace-only proxy
+variables, and the Python 3.14 Black check used one local worker. Neither
+adjustment changes the repository workflow, dependencies, formatting result,
+or normal GitHub-hosted execution.
+
+No Git tag, GitHub deployment, PyPI project, package version, distribution
+upload, GitHub Release, provider request, runtime API, dependency declaration,
+or architectural decision changed.
+
+Next task:
+
+```text
+V1-001 — Freeze the Version 1.0 public API
+```
+
 ### Python Test Matrix
 
 The supported matrix is:
@@ -3315,7 +3384,7 @@ the resulting environment, and runs the complete normal test suite.
 * [x] Pull requests run automated quality checks
 * [x] Supported Python versions are tested
 * [x] Package builds and validation run automatically
-* [ ] Publishing is restricted to release tags
+* [x] Publishing is restricted to release tags
 * [x] Release steps are documented
 
 ---
@@ -3417,7 +3486,7 @@ Live provider smoke tests must be explicit and must not run as normal unit tests
 * [ ] Important example gaps are closed
 * [ ] Package distributions pass validation
 * [ ] CI tests supported Python versions
-* [ ] Release automation is operational
+* [x] Release automation is operational
 * [ ] Version 1.0.0 is published and smoke-tested
 
 

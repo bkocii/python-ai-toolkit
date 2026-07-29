@@ -324,12 +324,15 @@ workflow run's summary page.
 This job has read-only repository access and does not publish anything. A
 failed build, Twine check, or archive check prevents artifact upload.
 
-### Build and publish a tagged release in CI
+### Rehearse or publish with the release workflow
 
-The separate `.github/workflows/release.yml` workflow runs only when a tag
-matching `v*.*.*` is pushed. Its first gate compares the tag with the
-authoritative package version in `pyproject.toml`. The values must match
-exactly:
+The separate `.github/workflows/release.yml` workflow supports two events:
+
+- a manual non-production rehearsal from a selected commit
+- a real release when a tag matching `v*.*.*` is pushed
+
+Both paths compare a tag-shaped release identity with the authoritative package
+version in `pyproject.toml`. The values must match exactly:
 
 ```text
 pyproject.toml version 0.7.0.dev0
@@ -342,24 +345,28 @@ Before creating a tag, run the same validation locally:
 python scripts\validate_release_tag.py v0.7.0.dev0
 ```
 
-After the tag gate passes, the workflow:
+After the identity gate passes, both paths:
 
-1. checks out the exact tagged commit by its GitHub event SHA
+1. check out the exact selected commit by its GitHub event SHA
 2. repeats dependency, Black, Ruff, and test checks on Python 3.11–3.14
 3. builds the wheel and source distribution from that same commit
 4. runs strict Twine and offline archive validation
 5. retains both files under an artifact name containing the tag
-6. passes those exact files to an isolated PyPI publishing job
 
-The validation jobs have read-only repository permission and do not persist
-checkout credentials. Only the final publishing job receives
+For a manual rehearsal, the final publishing job is skipped. The input
+`v0.7.0.dev0` is only a validated label: it creates no Git tag and cannot enter
+the protected `pypi` environment. Follow the
+[non-production rehearsal](releasing.md#non-production-workflow-rehearsal) and
+verify that all four matrix jobs plus the build pass while publication is
+reported as skipped.
+
+For a real tag push, the validated files pass to an isolated PyPI publishing
+job. The validation jobs have read-only repository permission and do not
+persist checkout credentials. Only the final publishing job receives
 `id-token: write`, which lets PyPI exchange the workflow identity for a
 short-lived project-scoped token. That job does not check out source, install
 Python, execute project code, or rebuild artifacts. It creates no GitHub
 Release and uses no stored PyPI password or API token.
-
-`RELEASE-009` owns the non-production rehearsal. Do not create a production
-release tag merely to test this workflow before that task.
 
 ### Configure trusted PyPI publishing
 

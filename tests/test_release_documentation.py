@@ -10,9 +10,14 @@ def guide_text() -> str:
     return RELEASE_GUIDE_PATH.read_text(encoding="utf-8")
 
 
+def normalized_guide_text() -> str:
+    return " ".join(guide_text().split())
+
+
 def test_release_guide_covers_complete_release_lifecycle():
     text = guide_text()
     headings = [
+        "## Non-production workflow rehearsal",
         "## One-time account setup",
         "## Phase 1 — Prepare the release",
         "## Phase 2 — Approve the exact commit",
@@ -26,6 +31,40 @@ def test_release_guide_covers_complete_release_lifecycle():
     positions = [text.index(heading) for heading in headings]
 
     assert positions == sorted(positions)
+
+
+def test_release_guide_documents_safe_manual_rehearsal():
+    text = guide_text()
+    normalized_text = normalized_guide_text()
+
+    for expected_result in [
+        "**Validate release identity** — passed",
+        "**Tests (Python 3.11)** — passed",
+        "**Tests (Python 3.12)** — passed",
+        "**Tests (Python 3.13)** — passed",
+        "**Tests (Python 3.14)** — passed",
+        "**Build release distributions** — passed",
+        "**Publish distributions to PyPI** — skipped",
+    ]:
+        assert expected_result in text
+
+    assert "**Run workflow**" in text
+    assert "python-package-distributions-v0.7.0.dev0" in text
+    assert "It does not create or push a Git tag." in normalized_text
+    assert "do not enter the `pypi` environment" in normalized_text
+    assert "request an OIDC identity token" in normalized_text
+    assert "Do not approve a deployment" in text
+
+
+def test_release_guide_records_rehearsal_evidence_and_limits():
+    text = normalized_guide_text()
+
+    assert "exactly one wheel and one source distribution" in text
+    assert "strict Twine validation and the offline archive" in text
+    assert "creates no tag, PyPI project, package version, GitHub Release" in text
+    assert "temporary workflow artifact can expire normally or be deleted" in text
+    assert "does not prove the PyPI trusted-publisher identity or upload" in text
+    assert "first roadmap-authorized release" in text
 
 
 def test_release_guide_preserves_exact_trusted_publisher_identity():

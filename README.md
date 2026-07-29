@@ -576,19 +576,21 @@ after both validation commands pass. Ordinary pushes and pull requests never
 publish packages, and the CI workflow requires only read access to repository
 contents.
 
-An explicit version tag starts the separate release workflow.
-The tag must exactly match the package version in `pyproject.toml`; for example,
-version `0.7.0.dev0` requires tag `v0.7.0.dev0`. The workflow repeats the
-supported-version quality matrix and rebuilds and validates both distributions
-from the tagged commit. A final isolated job then downloads those exact files
-and publishes them through PyPI trusted publishing. Only that job can request a
+An explicit version tag starts the production path in the separate release
+workflow. The tag must exactly match the package version in `pyproject.toml`;
+for example, version `0.7.0.dev0` requires tag `v0.7.0.dev0`. A manual
+non-production rehearsal can run the same validation, supported-version
+quality matrix, build, validators, and artifact retention from a selected
+commit without creating a tag. Manual runs always skip the publishing job.
+
+For a real tag, a final isolated job downloads the validated files and
+publishes them through PyPI trusted publishing. Only that job can request a
 short-lived identity token; the repository stores no PyPI password or API
 token. The protected `pypi` environment can require manual approval before
 upload. See the [installation guide](docs/installation.md#configure-trusted-pypi-publishing)
 for the one-time account configuration and the
 [release procedure](docs/releasing.md) for the complete maintainer checklist,
-verification, and recovery path. Do not create a production release tag until
-the documented rehearsal task is complete.
+safe rehearsal, verification, and recovery path.
 
 Format and lint:
 

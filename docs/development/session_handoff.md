@@ -5,8 +5,8 @@
 **Project:** Python AI Toolkit  
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
-**Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-009 — Test release workflow without publishing production artifacts`
+**Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
+**Next task:** `V1-001 — Freeze the Version 1.0 public API`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-009`.
+The current next task is `V1-001`.
 
 ---
 
@@ -2244,20 +2244,55 @@ decision changed.
 
 ---
 
-# Exact Next Task — RELEASE-009
+# RELEASE-009 Completion
 
-Test the release workflow without publishing production artifacts.
+`RELEASE-009 — Test Release Workflow Without Publishing Production Artifacts`
+is complete.
+
+The existing release workflow now supports a manual rehearsal with a validated
+tag-shaped label. It runs the exact release identity, Python 3.11–3.14 quality,
+build, Twine, archive, and artifact jobs from the selected commit without
+creating a Git tag.
+
+The publishing job remains restricted to a real tag push. Manual rehearsals
+therefore skip the entire job before the protected `pypi` environment or OIDC
+permission can be used. The release guide documents the expected green jobs,
+skipped publish result, artifact inspection, cleanup, and the deliberate
+exclusion of a real PyPI upload.
+
+Completion evidence:
+
+```text
+23 release-workflow regressions passed
+8 release-documentation regressions passed
+80 focused release, CI, package-metadata, and documentation tests passed
+386 normal tests passed independently on Python 3.11, 3.12, 3.13, and 3.14
+pip check, Black, and Ruff passed on all four supported interpreters
+both workflow YAML files parsed successfully
+wheel and source distribution passed strict Twine and offline validation
+```
+
+No Git tag, GitHub deployment, PyPI project, distribution upload, or GitHub
+Release was created.
+
+---
+
+# Exact Next Task — V1-001
+
+Freeze the Version 1.0 public API.
 
 Required work:
 
-1. inspect the completed release guide and exact current workflow
-2. design a safe rehearsal that cannot upload a production artifact
-3. verify tag validation and the Python 3.11–3.14 quality matrix
-4. verify tagged wheel/source construction and both artifact validators
-5. verify the protected publishing boundary without approving a production
-   upload
-6. document evidence, cleanup, limitations, and the remaining Version 1.0 gate
-7. update project records without skipping into the Version 1.0 release
+1. inspect the current public API reference and the roadmap's complete API
+   freeze list
+2. inventory all intentionally supported public symbols, signatures, return
+   contracts, exceptions, mutable state, and extension interfaces
+3. resolve every recorded Version 1.0 API-review decision explicitly
+4. preserve provider independence and create an ADR only for a real
+   architectural or public-contract change
+5. update tests and documentation for the approved stable surface
+6. do not change the package version, create `v1.0.0`, or publish; those belong
+   to later V1 tasks
 
 ---
 
@@ -2790,23 +2825,18 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `CHANGELOG.md`
 8. `pyproject.toml`
-9. `.github/workflows/release.yml`
-10. `.github/workflows/ci.yml`
-11. `tests/test_release_workflow.py`
-12. `tests/test_ci_workflow.py`
-13. `tests/test_package_metadata.py`
-14. `scripts/validate_release_tag.py`
-15. `scripts/validate_distributions.py`
-16. `docs/installation.md`
-17. `docs/releasing.md`
-18. `tests/test_release_documentation.py`
+9. `docs/api_reference.md`
+10. `ai/__init__.py`
+11. the public client, configuration, schema, provider-interface, request,
+    retrieval, memory, agent, workflow, integration, and CLI modules named by
+    the roadmap review list
+12. tests covering those public contracts
 
-Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
-example media, and future-backlog implementation files are not required for
-`RELEASE-009`. The release and CI workflows, their regressions, the release
-procedure, release-tag and distribution validators, installation guidance,
-changelog, and authoritative package metadata are required so the rehearsal
-can test the real verified release path without production publication.
+Profiling evidence, generated benchmark artifacts, release artifacts,
+deliverable ZIPs, caches, example media, and future-backlog implementation
+files are not required for `V1-001`. The API reference, roadmap review list,
+current public modules, focused guides, and contract tests are required so the
+freeze reviews real behavior rather than assumptions.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2820,9 +2850,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-009 is still the correct next task.
-4. Read docs/releasing.md and confirm the rehearsal design cannot publish a production artifact.
-5. Confirm that the tag workflow validates the package version, tagged commit, Python 3.11–3.14 quality matrix, and both distributions before reaching the isolated trusted-publishing boundary.
+3. Verify the repository's current state and confirm that V1-001 is still the correct next task.
+4. Read docs/api_reference.md and the complete PROD-007 public API freeze list.
+5. Inventory and review every recorded Version 1.0 public-contract decision before proposing changes.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

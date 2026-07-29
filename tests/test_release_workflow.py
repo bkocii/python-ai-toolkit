@@ -17,13 +17,17 @@ def workflow_text() -> str:
     return RELEASE_WORKFLOW_PATH.read_text(encoding="utf-8")
 
 
-def test_release_workflow_runs_only_for_version_tags():
+def test_release_workflow_supports_tag_releases_and_manual_rehearsals():
     text = workflow_text()
 
     assert text.startswith("name: Release candidate\n")
     assert '\n      - "v*.*.*"\n' in text
+    assert "\n  workflow_dispatch:\n" in text
+    assert "\n      rehearsal_tag:\n" in text
+    assert "Tag-shaped label matching the package version (no tag is created)" in text
+    assert "\n        required: true\n" in text
+    assert "\n        type: string\n" in text
     assert "\n  pull_request:" not in text
-    assert "\n  workflow_dispatch:" not in text
     assert "\n  workflow_run:" not in text
     assert "\n  branches:" not in text
 
@@ -45,8 +49,29 @@ def test_release_workflow_validates_tag_before_quality_jobs():
     build_position = text.index("\n  build:\n")
 
     assert validate_position < tests_position < build_position
-    assert 'run: python scripts/validate_release_tag.py "${GITHUB_REF_NAME}"' in text
+    assert 'release_tag="${GITHUB_REF_NAME}"' in text
+    assert '"${GITHUB_EVENT_NAME}" == "workflow_dispatch"' in text
+    assert 'release_tag="${REHEARSAL_TAG}"' in text
+    assert 'python scripts/validate_release_tag.py "${release_tag}"' in text
+    assert 'echo "release_tag=${release_tag}" >> "${GITHUB_OUTPUT}"' in text
+    assert "REHEARSAL_TAG: ${{ inputs.rehearsal_tag }}" in text
+    assert "${{ inputs.rehearsal_tag }}" not in text.split("run: |", 1)[1]
     assert "needs: validate-tag" in text
+
+
+def test_release_workflow_uses_validated_identity_for_both_event_types():
+    text = workflow_text()
+
+    assert "release_tag: ${{ steps.release_identity.outputs.release_tag }}" in text
+    assert (
+        text.count(
+            "python-package-distributions-${{ needs.validate-tag.outputs.release_tag }}"
+        )
+        == 2
+    )
+    assert "python-package-distributions-${{ github.ref_name }}" not in text
+    assert "needs: [validate-tag, tests]" in text
+    assert "needs: [validate-tag, build]" in text
 
 
 def test_release_workflow_repeats_supported_quality_matrix():
@@ -77,12 +102,15 @@ def test_release_workflow_builds_and_validates_after_quality_jobs():
     )
     upload_position = text.index("uses: actions/upload-artifact@v7", build_job_position)
 
-    assert "needs: tests" in text[build_job_position:]
+    assert "needs: [validate-tag, tests]" in text[build_job_position:]
     assert build_position < twine_position < archive_position < upload_position
     assert "dist/*.whl" in text
     assert "dist/*.tar.gz" in text
     assert "if-no-files-found: error" in text
-    assert "python-package-distributions-${{ github.ref_name }}" in text
+    assert (
+        "python-package-distributions-${{ needs.validate-tag.outputs.release_tag }}"
+        in text
+    )
 
 
 def test_release_workflow_publishes_only_after_validated_build():
@@ -97,13 +125,16 @@ def test_release_workflow_publishes_only_after_validated_build():
     )
 
     assert build_position < publish_position
-    assert "needs: build" in publish_text
+    assert "needs: [validate-tag, build]" in publish_text
     assert (
         "if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')"
         in publish_text
     )
     assert download_position < publish_action_position
-    assert "name: python-package-distributions-${{ github.ref_name }}" in publish_text
+    assert (
+        "name: python-package-distributions-"
+        "${{ needs.validate-tag.outputs.release_tag }}" in publish_text
+    )
     assert "path: dist/" in publish_text
     assert "packages-dir: dist/" in publish_text
 
@@ -119,6 +150,20 @@ def test_release_workflow_limits_trusted_identity_to_publish_job():
     assert "secrets." not in text
     assert "password:" not in text
     assert "PYPI_API_TOKEN" not in text
+
+
+def test_manual_rehearsal_cannot_reach_publishing_identity():
+    text = workflow_text()
+    publish_text = text[text.index("\n  publish:\n") :]
+
+    assert "\n  workflow_dispatch:\n" in text
+    assert (
+        "if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')"
+        in publish_text
+    )
+    assert "workflow_dispatch" not in publish_text
+    assert text.count("\n      id-token: write\n") == 1
+    assert text.count("\n      name: pypi\n") == 1
 
 
 def test_release_workflow_publish_job_cannot_rebuild_or_change_source():

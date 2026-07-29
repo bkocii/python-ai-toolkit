@@ -4,18 +4,26 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      rehearsal_tag:
+        description: Tag-shaped label matching the package version (no tag is created)
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 jobs:
   validate-tag:
-    name: Validate version tag
+    name: Validate release identity
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      release_tag: ${{ steps.release_identity.outputs.release_tag }}
 
     steps:
-      - name: Check out tagged commit
+      - name: Check out release source
         uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
@@ -26,8 +34,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Match tag to package version
-        run: python scripts/validate_release_tag.py "${GITHUB_REF_NAME}"
+      - name: Match release identity to package version
+        id: release_identity
+        env:
+          REHEARSAL_TAG: ${{ inputs.rehearsal_tag }}
+        run: |
+          release_tag="${GITHUB_REF_NAME}"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            release_tag="${REHEARSAL_TAG}"
+          fi
+          python scripts/validate_release_tag.py "${release_tag}"
+          echo "release_tag=${release_tag}" >> "${GITHUB_OUTPUT}"
 
   tests:
     name: Tests (Python ${{ matrix.python-version }})
@@ -40,7 +57,7 @@ jobs:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
-      - name: Check out tagged commit
+      - name: Check out release source
         uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
@@ -71,13 +88,13 @@ jobs:
         run: python -m pytest -q
 
   build:
-    name: Build tagged distributions
-    needs: tests
+    name: Build release distributions
+    needs: [validate-tag, tests]
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Check out tagged commit
+      - name: Check out release source
         uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
@@ -102,10 +119,10 @@ jobs:
       - name: Validate distribution archives
         run: python scripts/validate_distributions.py
 
-      - name: Upload tagged distributions
+      - name: Upload release distributions
         uses: actions/upload-artifact@v7
         with:
-          name: python-package-distributions-${{ github.ref_name }}
+          name: python-package-distributions-${{ needs.validate-tag.outputs.release_tag }}
           path: |
             dist/*.whl
             dist/*.tar.gz
@@ -113,7 +130,7 @@ jobs:
 
   publish:
     name: Publish distributions to PyPI
-    needs: build
+    needs: [validate-tag, build]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -127,7 +144,7 @@ jobs:
       - name: Download validated distributions
         uses: actions/download-artifact@v8
         with:
-          name: python-package-distributions-${{ github.ref_name }}
+          name: python-package-distributions-${{ needs.validate-tag.outputs.release_tag }}
           path: dist/
 
       - name: Publish distributions with trusted identity
