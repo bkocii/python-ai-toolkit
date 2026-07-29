@@ -46,3 +46,37 @@ jobs:
         env:
           AI_FILE_LOGGING_ENABLED: "false"
         run: python -m pytest -q
+
+  build:
+    name: Build distributions
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install build frontend
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+
+      - name: Build wheel and source distribution
+        run: python -m build
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-package-distributions
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error

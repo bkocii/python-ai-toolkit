@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* CI distribution-build job that waits for every supported-version quality job,
+  builds the wheel and source distribution, and retains both as a GitHub Actions
+  artifact without publishing
+* CI regressions preserving the build job's quality dependency, expected
+  distribution formats, read-only permissions, and separation from validation
+  and publishing
 * Repository-wide Black and Ruff enforcement in every supported-version CI job
 * Narrow Ruff configuration preserving the numbered example-gallery filenames
   while continuing to lint all example content

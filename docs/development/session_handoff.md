@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-004 — Build package distributions in CI`
+**Next task:** `RELEASE-005 — Validate built distributions`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-004`.
+The current next task is `RELEASE-005`.
 
 ---
 
@@ -2053,19 +2053,49 @@ changed.
 
 ---
 
-# Exact Next Task — RELEASE-004
+# RELEASE-004 — Build Package Distributions in CI
 
-Build package distributions in CI.
+**Status:** Completed
+
+Implemented:
+
+1. added a `Build distributions` job that depends on the complete test matrix
+2. used Python 3.11 and the standard `python -m build` workflow
+3. uploaded only the wheel and source distribution as the
+   `python-package-distributions` workflow artifact
+4. kept repository permissions read-only and checkout credentials disabled
+5. preserved strict validation for `RELEASE-005`
+6. added CI regressions and local build documentation
+
+Completion verification:
+
+```text
+clean source build produced python_ai_toolkit-0.7.0.dev0-py3-none-any.whl
+clean source build produced python_ai_toolkit-0.7.0.dev0.tar.gz
+7 CI-workflow regressions passed
+353 normal tests passed
+workflow YAML parsed successfully
+repository-wide Black check passed
+repository-wide Ruff check passed
+```
+
+No runtime API, dependency declaration, provider behavior, strict distribution
+validation, publishing permission, credential, or architectural decision
+changed.
+
+---
+
+# Exact Next Task — RELEASE-005
+
+Validate built distributions.
 
 Required work:
 
-1. design a distribution-build job with an explicit dependency on successful
-   quality checks
-2. build the wheel and source distribution from the checked-out source
-3. preserve `RELEASE-005` ownership of strict distribution validation
-4. upload build outputs only as CI artifacts, without publishing them
-5. keep pull requests read-only and preserve the supported Python matrix
-6. update CI regression coverage, documentation, and project records
+1. validate the exact CI-built wheel and source distribution
+2. run strict Twine checks and the existing offline archive validator
+3. keep validation dependent on successful quality and build jobs
+4. preserve read-only pull requests and exclude publishing
+5. update CI regression coverage, documentation, and project records
 
 ---
 
@@ -2606,9 +2636,9 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`RELEASE-004`. The current CI workflow and authoritative package metadata are
-required so distribution construction can be added without taking over later
-validation or publishing tasks.
+`RELEASE-005`. The current CI workflow, distribution validator, and
+authoritative package metadata are required so validation can be applied to the
+exact CI-built files without taking over publishing tasks.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2622,8 +2652,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-004 is still the correct next task.
-4. Confirm that RELEASE-003 added Black and Ruff to every Python 3.11–3.14 CI job.
+3. Verify the repository's current state and confirm that RELEASE-005 is still the correct next task.
+4. Confirm that RELEASE-004 builds and retains both distributions only after every Python 3.11–3.14 CI job succeeds.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

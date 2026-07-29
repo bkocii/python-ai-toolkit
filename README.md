@@ -550,6 +550,9 @@ push and pull request through `.github/workflows/ci.yml`. Independent jobs use
 Python `3.11`, `3.12`, `3.13`, and `3.14`; each installs `.[dev]` from
 `pyproject.toml`, runs `python -m pip check`, disables toolkit-managed file
 logging, checks Black formatting, runs Ruff, and runs the normal test suite.
+After every matrix job succeeds, a separate read-only job builds the wheel and
+source distribution and retains both as the `python-package-distributions`
+workflow artifact.
 
 Run its current functional equivalent locally:
 
@@ -559,13 +562,15 @@ python -m pip check
 python -m black --check .
 python -m ruff check .
 python -m pytest -q
+python -m pip install build
+python -m build
 ```
 
 See the [compatibility guide](docs/compatibility.md) for the tested-version
-matrix and local multi-version procedure. Distribution building, artifact
-validation, and publishing remain separate release-automation tasks. The CI
-workflow does not publish packages and requires only read access to repository
-contents.
+matrix and local multi-version procedure. CI construction does not prove that
+the distributions are valid; strict artifact validation and publishing remain
+separate release-automation tasks. The workflow does not publish packages and
+requires only read access to repository contents.
 
 Format and lint:
 

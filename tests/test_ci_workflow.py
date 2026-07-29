@@ -51,10 +51,31 @@ def test_ci_installs_from_package_metadata_and_runs_quality_checks():
     assert "python -m pytest -q" in text
 
 
-def test_ci_does_not_take_over_later_release_tasks():
+def test_ci_builds_distributions_after_all_quality_jobs_pass():
+    text = workflow_text()
+
+    assert "\n  build:\n" in text
+    assert "name: Build distributions" in text
+    assert "needs: tests" in text
+    assert 'python-version: "3.11"' in text
+    assert "python -m pip install build" in text
+    assert "python -m build" in text
+
+
+def test_ci_retains_only_the_expected_distribution_artifacts():
+    text = workflow_text()
+
+    assert "actions/upload-artifact@v7" in text
+    assert "name: python-package-distributions" in text
+    assert "dist/*.whl" in text
+    assert "dist/*.tar.gz" in text
+    assert "if-no-files-found: error" in text
+
+
+def test_ci_does_not_take_over_validation_or_publishing_tasks():
     text = workflow_text().lower()
 
-    assert "python -m build" not in text
     assert "twine" not in text
+    assert "validate_distributions.py" not in text
     assert "publish" not in text
     assert "pypi" not in text

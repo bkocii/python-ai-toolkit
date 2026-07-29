@@ -298,6 +298,25 @@ reads `pyproject.toml`, creates an isolated build environment, asks setuptools
 to construct the source distribution, and then builds the wheel from that
 source distribution.
 
+### Build distributions in CI
+
+Every push and pull request runs the supported Python quality matrix first.
+Only after all four Python jobs succeed, the `Build distributions` job runs
+`python -m build` from the checked-out source and uploads:
+
+```text
+dist/*.whl
+dist/*.tar.gz
+```
+
+The files are retained together under the GitHub Actions artifact name
+`python-package-distributions`. They can be downloaded from the completed
+workflow run's summary page.
+
+This job has read-only repository access and does not publish anything.
+Successful construction alone is not release approval: strict Twine and
+project-specific distribution validation remain separate required checks.
+
 The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
 they are reproducible outputs rather than source files. Do not upload these
 development artifacts to PyPI. Building proves that both files can be created;

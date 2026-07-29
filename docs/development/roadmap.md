@@ -2846,7 +2846,7 @@ Automate testing, package validation, and publishing.
 * [x] RELEASE-001 Add continuous-integration workflow
 * [x] RELEASE-002 Test supported Python versions
 * [x] RELEASE-003 Run tests, Black, and Ruff in CI
-* [ ] RELEASE-004 Build package distributions in CI
+* [x] RELEASE-004 Build package distributions in CI
 * [ ] RELEASE-005 Validate built distributions
 * [ ] RELEASE-006 Add release workflow for version tags
 * [ ] RELEASE-007 Configure secure PyPI publishing
@@ -3012,6 +3012,50 @@ Next task:
 
 ```text
 RELEASE-004 — Build package distributions in CI
+```
+
+#### RELEASE-004 — Build Package Distributions in CI
+
+Status: Completed
+
+Implementation:
+
+* added a dedicated `Build distributions` job with an explicit dependency on
+  the complete Python 3.11–3.14 quality matrix
+* used Python 3.11 and the standard `build` frontend to run
+  `python -m build` from the checked-out source
+* uploaded only `dist/*.whl` and `dist/*.tar.gz` under the stable
+  `python-package-distributions` artifact name
+* failed the workflow if either expected distribution pattern produces no file
+* retained read-only repository permissions and disabled checkout credential
+  persistence in the build job
+* added regression coverage for job ordering, build commands, artifact paths,
+  action version, and later-task exclusions
+* documented the equivalent local build and the workflow artifact boundary
+
+Scope decision:
+
+`RELEASE-004` proves only that both standard package formats can be constructed
+after all quality jobs pass. `RELEASE-005` continues to own strict Twine and
+offline archive validation. Tagged release behavior and PyPI publishing remain
+reserved for `RELEASE-006` and later tasks. No provider request, API key,
+write permission, publishing credential, or public runtime behavior changed.
+
+Completion verification:
+
+```text
+clean source build produced the expected .whl and .tar.gz files
+7 CI-workflow regressions passed
+353 normal tests passed
+workflow YAML parsed successfully
+repository-wide Black check passed
+repository-wide Ruff check passed
+```
+
+Next task:
+
+```text
+RELEASE-005 — Validate built distributions
 ```
 
 ### Python Test Matrix
