@@ -3399,7 +3399,7 @@ Publish the first stable release.
 
 * [x] V1-001 Freeze the Version 1.0 public API
 * [x] V1-002 Resolve release-blocking defects
-* [ ] V1-003 Complete changelog
+* [x] V1-003 Complete changelog
 * [ ] V1-004 Update project version to `1.0.0`
 * [ ] V1-005 Update project state
 * [ ] V1-006 Complete release documentation
@@ -3512,6 +3512,52 @@ Next task:
 
 ```text
 V1-003 — Complete changelog
+```
+
+#### V1-003 — Complete Changelog
+
+Status: Completed
+
+The complete unreleased history was reviewed against the frozen Version 1
+surface, focused guides, examples, production-readiness records, and
+release-blocker audit.
+
+Completed work:
+
+* replaced the anonymous pre-release change list with one explicit
+  `1.0.0 — Unreleased` section
+* incorporated the never-released `0.7.0.dev0` agent, workflow,
+  orchestration, and configuration-CLI work into Version 1 instead of
+  presenting it as a separate stable release
+* organized Version 1 changes into additions, behavior changes, fixes,
+  security, compatibility and upgrade notes, and maintainer release readiness
+* preserved the released `0.1.0` through `0.6.0` history
+* documented the frozen import and return boundaries, explicit-configuration
+  upgrade impact, provider capability boundary, optional extras, and current
+  asynchronous limits
+* recorded every confirmed `V1-002` blocker fix without duplicating
+  implementation-level test history
+* added permanent changelog regressions for release ordering, development-line
+  treatment, required categories, API boundaries, fixes, and historical
+  entries
+
+Completion verification:
+
+```text
+6 focused changelog regressions passed
+446 normal tests passed on each supported Python version
+Black and Ruff passed all 132 Python files on Python 3.11 through 3.14
+dependency validation passed on Python 3.11 through 3.14
+```
+
+No runtime API, dependency, package version, classifier, release workflow, Git
+tag, GitHub deployment, PyPI project, distribution upload, or publication
+changed.
+
+Next task:
+
+```text
+V1-004 — Update project version to 1.0.0
 ```
 
 ### Public API Freeze

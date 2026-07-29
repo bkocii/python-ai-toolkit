@@ -45,6 +45,7 @@ Completed PROD-007 release tasks:
 
 * V1-001 Freeze the Version 1.0 public API
 * V1-002 Resolve release-blocking defects
+* V1-003 Complete changelog
 
 Completed PROD-001 benchmark tasks:
 
@@ -997,13 +998,15 @@ PROD-007 — Version 1.0.0 Release
 
 ### Next Recommended Focus
 
-Begin `V1-003 — Complete changelog`.
+Begin `V1-004 — Update project version to 1.0.0`.
 
-`V1-002` resolved the reproduced configuration, provider-output, test
-isolation, and installed-request verification blockers without changing the
-frozen public API. The next task should review the complete unreleased
-changelog for Version 1.0 user-visible accuracy and release-note readiness. It
-must not change the package version, create a release tag, or publish.
+`V1-003` consolidated the complete unreleased history into one release-ready
+Version 1 section with user-visible additions, behavior changes, fixes,
+security, compatibility boundaries, upgrade implications, and maintainer
+release evidence. The next task should change the authoritative package and
+documentation version from `0.7.0.dev0` / `0.7.0-dev` to `1.0.0`, including
+every version-coupled test and installation verifier. It must not create a Git
+tag or publish.
 
 ---
 
