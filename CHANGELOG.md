@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Tag-only release-candidate workflow that verifies the package version,
+  repeats the Python 3.11–3.14 quality matrix, and builds and validates both
+  distributions from the exact tagged commit without publishing
+* Reusable release-tag validator and regression coverage for exact
+  tag-to-package-version agreement, tagged-source identity, read-only
+  permissions, quality gates, artifact validation, and publishing exclusion
 * CI validation gates that run strict Twine and project-specific offline
   archive checks against the exact built wheel and source distribution before
   artifact upload

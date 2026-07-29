@@ -2848,7 +2848,7 @@ Automate testing, package validation, and publishing.
 * [x] RELEASE-003 Run tests, Black, and Ruff in CI
 * [x] RELEASE-004 Build package distributions in CI
 * [x] RELEASE-005 Validate built distributions
-* [ ] RELEASE-006 Add release workflow for version tags
+* [x] RELEASE-006 Add release workflow for version tags
 * [ ] RELEASE-007 Configure secure PyPI publishing
 * [ ] RELEASE-008 Document release procedure
 * [ ] RELEASE-009 Test release workflow without publishing production artifacts
@@ -3110,6 +3110,62 @@ Next task:
 RELEASE-006 — Add release workflow for version tags
 ```
 
+#### RELEASE-006 — Add Release Workflow for Version Tags
+
+Status: Completed
+
+Implementation:
+
+* added a separate `.github/workflows/release.yml` workflow triggered only by
+  tags matching `v*.*.*`
+* added `scripts/validate_release_tag.py` so the tag must exactly equal `v`
+  plus the authoritative `pyproject.toml` version
+* checked out `github.sha` explicitly in every job so tests and distributions
+  come from the tagged commit
+* repeated dependency validation, Black, Ruff, and the complete normal test
+  suite on Python 3.11, 3.12, 3.13, and 3.14
+* built and validated the wheel and source distribution only after every
+  supported-version job passed
+* retained both validated files under a tag-specific workflow artifact name
+* kept repository permissions read-only, disabled checkout credential
+  persistence, and excluded PyPI publishing and GitHub Release creation
+* added regression coverage and local tag-validation guidance
+
+Scope decision:
+
+The tagged workflow repeats the complete quality matrix rather than trusting an
+earlier branch workflow. This keeps every retained release candidate
+independently traceable to and verified from its tagged commit. The workflow
+prepares validated artifacts only; `RELEASE-007` owns trusted PyPI publishing,
+`RELEASE-008` owns the complete release procedure, and `RELEASE-009` owns the
+non-production rehearsal.
+
+No runtime API, dependency declaration, package metadata, provider behavior,
+publishing permission, credential, benchmark contract, or architectural
+decision changed.
+
+Completion verification:
+
+```text
+current package tag v0.7.0.dev0 passed exact version validation
+an incorrect v1.0.0 tag failed before quality or build work
+18 release-workflow regressions passed
+26 combined CI and release-workflow regressions passed
+66 focused release, CI, package-metadata, and documentation tests passed
+372 normal tests passed
+both workflow YAML files parsed successfully
+all 128 Python files passed Black
+repository-wide Ruff check passed
+clean source build produced exactly one wheel and one source distribution
+strict Twine and offline archive validation passed for both distributions
+```
+
+Next task:
+
+```text
+RELEASE-007 — Configure secure PyPI publishing
+```
+
 ### Python Test Matrix
 
 The supported matrix is:
@@ -3137,7 +3193,7 @@ the resulting environment, and runs the complete normal test suite.
 
 * [x] Pull requests run automated quality checks
 * [x] Supported Python versions are tested
-* [ ] Package builds and validation run automatically
+* [x] Package builds and validation run automatically
 * [ ] Publishing is restricted to release tags
 * [ ] Release steps are documented
 

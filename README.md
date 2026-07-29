@@ -575,6 +575,13 @@ after both validation commands pass. Publishing remains a separate
 release-automation task; the workflow does not publish packages and requires
 only read access to repository contents.
 
+An explicit version tag also starts the separate release-candidate workflow.
+The tag must exactly match the package version in `pyproject.toml`; for example,
+version `0.7.0.dev0` requires tag `v0.7.0.dev0`. The workflow repeats the
+supported-version quality matrix and rebuilds and validates both distributions
+from the tagged commit. It retains the files for inspection but does not
+publish them.
+
 Format and lint:
 
 ```bash

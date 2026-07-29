@@ -35,6 +35,7 @@ Completed PROD-006 release-automation tasks:
 * RELEASE-003 Run tests, Black, and Ruff in CI
 * RELEASE-004 Build package distributions in CI
 * RELEASE-005 Validate built distributions
+* RELEASE-006 Add release workflow for version tags
 
 Completed PROD-001 benchmark tasks:
 
@@ -111,7 +112,7 @@ PROD-006 — Release Automation
 Next roadmap task:
 
 ```text
-RELEASE-006 — Add release workflow for version tags
+RELEASE-007 — Configure secure PyPI publishing
 ```
 
 ---
@@ -753,7 +754,8 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 `RELEASE-002 — Test Supported Python Versions`, and
 `RELEASE-003 — Run Tests, Black, and Ruff in CI`,
 `RELEASE-004 — Build Package Distributions in CI`, and
-`RELEASE-005 — Validate Built Distributions` are complete.
+`RELEASE-005 — Validate Built Distributions`, and
+`RELEASE-006 — Add Release Workflow for Version Tags` are complete.
 
 The current `.github/workflows/ci.yml`:
 
@@ -792,6 +794,25 @@ exactly one wheel and one source distribution, validates those exact files, and
 uploads only `dist/*.whl` and `dist/*.tar.gz`. The final clean-source execution
 passed both validation gates. Publishing remains reserved for the later
 tagged-release tasks.
+
+The separate `.github/workflows/release.yml`:
+
+* runs only for tags matching `v*.*.*`
+* rejects a tag unless it exactly matches `v` plus the package version in
+  `pyproject.toml`
+* checks out the exact tagged event SHA in every job
+* repeats the Python 3.11–3.14 dependency, Black, Ruff, and test gates
+* builds and validates both distributions only after the complete matrix passes
+* retains the files under a tag-specific artifact name
+* grants read-only repository access and persists no checkout credentials
+* has no PyPI credential, publishing permission, publishing step, or GitHub
+  Release creation
+
+Final `RELEASE-006` verification passed 18 release-workflow regressions, 26
+combined CI and release-workflow regressions, 66 focused release/CI/package
+documentation checks, 372 normal tests, both workflow YAML parses,
+repository-wide Black and Ruff checks, and a clean-source build. The wheel and
+source distribution both passed strict Twine and offline archive validation.
 
 ---
 
@@ -891,12 +912,12 @@ PROD-006 — Release Automation
 
 ### Next Recommended Focus
 
-Begin `RELEASE-006 — Add release workflow for version tags`.
+Begin `RELEASE-007 — Configure secure PyPI publishing`.
 
-`RELEASE-005` made strict Twine and offline archive validation mandatory before
-the CI-built files are retained. The next task should add a version-tag release
-workflow while preserving the existing quality, construction, and validation
-gates. PyPI credentials and publishing remain owned by later roadmap tasks.
+`RELEASE-006` now produces independently tested and validated artifacts only
+from an exact version tag and tagged commit. The next task should add PyPI
+trusted publishing to that established boundary without storing a PyPI password
+in the repository or allowing pull requests and ordinary pushes to publish.
 
 ---
 

@@ -324,6 +324,38 @@ workflow run's summary page.
 This job has read-only repository access and does not publish anything. A
 failed build, Twine check, or archive check prevents artifact upload.
 
+### Build a tagged release candidate in CI
+
+The separate `.github/workflows/release.yml` workflow runs only when a tag
+matching `v*.*.*` is pushed. Its first gate compares the tag with the
+authoritative package version in `pyproject.toml`. The values must match
+exactly:
+
+```text
+pyproject.toml version 0.7.0.dev0
+required tag          v0.7.0.dev0
+```
+
+Before creating a tag, run the same validation locally:
+
+```powershell
+python scripts\validate_release_tag.py v0.7.0.dev0
+```
+
+After the tag gate passes, the workflow:
+
+1. checks out the exact tagged commit by its GitHub event SHA
+2. repeats dependency, Black, Ruff, and test checks on Python 3.11–3.14
+3. builds the wheel and source distribution from that same commit
+4. runs strict Twine and offline archive validation
+5. retains both files under an artifact name containing the tag
+
+The workflow has read-only repository permission, does not persist checkout
+credentials, and cannot publish to PyPI or create a GitHub Release.
+`RELEASE-007` owns secure publishing configuration, while `RELEASE-009` owns
+the non-production rehearsal. Do not create a production release tag merely to
+test this workflow before that rehearsal task.
+
 The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
 they are reproducible outputs rather than source files. Do not upload these
 development artifacts to PyPI. Building proves that both files can be created;
