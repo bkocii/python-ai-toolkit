@@ -3,10 +3,10 @@
 ## Project
 
 **Project:** Python AI Toolkit  
-**Current version:** `0.7.0-dev`  
+**Current version:** `1.0.0`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-004 — Update project version to 1.0.0`
+**Next task:** `V1-005 — Update project state`
 
 ---
 
@@ -2375,24 +2375,50 @@ deployment, PyPI project, distribution upload, or publication changed.
 
 ---
 
-# Exact Next Task — V1-004
+# V1-004 — Update Project Version to 1.0.0
 
-Update the project version to `1.0.0`.
+`V1-004` is complete.
+
+The authoritative package version is now `1.0.0`, and the maturity classifier
+is Production/Stable. Current status text, release-rehearsal identity,
+distribution filenames, clean-install assertions, release-tag examples, and
+core/framework installation verifiers all use the same version.
+
+The Version 1 changelog remains `Unreleased` with no release date. Historical
+`0.7.0.dev0` task, artifact, installation, and workflow evidence remains
+unchanged.
+
+Completion evidence:
+
+```text
+64 focused version, package, changelog, release-guide, and workflow checks passed
+453 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 133 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 101-entry source archive
+core wheel and source-archive installation checks passed
+Django-only and FastAPI-only wheel installation checks passed
+```
+
+No runtime API, dependency, release workflow, Git tag, GitHub deployment, PyPI
+project, distribution upload, or publication changed.
+
+---
+
+# Exact Next Task — V1-005
+
+Update the project state for the `1.0.0` release-preparation stage.
 
 Required work:
 
-1. change the authoritative package version in `pyproject.toml` from
-   `0.7.0.dev0` to `1.0.0`
-2. update every user-facing `0.7.0-dev` status and version-coupled verifier,
-   command, artifact filename, and regression that represents the current
-   package version
-3. keep historical development and release evidence unchanged where
-   `0.7.0.dev0` is intentionally describing an earlier task
-4. update the Version 1 changelog status text without adding a release date
-   before the release commit and tag are authorized
-5. run the complete supported Python matrix and clean distribution validation
-6. do not create `v1.0.0`, approve a deployment, or publish; those belong to
-   later V1 tasks
+1. reconcile the project-state summary with completed `V1-001` through
+   `V1-004` work
+2. remove stale next-task and pre-Version-1 status language
+3. preserve detailed historical completion evidence
+4. point the authoritative project state to
+   `V1-006 — Complete release documentation`
+5. do not create `v1.0.0`, approve a deployment, or publish
 
 ---
 

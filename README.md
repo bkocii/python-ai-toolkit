@@ -7,8 +7,9 @@ It keeps provider communication, response validation, retries, usage metadata,
 logging, retrieval, and workflow primitives behind consistent interfaces so
 application business logic can remain in Python.
 
-> **Project status:** `0.7.0-dev`. Sprint 9 is preparing the toolkit for a
-> stable Version 1.0 release. The built-in provider is currently OpenAI; custom
+> **Project status:** `1.0.0` release preparation. The stable Version 1.0 API
+> is frozen but has not yet been tagged or published. The built-in provider is
+> currently OpenAI; custom
 > providers can be registered through the provider abstraction.
 
 ## Contents
@@ -580,7 +581,7 @@ contents.
 
 An explicit version tag starts the production path in the separate release
 workflow. The tag must exactly match the package version in `pyproject.toml`;
-for example, version `0.7.0.dev0` requires tag `v0.7.0.dev0`. A manual
+for example, version `1.0.0` requires tag `v1.0.0`. A manual
 non-production rehearsal can run the same validation, supported-version
 quality matrix, build, validators, and artifact retention from a selected
 commit without creating a tag. Manual runs always skip the publishing job.
@@ -622,7 +623,7 @@ between building and validating a release.
 
 ## Project status
 
-The current release line is `0.7.0-dev`.
+The current package version is `1.0.0`; publication is still pending.
 
 Completed capability milestones include:
 

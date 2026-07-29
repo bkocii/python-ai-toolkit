@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-ai-toolkit"
-version = "0.7.0.dev0"
+version = "1.0.0"
 description = "Reusable infrastructure for integrating LLMs into Python applications."
 readme = "README.md"
 license = "MIT"
@@ -14,7 +14,7 @@ authors = [
     { name = "Burim Koci" }
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Framework :: Django",
     "Framework :: FastAPI",

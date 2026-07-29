@@ -191,7 +191,7 @@ def test_release_tag_must_exactly_match_package_version():
     validate_release_tag(f"v{version}", version)
 
     with pytest.raises(ValueError, match="does not match package version"):
-        validate_release_tag("v1.0.0", version)
+        validate_release_tag("v1.0.1", version)
 
     with pytest.raises(ValueError, match="does not match package version"):
         validate_release_tag(version, version)

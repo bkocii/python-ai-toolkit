@@ -22,7 +22,7 @@ from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse
 
 DISTRIBUTION_NAME = "python-ai-toolkit"
-EXPECTED_VERSION = "0.7.0.dev0"
+EXPECTED_VERSION = "1.0.0"
 EXPECTED_EXTRA_REQUIREMENTS = {
     "django": "django>=5.0",
     "fastapi": "fastapi>=0.100,<1",

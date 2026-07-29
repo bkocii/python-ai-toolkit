@@ -24,7 +24,7 @@ from ai.schemas import ProviderResponse
 from ai.vector_store import InMemoryVectorStore, VectorRecord
 
 DISTRIBUTION_NAME = "python-ai-toolkit"
-EXPECTED_VERSION = "0.7.0.dev0"
+EXPECTED_VERSION = "1.0.0"
 EXPECTED_CORE_REQUIREMENTS = {
     "openai",
     "pydantic",

@@ -2,8 +2,9 @@
 
 ## Scope
 
-This report closes `PROD-002 — Performance Profiling` for Python AI Toolkit
-`0.7.0-dev`.
+This report closes `PROD-002 — Performance Profiling` for Python AI Toolkit.
+The work was completed on the pre-1.0 development line and remains part of the
+`1.0.0` release evidence.
 
 The profiling work measured the toolkit's internal overhead for:
 

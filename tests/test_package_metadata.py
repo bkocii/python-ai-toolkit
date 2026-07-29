@@ -22,7 +22,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
 GITIGNORE_PATH = PROJECT_ROOT / ".gitignore"
 EXPECTED_CLASSIFIERS = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Framework :: Django",
     "Framework :: FastAPI",
@@ -67,7 +67,7 @@ def test_core_package_metadata_matches_project_identity():
     project = load_pyproject()["project"]
 
     assert project["name"] == "python-ai-toolkit"
-    assert project["version"] == "0.7.0.dev0"
+    assert project["version"] == "1.0.0"
     assert project["description"] == (
         "Reusable infrastructure for integrating LLMs into Python applications."
     )
@@ -82,7 +82,7 @@ def test_readme_metadata_uses_the_project_readme():
 
     assert project["readme"] == "README.md"
     assert readme.startswith("# Python AI Toolkit\n")
-    assert "`0.7.0-dev`" in readme
+    assert "`1.0.0` release preparation" in readme
 
 
 def test_distribution_readme_comparison_is_platform_independent():
@@ -251,7 +251,7 @@ def test_package_classifiers_match_verified_python_support():
         "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: 3.14",
     }
-    assert "Development Status :: 5 - Production/Stable" not in classifiers
+    assert "Development Status :: 4 - Beta" not in classifiers
 
 
 def test_mit_license_metadata_matches_the_repository_license():

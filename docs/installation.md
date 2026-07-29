@@ -21,10 +21,8 @@ and terminal command:
 | Import package | `ai` | Python imports such as `from ai.client import AIClient` |
 | Console command | `ai-toolkit` | Terminal commands such as `ai-toolkit --help` |
 
-The current machine-readable package version is `0.7.0.dev0`. Project
-documentation displays the same development line as `0.7.0-dev`;
-`0.7.0.dev0` is the normalized Python-package spelling that sorts before a
-future final `0.7.0` release.
+The current machine-readable package version is `1.0.0`. The stable API is
+frozen, but the release has not yet been tagged or published.
 
 The author name is recorded in the package metadata. Canonical repository,
 documentation, and issue-tracker URLs have not yet been confirmed, so the
@@ -40,7 +38,7 @@ The current classifiers describe the toolkit as:
 
 | Area | Classifier meaning |
 | --- | --- |
-| Maturity | Beta: the main feature set exists, but the Version 1.0 API and release are not yet final |
+| Maturity | Production/Stable: the Version 1.0 public API is frozen |
 | Audience | A library intended for developers |
 | Interface | A Python library that also supplies a console command |
 | Frameworks | Optional Django and FastAPI integrations are implemented |
@@ -285,11 +283,11 @@ python -m build
 Get-ChildItem dist
 ```
 
-For version `0.7.0.dev0`, the expected filenames are:
+For version `1.0.0`, the expected filenames are:
 
 ```text
-python_ai_toolkit-0.7.0.dev0-py3-none-any.whl
-python_ai_toolkit-0.7.0.dev0.tar.gz
+python_ai_toolkit-1.0.0-py3-none-any.whl
+python_ai_toolkit-1.0.0.tar.gz
 ```
 
 The `py3-none-any` wheel tag means that the wheel contains pure Python and is
@@ -335,14 +333,14 @@ Both paths compare a tag-shaped release identity with the authoritative package
 version in `pyproject.toml`. The values must match exactly:
 
 ```text
-pyproject.toml version 0.7.0.dev0
-required tag          v0.7.0.dev0
+pyproject.toml version 1.0.0
+required tag          v1.0.0
 ```
 
 Before creating a tag, run the same validation locally:
 
 ```powershell
-python scripts\validate_release_tag.py v0.7.0.dev0
+python scripts\validate_release_tag.py v1.0.0
 ```
 
 After the identity gate passes, both paths:
@@ -354,7 +352,7 @@ After the identity gate passes, both paths:
 5. retains both files under an artifact name containing the tag
 
 For a manual rehearsal, the final publishing job is skipped. The input
-`v0.7.0.dev0` is only a validated label: it creates no Git tag and cannot enter
+`v1.0.0` is only a validated label: it creates no Git tag and cannot enter
 the protected `pypi` environment. Follow the
 [non-production rehearsal](releasing.md#non-production-workflow-rehearsal) and
 verify that all four matrix jobs plus the build pass while publication is
@@ -506,14 +504,14 @@ Push-Location $testRoot
 & "$testRoot\wheel-env\Scripts\python.exe" -c `
     "from pathlib import Path; import ai.client; print(Path(ai.client.__file__).resolve())"
 & "$testRoot\wheel-env\Scripts\python.exe" -c `
-    "from importlib.metadata import version; from ai.prompts import PromptTemplate; assert version('python-ai-toolkit') == '0.7.0.dev0'; assert PromptTemplate('Hello {name}').render(name='Burim') == 'Hello Burim'; print('wheel smoke: PASSED')"
+    "from importlib.metadata import version; from ai.prompts import PromptTemplate; assert version('python-ai-toolkit') == '1.0.0'; assert PromptTemplate('Hello {name}').render(name='Burim') == 'Hello Burim'; print('wheel smoke: PASSED')"
 & "$testRoot\wheel-env\Scripts\ai-toolkit.exe" --help
 & "$testRoot\wheel-env\Scripts\python.exe" -m pip check
 
 & "$testRoot\sdist-env\Scripts\python.exe" -c `
     "from pathlib import Path; import ai.client; print(Path(ai.client.__file__).resolve())"
 & "$testRoot\sdist-env\Scripts\python.exe" -c `
-    "from importlib.metadata import version; from ai.prompts import PromptTemplate; assert version('python-ai-toolkit') == '0.7.0.dev0'; assert PromptTemplate('Hello {name}').render(name='Burim') == 'Hello Burim'; print('source smoke: PASSED')"
+    "from importlib.metadata import version; from ai.prompts import PromptTemplate; assert version('python-ai-toolkit') == '1.0.0'; assert PromptTemplate('Hello {name}').render(name='Burim') == 'Hello Burim'; print('source smoke: PASSED')"
 & "$testRoot\sdist-env\Scripts\ai-toolkit.exe" --help
 & "$testRoot\sdist-env\Scripts\python.exe" -m pip check
 

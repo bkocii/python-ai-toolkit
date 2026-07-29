@@ -60,7 +60,7 @@ default branch and before the first real release:
 5. Enter a rehearsal label that exactly matches the current package version:
 
    ```text
-   v0.7.0.dev0
+   v1.0.0
    ```
 
 6. Select **Run workflow**.
@@ -76,7 +76,7 @@ push a Git tag. The run must show:
 - **Build release distributions** — passed
 - **Publish distributions to PyPI** — skipped
 
-Download `python-package-distributions-v0.7.0.dev0` from the run summary and
+Download `python-package-distributions-v1.0.0` from the run summary and
 confirm that it contains exactly one wheel and one source distribution. The
 build job has already run strict Twine validation and the offline archive
 validator against those exact files.

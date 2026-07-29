@@ -12,7 +12,7 @@ outside the toolkit.
 
 # Current Version
 
-0.7.0-dev
+1.0.0
 
 ---
 
@@ -3400,7 +3400,7 @@ Publish the first stable release.
 * [x] V1-001 Freeze the Version 1.0 public API
 * [x] V1-002 Resolve release-blocking defects
 * [x] V1-003 Complete changelog
-* [ ] V1-004 Update project version to `1.0.0`
+* [x] V1-004 Update project version to `1.0.0`
 * [ ] V1-005 Update project state
 * [ ] V1-006 Complete release documentation
 * [ ] V1-007 Create release commit
@@ -3558,6 +3558,47 @@ Next task:
 
 ```text
 V1-004 — Update project version to 1.0.0
+```
+
+#### V1-004 — Update Project Version to 1.0.0
+
+Status: Completed
+
+The authoritative package version and every current-version coupling were
+advanced from the unpublished development line to `1.0.0`.
+
+Completed work:
+
+* changed `project.version` in `pyproject.toml` to `1.0.0`
+* changed the maturity classifier from Beta to Production/Stable
+* aligned core-only and framework-extra installation verifiers with `1.0.0`
+* aligned current status text, release-rehearsal identity, artifact filenames,
+  clean-install assertions, and release-tag examples with `1.0.0`
+* kept the Version 1 changelog heading unreleased and added no release date
+* preserved historical `0.7.0.dev0` task, build, installation, and workflow
+  evidence
+* added permanent version-consistency regressions
+
+Completion verification:
+
+```text
+64 focused version, package, changelog, release-guide, and workflow checks passed
+453 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 133 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 101-entry source archive
+core wheel and source-archive installation checks passed
+Django-only and FastAPI-only wheel installation checks passed
+```
+
+No runtime API, dependency, release workflow, Git tag, GitHub deployment, PyPI
+project, distribution upload, or publication changed.
+
+Next task:
+
+```text
+V1-005 — Update project state
 ```
 
 ### Public API Freeze

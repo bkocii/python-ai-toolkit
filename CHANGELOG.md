@@ -8,8 +8,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [1.0.0] - Unreleased
 
 Version 1.0.0 is the first stable API release. The package metadata remains
-`0.7.0.dev0` until the separate version-update task is completed, and this
-release has not yet been tagged or published.
+`1.0.0`, but this release has not yet been tagged or published.
 
 The former `0.7.0.dev0` development line was never a separate stable release.
 Its agent, workflow, orchestration, and configuration-CLI work is included

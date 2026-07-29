@@ -26,8 +26,8 @@ presence in a module does not create a compatibility promise. Provider and
 model availability, network behavior, credentials, quotas, pricing, and
 third-party SDK behavior also remain outside the Python API guarantee.
 
-The package is still `0.7.0-dev`; this policy describes the approved target for
-the later `1.0.0` release.
+The package metadata is `1.0.0`. The release has not yet been tagged or
+published.
 
 ## Compatibility layers
 

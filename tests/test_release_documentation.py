@@ -49,7 +49,7 @@ def test_release_guide_documents_safe_manual_rehearsal():
         assert expected_result in text
 
     assert "**Run workflow**" in text
-    assert "python-package-distributions-v0.7.0.dev0" in text
+    assert "python-package-distributions-v1.0.0" in text
     assert "It does not create or push a Git tag." in normalized_text
     assert "do not enter the `pypi` environment" in normalized_text
     assert "request an OIDC identity token" in normalized_text

@@ -7,7 +7,7 @@ Python AI Toolkit
 ## Current Version
 
 ```text
-0.7.0-dev
+1.0.0
 ```
 
 ## Current Milestone
