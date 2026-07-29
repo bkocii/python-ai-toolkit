@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-006 — Release Automation`  
-**Next task:** `RELEASE-007 — Configure secure PyPI publishing`
+**Next task:** `RELEASE-008 — Document release procedure`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `RELEASE-007`.
+The current next task is `RELEASE-008`.
 
 ---
 
@@ -2157,18 +2157,66 @@ decision changed.
 
 ---
 
-# Exact Next Task — RELEASE-007
+# RELEASE-007 — Configure Secure PyPI Publishing
 
-Configure secure PyPI publishing.
+**Status:** Completed
+
+Implemented:
+
+1. added a publishing job that runs only after the validated tagged build
+2. passed only the tag-specific retained artifact into that job
+3. configured PyPI trusted publishing without a stored password or API token
+4. granted `id-token: write` only to the publishing job
+5. bound publishing to the protected GitHub environment named `pypi`
+6. kept checkout, Python setup, project execution, building, and validation out
+   of the identity-enabled job
+7. documented the exact GitHub and PyPI account-side configuration
+8. added permanent security and ordering regressions
+
+Trusted-publisher identity:
+
+```text
+PyPI project: python-ai-toolkit
+GitHub owner: bkocii
+GitHub repository: python-ai-toolkit
+Workflow: release.yml
+Environment: pypi
+```
+
+Completion verification:
+
+```text
+21 release-workflow regressions passed
+29 combined CI and release-workflow regressions passed
+69 focused release, CI, package-metadata, and documentation tests passed
+375 normal tests passed
+both workflow YAML files parsed successfully
+all 128 Python files passed Black
+repository-wide Ruff check passed
+strict Twine and offline archive validation passed for the clean-source build
+```
+
+No production tag was created and no package was uploaded. The documented
+one-time GitHub environment and PyPI publisher setup must be completed before
+the first release.
+
+No runtime API, dependency declaration, package metadata, provider behavior,
+benchmark contract, example behavior, or architectural decision changed.
+
+---
+
+# Exact Next Task — RELEASE-008
+
+Document the complete release procedure.
 
 Required work:
 
-1. use PyPI trusted publishing rather than a stored PyPI password
-2. grant identity-token permission only to the publishing job
-3. preserve version-tag, tagged-source, quality, build, and validation gates
-4. prevent pull requests, ordinary branch pushes, and unvalidated artifacts
-   from publishing
-5. add regression coverage, documentation, and project records
+1. define the authoritative pre-release checklist
+2. document version and changelog updates
+3. document local validation, commit, push, tag, approval, and verification
+4. document failure recovery without reusing an immutable PyPI version
+5. preserve the trusted-publishing and validated-artifact security boundaries
+6. add documentation regressions and update project records
 
 ---
 
@@ -2712,9 +2760,10 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, deliverable ZIPs, caches,
 example media, and future-backlog implementation files are not required for
-`RELEASE-007`. The tag workflow, its regression tests, release-tag and
-distribution validators, and authoritative package metadata are required so
-secure publishing can be added without weakening the verified release gates.
+`RELEASE-008`. The release and CI workflows, workflow regressions, release-tag
+and distribution validators, installation guidance, changelog, and
+authoritative package metadata are required so the procedure can describe the
+real verified release path.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2728,8 +2777,8 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that RELEASE-007 is still the correct next task.
-4. Confirm that the tag workflow validates the package version, tagged commit, Python 3.11–3.14 quality matrix, and both distributions before adding publishing authority.
+3. Verify the repository's current state and confirm that RELEASE-008 is still the correct next task.
+4. Confirm that the tag workflow validates the package version, tagged commit, Python 3.11–3.14 quality matrix, and both distributions before passing them to the isolated trusted-publishing job.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

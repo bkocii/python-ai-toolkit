@@ -36,6 +36,7 @@ Completed PROD-006 release-automation tasks:
 * RELEASE-004 Build package distributions in CI
 * RELEASE-005 Validate built distributions
 * RELEASE-006 Add release workflow for version tags
+* RELEASE-007 Configure secure PyPI publishing
 
 Completed PROD-001 benchmark tasks:
 
@@ -112,7 +113,7 @@ PROD-006 — Release Automation
 Next roadmap task:
 
 ```text
-RELEASE-007 — Configure secure PyPI publishing
+RELEASE-008 — Document release procedure
 ```
 
 ---
@@ -755,7 +756,8 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 `RELEASE-003 — Run Tests, Black, and Ruff in CI`,
 `RELEASE-004 — Build Package Distributions in CI`, and
 `RELEASE-005 — Validate Built Distributions`, and
-`RELEASE-006 — Add Release Workflow for Version Tags` are complete.
+`RELEASE-006 — Add Release Workflow for Version Tags`, and
+`RELEASE-007 — Configure Secure PyPI Publishing` are complete.
 
 The current `.github/workflows/ci.yml`:
 
@@ -804,13 +806,32 @@ The separate `.github/workflows/release.yml`:
 * repeats the Python 3.11–3.14 dependency, Black, Ruff, and test gates
 * builds and validates both distributions only after the complete matrix passes
 * retains the files under a tag-specific artifact name
-* grants read-only repository access and persists no checkout credentials
-* has no PyPI credential, publishing permission, publishing step, or GitHub
-  Release creation
+* passes only those validated files to a final publishing job
+* grants `id-token: write` only to that publishing job
+* binds publishing to the protected GitHub environment named `pypi`
+* uses PyPI trusted publishing without a stored secret, API token, username, or
+  password
+* prevents the identity-enabled job from checking out source, installing
+  Python, running project code, or rebuilding distributions
+* creates no GitHub Release
 
-Final `RELEASE-006` verification passed 18 release-workflow regressions, 26
-combined CI and release-workflow regressions, 66 focused release/CI/package
-documentation checks, 372 normal tests, both workflow YAML parses,
+The documented trusted-publisher identity is:
+
+```text
+PyPI project: python-ai-toolkit
+GitHub owner: bkocii
+GitHub repository: python-ai-toolkit
+Workflow: release.yml
+Environment: pypi
+```
+
+GitHub and PyPI require the documented one-time account configuration before
+the first upload. No tag was created and no package was uploaded for
+`RELEASE-007`.
+
+Final `RELEASE-007` verification passed 21 release-workflow regressions, 29
+combined CI and release-workflow regressions, 69 focused release/CI/package
+documentation checks, 375 normal tests, both workflow YAML parses,
 repository-wide Black and Ruff checks, and a clean-source build. The wheel and
 source distribution both passed strict Twine and offline archive validation.
 
@@ -912,12 +933,13 @@ PROD-006 — Release Automation
 
 ### Next Recommended Focus
 
-Begin `RELEASE-007 — Configure secure PyPI publishing`.
+Begin `RELEASE-008 — Document release procedure`.
 
-`RELEASE-006` now produces independently tested and validated artifacts only
-from an exact version tag and tagged commit. The next task should add PyPI
-trusted publishing to that established boundary without storing a PyPI password
-in the repository or allowing pull requests and ordinary pushes to publish.
+`RELEASE-007` now passes only independently tested and validated tagged
+artifacts to an isolated, protected PyPI trusted-publishing job. The next task
+should document the complete human release procedure, including version
+updates, changelog review, account-side prerequisites, tag creation, approvals,
+verification, and failure handling.
 
 ---
 

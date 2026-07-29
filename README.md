@@ -571,16 +571,21 @@ python scripts/validate_distributions.py
 
 See the [compatibility guide](docs/compatibility.md) for the tested-version
 matrix and local multi-version procedure. CI uploads the distributions only
-after both validation commands pass. Publishing remains a separate
-release-automation task; the workflow does not publish packages and requires
-only read access to repository contents.
+after both validation commands pass. Ordinary pushes and pull requests never
+publish packages, and the CI workflow requires only read access to repository
+contents.
 
-An explicit version tag also starts the separate release-candidate workflow.
+An explicit version tag starts the separate release workflow.
 The tag must exactly match the package version in `pyproject.toml`; for example,
 version `0.7.0.dev0` requires tag `v0.7.0.dev0`. The workflow repeats the
 supported-version quality matrix and rebuilds and validates both distributions
-from the tagged commit. It retains the files for inspection but does not
-publish them.
+from the tagged commit. A final isolated job then downloads those exact files
+and publishes them through PyPI trusted publishing. Only that job can request a
+short-lived identity token; the repository stores no PyPI password or API
+token. The protected `pypi` environment can require manual approval before
+upload. See the [installation guide](docs/installation.md#configure-trusted-pypi-publishing)
+for the one-time account configuration. Do not create a production release tag
+until the documented rehearsal task is complete.
 
 Format and lint:
 

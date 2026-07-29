@@ -110,3 +110,27 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
           if-no-files-found: error
+
+  publish:
+    name: Publish distributions to PyPI
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/p/python-ai-toolkit
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download validated distributions
+        uses: actions/download-artifact@v8
+        with:
+          name: python-package-distributions-${{ github.ref_name }}
+          path: dist/
+
+      - name: Publish distributions with trusted identity
+        uses: pypa/gh-action-pypi-publish@v1.14.1
+        with:
+          packages-dir: dist/

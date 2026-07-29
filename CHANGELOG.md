@@ -23,6 +23,12 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Tokenless PyPI trusted publishing from validated version-tag artifacts,
+  isolated in a protected `pypi` environment with identity-token permission
+  granted only to the publishing job
+* Release-workflow regressions preventing branch, pull-request, secret-based,
+  unvalidated-artifact, source-checkout, and rebuild paths from reaching PyPI
+* One-time PyPI pending-publisher and GitHub environment configuration guidance
 * Tag-only release-candidate workflow that verifies the package version,
   repeats the Python 3.11–3.14 quality matrix, and builds and validates both
   distributions from the exact tagged commit without publishing

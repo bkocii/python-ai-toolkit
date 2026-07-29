@@ -324,7 +324,7 @@ workflow run's summary page.
 This job has read-only repository access and does not publish anything. A
 failed build, Twine check, or archive check prevents artifact upload.
 
-### Build a tagged release candidate in CI
+### Build and publish a tagged release in CI
 
 The separate `.github/workflows/release.yml` workflow runs only when a tag
 matching `v*.*.*` is pushed. Its first gate compares the tag with the
@@ -349,12 +349,49 @@ After the tag gate passes, the workflow:
 3. builds the wheel and source distribution from that same commit
 4. runs strict Twine and offline archive validation
 5. retains both files under an artifact name containing the tag
+6. passes those exact files to an isolated PyPI publishing job
 
-The workflow has read-only repository permission, does not persist checkout
-credentials, and cannot publish to PyPI or create a GitHub Release.
-`RELEASE-007` owns secure publishing configuration, while `RELEASE-009` owns
-the non-production rehearsal. Do not create a production release tag merely to
-test this workflow before that rehearsal task.
+The validation jobs have read-only repository permission and do not persist
+checkout credentials. Only the final publishing job receives
+`id-token: write`, which lets PyPI exchange the workflow identity for a
+short-lived project-scoped token. That job does not check out source, install
+Python, execute project code, or rebuild artifacts. It creates no GitHub
+Release and uses no stored PyPI password or API token.
+
+`RELEASE-009` owns the non-production rehearsal. Do not create a production
+release tag merely to test this workflow before that task.
+
+### Configure trusted PyPI publishing
+
+The workflow source is configured, but PyPI and GitHub each require one
+account-side setup before the first real release.
+
+In the GitHub repository:
+
+1. Open **Settings → Environments**.
+2. Create an environment named exactly `pypi`.
+3. Add a required reviewer when that protection is available for the
+   repository.
+
+In PyPI, sign in and open the account **Publishing** page. If the project does
+not exist yet, add a pending GitHub publisher with these exact values:
+
+| Field | Value |
+| --- | --- |
+| PyPI project name | `python-ai-toolkit` |
+| GitHub owner | `bkocii` |
+| GitHub repository | `python-ai-toolkit` |
+| Workflow filename | `release.yml` |
+| Environment name | `pypi` |
+
+If the PyPI project already exists, add the same values from that project's
+**Manage → Publishing** page instead. The environment name, repository owner,
+repository name, and workflow filename must match exactly on both services.
+
+A pending publisher does not reserve the package name. It becomes a normal
+publisher after the first successful upload. Do not add `PYPI_API_TOKEN`,
+`password`, or username inputs to the workflow: trusted publishing creates a
+short-lived credential only when the protected publishing job runs.
 
 The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
 they are reproducible outputs rather than source files. Do not upload these

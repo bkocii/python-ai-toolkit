@@ -35,7 +35,6 @@ def test_release_workflow_uses_read_only_tagged_source():
     assert text.count("ref: ${{ github.sha }}") == 3
     assert text.count("persist-credentials: false") == 3
     assert "contents: write" not in text
-    assert "id-token: write" not in text
 
 
 def test_release_workflow_validates_tag_before_quality_jobs():
@@ -86,14 +85,59 @@ def test_release_workflow_builds_and_validates_after_quality_jobs():
     assert "python-package-distributions-${{ github.ref_name }}" in text
 
 
-def test_release_workflow_does_not_publish_or_create_a_release():
+def test_release_workflow_publishes_only_after_validated_build():
+    text = workflow_text()
+
+    build_position = text.index("\n  build:\n")
+    publish_position = text.index("\n  publish:\n")
+    publish_text = text[publish_position:]
+    download_position = publish_text.index("uses: actions/download-artifact@v8")
+    publish_action_position = publish_text.index(
+        "uses: pypa/gh-action-pypi-publish@v1.14.1"
+    )
+
+    assert build_position < publish_position
+    assert "needs: build" in publish_text
+    assert (
+        "if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')"
+        in publish_text
+    )
+    assert download_position < publish_action_position
+    assert "name: python-package-distributions-${{ github.ref_name }}" in publish_text
+    assert "path: dist/" in publish_text
+    assert "packages-dir: dist/" in publish_text
+
+
+def test_release_workflow_limits_trusted_identity_to_publish_job():
+    text = workflow_text()
+    publish_text = text[text.index("\n  publish:\n") :]
+
+    assert text.count("id-token: write") == 1
+    assert "\n    permissions:\n      id-token: write\n" in publish_text
+    assert "\n    environment:\n      name: pypi\n" in publish_text
+    assert "url: https://pypi.org/p/python-ai-toolkit" in publish_text
+    assert "secrets." not in text
+    assert "password:" not in text
+    assert "PYPI_API_TOKEN" not in text
+
+
+def test_release_workflow_publish_job_cannot_rebuild_or_change_source():
+    text = workflow_text()
+    publish_text = text[text.index("\n  publish:\n") :].lower()
+
+    assert "actions/checkout" not in publish_text
+    assert "actions/setup-python" not in publish_text
+    assert "python -m build" not in publish_text
+    assert "validate_distributions.py" not in publish_text
+    assert "\n      - run:" not in publish_text
+    assert "contents: write" not in publish_text
+
+
+def test_release_workflow_does_not_create_a_github_release():
     text = workflow_text().lower()
 
-    assert "pypi" not in text
-    assert "publish" not in text
     assert "gh release" not in text
     assert "softprops/action-gh-release" not in text
-    assert "pypa/gh-action-pypi-publish" not in text
 
 
 def test_release_tag_must_exactly_match_package_version():

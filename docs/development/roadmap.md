@@ -2849,7 +2849,7 @@ Automate testing, package validation, and publishing.
 * [x] RELEASE-004 Build package distributions in CI
 * [x] RELEASE-005 Validate built distributions
 * [x] RELEASE-006 Add release workflow for version tags
-* [ ] RELEASE-007 Configure secure PyPI publishing
+* [x] RELEASE-007 Configure secure PyPI publishing
 * [ ] RELEASE-008 Document release procedure
 * [ ] RELEASE-009 Test release workflow without publishing production artifacts
 
@@ -3164,6 +3164,66 @@ Next task:
 
 ```text
 RELEASE-007 — Configure secure PyPI publishing
+```
+
+#### RELEASE-007 — Configure Secure PyPI Publishing
+
+Status: Completed
+
+Implementation:
+
+* added a final publishing job that depends on the validated tagged build
+* downloaded only the tag-specific artifact retained by the build job
+* used PyPI trusted publishing without a repository secret, API token,
+  username, or password
+* granted `id-token: write` only to the publishing job
+* bound publishing to the protected GitHub environment named `pypi`
+* retained the tag-only workflow trigger and added a defensive tag-event
+  condition to the publishing job
+* kept checkout, Python setup, project execution, building, and validation out
+  of the identity-enabled job
+* pinned the PyPI publishing action to `v1.14.1` and used
+  `actions/download-artifact@v8`
+* documented the exact pending-publisher identity for
+  `bkocii/python-ai-toolkit`
+* added permanent regressions for ordering, identity scope, artifact identity,
+  credential exclusion, and publishing-job isolation
+
+Scope decision:
+
+The publishing job receives only the validated artifacts and an ephemeral OIDC
+identity. Build and test dependencies therefore execute without publishing
+authority, while publishing executes without source code or build machinery.
+The `pypi` environment provides an account-side approval boundary when a
+required reviewer is configured. `RELEASE-008` continues to own the complete
+release procedure, and `RELEASE-009` owns the non-production rehearsal.
+
+The workflow configuration is complete, but PyPI and GitHub each require the
+documented one-time account setup before the first release. No production tag
+was created and no package was uploaded during this task.
+
+No runtime API, dependency declaration, package metadata, provider behavior,
+benchmark contract, example behavior, or architectural decision changed.
+
+Completion verification:
+
+```text
+21 release-workflow regressions passed
+29 combined CI and release-workflow regressions passed
+69 focused release, CI, package-metadata, and documentation tests passed
+375 normal tests passed
+both workflow YAML files parsed successfully
+all 128 Python files passed Black
+repository-wide Ruff check passed
+clean source build produced exactly one wheel and one source distribution
+strict Twine and offline archive validation passed for both distributions
+publishing job contains no stored credential, source checkout, or build command
+```
+
+Next task:
+
+```text
+RELEASE-008 — Document release procedure
 ```
 
 ### Python Test Matrix
