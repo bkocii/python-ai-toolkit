@@ -558,6 +558,7 @@ Core installation verification: PASSED
 Optional frameworks absent: django, fastapi
 Core modules imported: 35
 Offline prompt and vector-store checks: PASSED
+Offline plain and structured client requests: PASSED
 ```
 
 The printed import path must be inside
@@ -569,7 +570,9 @@ The wheel includes the toolkit's optional adapter source code so one
 distribution supports every extra. Importing
 `ai.integrations.django` or `ai.integrations.fastapi` without the corresponding
 extra is not a supported core operation. Normal core modules must remain
-importable without either framework; the verifier checks every one.
+importable without either framework; the verifier checks every one. It also
+registers a deterministic local provider and exercises installed plain and
+structured `AIClient` requests without credentials or network access.
 
 ### Test the framework extras separately on Windows
 

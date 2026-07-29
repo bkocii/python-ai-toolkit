@@ -291,11 +291,12 @@ def test_openai_provider_rejects_empty_embedding_text():
         )
 
 
-def test_openai_provider_rejects_invalid_embedding_index():
+@pytest.mark.parametrize("invalid_index", [-1, 5, None, True])
+def test_openai_provider_rejects_invalid_embedding_index(invalid_index):
     response = SimpleNamespace(
         data=[
             SimpleNamespace(
-                index=5,
+                index=invalid_index,
                 embedding=[0.1, 0.2],
             ),
         ],
@@ -313,3 +314,77 @@ def test_openai_provider_rejects_invalid_embedding_index():
                 EmbeddingInput(text="Hello world"),
             ]
         )
+
+
+def test_openai_provider_rejects_duplicate_embedding_index():
+    response = SimpleNamespace(
+        data=[
+            SimpleNamespace(index=0, embedding=[0.1, 0.2]),
+            SimpleNamespace(index=0, embedding=[0.3, 0.4]),
+        ],
+        model="text-embedding-3-small",
+        usage=None,
+    )
+    provider = make_openai_embedding_provider(response)
+
+    with pytest.raises(
+        AIProviderError,
+        match="OpenAI returned a duplicate embedding index: 0",
+    ):
+        provider.embed_texts(
+            [
+                EmbeddingInput(text="First"),
+                EmbeddingInput(text="Second"),
+            ]
+        )
+
+
+def test_openai_provider_rejects_incomplete_embedding_response():
+    response = SimpleNamespace(
+        data=[
+            SimpleNamespace(index=0, embedding=[0.1, 0.2]),
+        ],
+        model="text-embedding-3-small",
+        usage=None,
+    )
+    provider = make_openai_embedding_provider(response)
+
+    with pytest.raises(
+        AIProviderError,
+        match="Missing indices: 1",
+    ):
+        provider.embed_texts(
+            [
+                EmbeddingInput(text="First"),
+                EmbeddingInput(text="Second"),
+            ]
+        )
+
+
+def test_openai_provider_orders_embeddings_by_input_index():
+    response = SimpleNamespace(
+        data=[
+            SimpleNamespace(index=1, embedding=[0.3, 0.4]),
+            SimpleNamespace(index=0, embedding=[0.1, 0.2]),
+        ],
+        model="text-embedding-3-small",
+        usage=None,
+    )
+    provider = make_openai_embedding_provider(response)
+
+    result = provider.embed_texts(
+        [
+            EmbeddingInput(text="First", metadata={"source": "first"}),
+            EmbeddingInput(text="Second", metadata={"source": "second"}),
+        ]
+    )
+
+    assert [embedding.index for embedding in result.embeddings] == [0, 1]
+    assert [embedding.text for embedding in result.embeddings] == [
+        "First",
+        "Second",
+    ]
+    assert [embedding.metadata for embedding in result.embeddings] == [
+        {"source": "first"},
+        {"source": "second"},
+    ]

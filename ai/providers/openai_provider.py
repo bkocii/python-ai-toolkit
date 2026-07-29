@@ -125,12 +125,20 @@ class OpenAIProvider(BaseAIProvider):
         Parse tool call arguments returned by OpenAI.
         """
         try:
-            return json.loads(raw_arguments or "{}")
+            arguments = json.loads(raw_arguments or "{}")
         except json.JSONDecodeError as exc:
             raise AIProviderError(
                 f"OpenAI returned invalid tool arguments: {raw_arguments}. "
                 "Tool call arguments must be valid JSON."
             ) from exc
+
+        if not isinstance(arguments, dict):
+            raise AIProviderError(
+                f"OpenAI returned invalid tool arguments: {raw_arguments}. "
+                "Tool call arguments must be a JSON object."
+            )
+
+        return arguments
 
     def ask_with_tools(
         self,
@@ -264,29 +272,48 @@ class OpenAIProvider(BaseAIProvider):
                 total_tokens=getattr(usage, "total_tokens", None),
             )
 
-        embeddings: list[EmbeddingVector] = []
+        embeddings_by_index: dict[int, EmbeddingVector] = {}
 
         for item in response.data:
             index = getattr(item, "index", None)
 
-            if index is None or index >= len(inputs):
+            if (
+                isinstance(index, bool)
+                or not isinstance(index, int)
+                or index < 0
+                or index >= len(inputs)
+            ):
                 raise AIProviderError(
                     f"OpenAI returned an invalid embedding index: {index}."
                 )
 
+            if index in embeddings_by_index:
+                raise AIProviderError(
+                    f"OpenAI returned a duplicate embedding index: {index}."
+                )
+
             original_input = inputs[index]
 
-            embeddings.append(
-                EmbeddingVector(
-                    text=original_input.text,
-                    vector=list(item.embedding),
-                    index=index,
-                    metadata=original_input.metadata,
-                )
+            embeddings_by_index[index] = EmbeddingVector(
+                text=original_input.text,
+                vector=list(item.embedding),
+                index=index,
+                metadata=original_input.metadata,
+            )
+
+        missing_indices = [
+            index for index in range(len(inputs)) if index not in embeddings_by_index
+        ]
+
+        if missing_indices:
+            formatted_indices = ", ".join(str(index) for index in missing_indices)
+            raise AIProviderError(
+                "OpenAI returned an incomplete embedding response. "
+                f"Missing indices: {formatted_indices}."
             )
 
         return EmbeddingResponse(
-            embeddings=embeddings,
+            embeddings=[embeddings_by_index[index] for index in range(len(inputs))],
             model=getattr(response, "model", self.embedding_model),
             token_usage=token_usage,
         )

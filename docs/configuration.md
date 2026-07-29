@@ -86,15 +86,16 @@ requirements.
 | `AI_EMBEDDING_MODEL` | Provider-independent embedding-model fallback | Non-empty string; default `text-embedding-3-small` |
 | `AI_EMBEDDING_DIMENSIONS` | Requested embedding vector size | Positive whole number; blank means provider default |
 | `AI_MAX_RETRIES` | Retries after the initial structured-response attempt | Whole number zero or greater; default `1` |
-| `AI_INPUT_COST_PER_1M_TOKENS` | Custom input-token price in USD | Decimal-compatible string; optional |
-| `AI_OUTPUT_COST_PER_1M_TOKENS` | Custom output-token price in USD | Decimal-compatible string; optional |
+| `AI_INPUT_COST_PER_1M_TOKENS` | Custom input-token price in USD | Finite, non-negative decimal-compatible string; configure with output price |
+| `AI_OUTPUT_COST_PER_1M_TOKENS` | Custom output-token price in USD | Finite, non-negative decimal-compatible string; configure with input price |
 | `AI_LOG_LEVEL` | Toolkit logger level | `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`; default `INFO` |
 | `AI_LOG_FILE_PATH` | Toolkit-managed log destination | Non-empty path when file logging is enabled; default `logs/ai_toolkit.log` |
 | `AI_FILE_LOGGING_ENABLED` | Enables the toolkit-managed file handler | `1`, `true`, `yes`, `on`, `0`, `false`, `no`, or `off`; default `true` |
 
 Custom token prices override the built-in model-price table only when both the
-input and output values are configured. Prices are resolved once when a client
-is constructed.
+input and output values are configured. Supplying only one value, a negative or
+non-finite value, or a value that cannot be parsed as a decimal raises
+`AIConfigurationError`. Prices are resolved once when a client is constructed.
 
 `AI_MAX_RETRIES=0` disables retry attempts; the initial request still runs.
 
@@ -179,12 +180,19 @@ use a lowercase registered provider name and an uppercase supported log level.
 `get_ai_config()`, `AIClient`, and `AsyncAIClient` call
 `ConfigValidator.validate()` automatically. Structural validation checks that:
 
-- provider, API key, request model, and embedding model are not blank
-- maximum retries is zero or greater
-- embedding dimensions are positive when supplied
+- provider, API key, request model, and embedding model are non-blank strings
+- maximum retries is a whole number zero or greater
+- embedding dimensions are a positive whole number when supplied
+- custom input and output prices are configured together as finite,
+  non-negative decimal strings
 - file logging is a Boolean value
-- the log level is supported
-- the log path is not blank when file logging is enabled
+- the log level is a supported string
+- the log path is a string and is not blank when file logging is enabled
+
+These runtime checks matter for explicit `AIConfig` construction because Python
+dataclass annotations do not enforce field types by themselves. Invalid
+explicit values fail as `AIConfigurationError` before provider, logger, or
+executor construction.
 
 Structural validation does not:
 

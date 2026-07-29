@@ -100,9 +100,11 @@ toolkit can identify invalid local configuration.
 Examples include:
 
 - a missing environment API key
-- blank provider, API key, request model, or embedding model values
-- a negative retry count
-- non-positive embedding dimensions
+- non-string or blank provider, API key, request model, or embedding model
+  values
+- a non-integer or negative retry count
+- non-integer or non-positive embedding dimensions
+- incomplete, non-numeric, negative, or non-finite custom token pricing
 - an unsupported logging level
 - an empty log path while file logging is enabled
 - an unsupported or duplicate provider registration name
@@ -146,6 +148,11 @@ runs.
 Configuration errors normally require a deployment, settings, or application
 fix. Repeating the same request with unchanged configuration is not a useful
 retry strategy.
+
+Malformed provider-returned tool arguments and embedding index sets are
+reported separately as `AIProviderError`. They are provider-response failures,
+not local configuration failures; the built-in adapter rejects them before
+returning incorrectly typed tool data or misassociated embedding metadata.
 
 ## Provider errors
 

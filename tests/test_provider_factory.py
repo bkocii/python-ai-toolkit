@@ -8,7 +8,21 @@ from ai.providers.openai_provider import OpenAIProvider
 from ai.schemas import ProviderResponse
 
 
-def test_provider_factory_creates_openai_provider():
+def test_provider_factory_creates_openai_provider_without_network_clients(
+    monkeypatch,
+):
+    sync_client = object()
+    async_client = object()
+
+    monkeypatch.setattr(
+        "ai.providers.openai_provider.OpenAI",
+        lambda **_kwargs: sync_client,
+    )
+    monkeypatch.setattr(
+        "ai.providers.openai_provider.AsyncOpenAI",
+        lambda **_kwargs: async_client,
+    )
+
     config = AIConfig(
         api_key="test-key",
         model="test-model",
@@ -19,10 +33,12 @@ def test_provider_factory_creates_openai_provider():
 
     assert isinstance(provider, OpenAIProvider)
     assert provider.model == "test-model"
+    assert provider.client is sync_client
+    assert provider.async_client is async_client
 
 
 def test_provider_factory_rejects_unsupported_provider():
-    AIConfig(
+    config = AIConfig(
         api_key="test-key",
         model="test-model",
         provider="unsupported",
@@ -30,16 +46,20 @@ def test_provider_factory_rejects_unsupported_provider():
 
     with pytest.raises(
         AIConfigurationError,
-        match="Provider 'openai' is already registered",
+        match="Unsupported AI provider 'unsupported'",
     ):
-        ProviderFactory.register("openai", OpenAIProvider)
+        ProviderFactory.create(config)
 
 
-def test_register_provider():
+def test_register_provider(monkeypatch):
     class CustomProvider(OpenAIProvider):
         pass
 
-    ProviderFactory.register("custom", CustomProvider)
+    monkeypatch.setitem(
+        ProviderFactory._registry,
+        "custom",
+        CustomProvider,
+    )
 
     assert "custom" in ProviderFactory.available_providers()
 

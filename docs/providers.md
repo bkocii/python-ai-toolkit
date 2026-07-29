@@ -249,6 +249,19 @@ plain-text requests, synchronous streaming, tool calling, image inputs, and
 embeddings. Detailed model and SDK compatibility is handled separately from
 the registration contract in the [compatibility guide](compatibility.md).
 
+The built-in adapter also validates provider-returned structures before they
+reach application code:
+
+- function-call arguments must decode to a JSON object
+- embedding indices must be whole numbers within the submitted batch
+- every embedding index must appear exactly once
+- batch results are restored to input order before text and metadata are
+  attached
+
+Invalid tool arguments or embedding index sets raise `AIProviderError`. This
+prevents malformed provider output from becoming incorrectly associated
+application data.
+
 ## Errors and validation boundaries
 
 Registering an existing name raises `AIConfigurationError`. The built-in
@@ -272,6 +285,12 @@ Both client constructors validate a manually constructed `AIConfig` before
 provider creation. Calling `ConfigValidator.validate(config)` directly remains
 useful when an application wants an earlier startup check, but it is not
 required to make client construction safe.
+
+Tests that exercise factory construction should replace provider SDK client
+constructors or register a deterministic local provider. Merely constructing
+the built-in SDK client can read ambient proxy configuration, so an offline
+unit test must not treat that environment-dependent SDK setup as the behavior
+it intends to verify.
 
 ## What registration does not provide
 

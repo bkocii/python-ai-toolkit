@@ -7,6 +7,15 @@ The format loosely follows Keep a Changelog.
 ---
 ### Fixed
 
+* Explicit configuration now rejects wrong runtime field types, incomplete or
+  invalid custom token pricing, and other structurally invalid values as
+  `AIConfigurationError` before client side effects
+* OpenAI tool responses now reject JSON arguments that are not objects
+* OpenAI embedding responses now reject invalid, duplicate, or missing indices
+  and restore valid batches to input order before attaching text and metadata
+* Provider-factory tests no longer construct live SDK transports or depend on
+  ambient proxy settings, and unsupported-provider coverage now exercises the
+  intended failure path
 * Both clients now reject invalid supplied `AIConfig` values before provider,
   logger, or executor construction
 * Agent prompts include the current user message once while preserving the
@@ -30,6 +39,11 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Installed-core release verification now executes deterministic plain and
+  structured `AIClient` requests in addition to import, dependency, prompt,
+  vector-store, and optional-framework checks
+* Version 1.0 release-blocker audit documenting reproduced defects, fixes,
+  excluded backlog work, and required evidence
 * Approved Version 1.0 public API contract covering supported module imports,
   call signatures, data models, enum values, exceptions, extension interfaces,
   return boundaries, orchestration semantics, and compatibility policy

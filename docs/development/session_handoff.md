@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-002 — Resolve release-blocking defects`
+**Next task:** `V1-003 — Complete changelog`
 
 ---
 
@@ -2301,7 +2301,7 @@ It also:
 Completion evidence:
 
 ```text
-53 focused public API, client, agent, and orchestration tests passed
+62 focused public API, client, agent, and orchestration tests passed
 409 normal tests passed on each supported Python version
 ```
 
@@ -2310,20 +2310,57 @@ upload, or publication changed.
 
 ---
 
-# Exact Next Task — V1-002
+# V1-002 — Release-Blocking Defects
 
-Resolve release-blocking defects.
+`V1-002` is complete.
+
+The task reproduced and corrected:
+
+1. explicit configuration values that escaped structural type validation or
+   raised raw Python exceptions
+2. incomplete, invalid, negative, or non-finite custom pricing
+3. non-object provider tool arguments
+4. invalid, duplicate, missing, or out-of-order embedding indices
+5. provider-factory tests that depended on ambient SDK transport/proxy setup
+6. unsupported-provider coverage that did not execute its named failure path
+7. installed-core verification that omitted plain and structured client
+   requests
+
+The complete scope and excluded non-blockers are recorded in:
+
+```text
+docs/development/release_blocker_audit.md
+```
+
+Completion evidence:
+
+```text
+166 focused configuration, provider, package, and documentation checks passed
+440 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black, Ruff, and pip check passed on every supported Python version
+clean wheel and source archive passed strict Twine and offline validation
+core-only, Django-only, and FastAPI-only clean wheel checks passed
+```
+
+The 71-symbol frozen public API, dependency set, package version, classifiers,
+release workflows, Git tags, GitHub deployments, and PyPI state did not change.
+
+---
+
+# Exact Next Task — V1-003
+
+Complete changelog.
 
 Required work:
 
-1. audit current tests, documentation, package validation, and release evidence
-   for reproduced Version 1.0 blockers
-2. distinguish actual defects from new features or Future Backlog work
-3. fix only confirmed release-blocking defects
-4. preserve the frozen public API unless a blocker proves a contract must
-   change
-5. add focused regressions and update affected documentation
-6. do not change the package version, create `v1.0.0`, or publish; those belong
+1. review the complete unreleased changelog against the implemented Version 1
+   surface and completed production-readiness work
+2. make user-visible additions, changes, fixes, compatibility boundaries, and
+   upgrade implications accurate and non-duplicative
+3. keep internal implementation details out unless they affect users or
+   maintainers during release
+4. preserve the frozen public API and resolved release-blocker behavior
+5. do not change the package version, create `v1.0.0`, or publish; those belong
    to later V1 tasks
 
 ---
@@ -2858,16 +2895,15 @@ For the immediate next task, also provide:
 7. `CHANGELOG.md`
 8. `pyproject.toml`
 9. `docs/api_reference.md`
-10. ADR-0017 and ADR-0018
-11. the modules changed by `V1-001`: clients, agent, and orchestrator
-12. public-contract, client, agent, and orchestrator tests
-13. current failing-check or reproduced-defect evidence, if any
+10. `docs/development/release_blocker_audit.md`
+11. ADR-0017 and ADR-0018
+12. current release documentation and completed roadmap records
 
 Profiling evidence, generated benchmark artifacts, release artifacts,
 deliverable ZIPs, caches, example media, and future-backlog implementation
-files are not required for `V1-002`. The frozen API reference, ADRs, affected
-implementation, focused tests, and reproduced evidence are required so the
-defect audit distinguishes blockers from new feature work.
+files are not required for `V1-003`. The frozen API reference, release-blocker
+audit, changelog, and completed roadmap records are required so the changelog
+describes the actual Version 1 release.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2881,9 +2917,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that V1-002 is still the correct next task.
-4. Read docs/api_reference.md, ADR-0017, and ADR-0018.
-5. Audit reproduced release-blocking defects without adding Future Backlog features.
+3. Verify the repository's current state and confirm that V1-003 is still the correct next task.
+4. Read CHANGELOG.md, docs/api_reference.md, and docs/development/release_blocker_audit.md.
+5. Complete the Version 1 changelog without changing the version or publishing.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

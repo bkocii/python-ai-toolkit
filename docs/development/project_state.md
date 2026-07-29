@@ -44,6 +44,7 @@ Completed PROD-006 release-automation tasks:
 Completed PROD-007 release tasks:
 
 * V1-001 Freeze the Version 1.0 public API
+* V1-002 Resolve release-blocking defects
 
 Completed PROD-001 benchmark tasks:
 
@@ -120,7 +121,7 @@ PROD-007 — Version 1.0.0 Release
 Next roadmap task:
 
 ```text
-V1-002 — Resolve release-blocking defects
+V1-003 — Complete changelog
 ```
 
 ---
@@ -140,6 +141,7 @@ V1-002 — Resolve release-blocking defects
 * retry tracking
 * explicit `AIConfig` injection
 * automatic structural validation at both client-construction boundaries
+* runtime type and custom-pricing validation for explicit configuration
 * environment-based default configuration
 
 ### Providers
@@ -148,6 +150,7 @@ V1-002 — Resolve release-blocking defects
 * OpenAI provider implementation
 * `ProviderFactory`
 * provider registry
+* provider-output integrity checks for tool arguments and embedding batches
 * custom provider registration
 * provider-aware configuration through `AI_PROVIDER`
 
@@ -646,10 +649,10 @@ Completed:
 * PROD-003 Complete Documentation
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
+* PROD-006 Release Automation
 
 Remaining:
 
-* PROD-006 Release Automation
 * PROD-007 Version 1.0 Release
 
 Completed release-automation tasks:
@@ -659,6 +662,10 @@ Completed release-automation tasks:
 * RELEASE-003 Run tests, Black, and Ruff in CI
 * RELEASE-004 Build package distributions in CI
 * RELEASE-005 Validate built distributions
+* RELEASE-006 Add release workflow for version tags
+* RELEASE-007 Configure secure PyPI publishing
+* RELEASE-008 Document release procedure
+* RELEASE-009 Test release workflow without publishing production artifacts
 
 ---
 
@@ -990,13 +997,13 @@ PROD-007 — Version 1.0.0 Release
 
 ### Next Recommended Focus
 
-Begin `V1-002 — Resolve release-blocking defects`.
+Begin `V1-003 — Complete changelog`.
 
-`V1-001` approved and regression-protected the 71-symbol Version 1.0 public
-surface. The next task should perform a release-blocker audit against the
-frozen contracts and current test evidence, then fix only reproduced defects.
-It must not add Future Backlog features, change the package version, create a
-release tag, or publish.
+`V1-002` resolved the reproduced configuration, provider-output, test
+isolation, and installed-request verification blockers without changing the
+frozen public API. The next task should review the complete unreleased
+changelog for Version 1.0 user-visible accuracy and release-note readiness. It
+must not change the package version, create a release tag, or publish.
 
 ---
 

@@ -204,3 +204,22 @@ def test_openai_provider_rejects_invalid_tool_arguments():
         match="OpenAI returned invalid tool arguments",
     ):
         provider._parse_tool_arguments("{not valid json}")
+
+
+@pytest.mark.parametrize(
+    "raw_arguments",
+    [
+        "[]",
+        '"Paris"',
+        "null",
+        "1",
+    ],
+)
+def test_openai_provider_rejects_non_object_tool_arguments(raw_arguments):
+    provider = OpenAIProvider.__new__(OpenAIProvider)
+
+    with pytest.raises(
+        AIProviderError,
+        match="Tool call arguments must be a JSON object",
+    ):
+        provider._parse_tool_arguments(raw_arguments)

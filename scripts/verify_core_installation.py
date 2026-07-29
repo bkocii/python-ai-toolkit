@@ -13,7 +13,14 @@ import sys
 from importlib import metadata
 from pathlib import Path
 
+from pydantic import BaseModel
+
+from ai.client import AIClient
+from ai.config import AIConfig
 from ai.prompts import PromptTemplate
+from ai.providers.base import BaseAIProvider
+from ai.providers.factory import ProviderFactory
+from ai.schemas import ProviderResponse
 from ai.vector_store import InMemoryVectorStore, VectorRecord
 
 DISTRIBUTION_NAME = "python-ai-toolkit"
@@ -64,6 +71,25 @@ CORE_MODULES = (
     "ai.vector_store",
     "ai.workflow",
 )
+OFFLINE_PROVIDER_NAME = "release-core-offline"
+
+
+class OfflineStructuredResponse(BaseModel):
+    answer: str
+
+
+class OfflineProvider(BaseAIProvider):
+    """Deterministic provider for installed client smoke checks."""
+
+    def __init__(self, api_key: str, model: str):
+        self.api_key = api_key
+        self.model = model
+
+    def ask_text(self, prompt: str) -> ProviderResponse:
+        if "The JSON must match this schema:" in prompt:
+            return ProviderResponse(text='{"answer": "structured"}')
+
+        return ProviderResponse(text=f"offline:{prompt}")
 
 
 def canonicalize_distribution_name(name: str) -> str:
@@ -157,6 +183,35 @@ def assert_offline_core_behavior() -> None:
         raise AssertionError("InMemoryVectorStore returned an unexpected result.")
 
 
+def assert_offline_client_requests() -> None:
+    """Exercise installed plain and structured client requests without network."""
+    if OFFLINE_PROVIDER_NAME not in ProviderFactory.available_providers():
+        ProviderFactory.register(OFFLINE_PROVIDER_NAME, OfflineProvider)
+
+    client = AIClient(
+        config=AIConfig(
+            provider=OFFLINE_PROVIDER_NAME,
+            api_key="release-structure-check",
+            model="release-offline-model",
+            file_logging_enabled=False,
+        )
+    )
+
+    if client.ask_text("plain") != "offline:plain":
+        raise AssertionError("AIClient returned an unexpected plain response.")
+
+    structured_result = client.ask(
+        "Return the structured release answer.",
+        response_type=OfflineStructuredResponse,
+    )
+
+    if structured_result.data.answer != "structured":
+        raise AssertionError("AIClient returned an unexpected structured response.")
+
+    if structured_result.model != "release-offline-model":
+        raise AssertionError("AIClient returned unexpected model metadata.")
+
+
 def verify_core_installation() -> Path:
     """Run the complete installed core-distribution verification."""
     installed_version = metadata.version(DISTRIBUTION_NAME)
@@ -175,6 +230,7 @@ def verify_core_installation() -> Path:
     assert_optional_frameworks_absent()
     import_core_modules()
     assert_offline_core_behavior()
+    assert_offline_client_requests()
 
     return module_path
 
@@ -189,6 +245,7 @@ def main() -> int:
     print("Optional frameworks absent: django, fastapi")
     print(f"Core modules imported: {len(CORE_MODULES)}")
     print("Offline prompt and vector-store checks: PASSED")
+    print("Offline plain and structured client requests: PASSED")
 
     return 0
 

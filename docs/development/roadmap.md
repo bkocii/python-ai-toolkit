@@ -3398,7 +3398,7 @@ Publish the first stable release.
 ### Tasks
 
 * [x] V1-001 Freeze the Version 1.0 public API
-* [ ] V1-002 Resolve release-blocking defects
+* [x] V1-002 Resolve release-blocking defects
 * [ ] V1-003 Complete changelog
 * [ ] V1-004 Update project version to `1.0.0`
 * [ ] V1-005 Update project state
@@ -3446,7 +3446,7 @@ Completed work:
 Completion verification:
 
 ```text
-53 focused public API, client, agent, and orchestration tests passed
+62 focused public API, client, agent, and orchestration tests passed
 409 normal tests passed on each supported Python version
 ```
 
@@ -3458,6 +3458,60 @@ Next task:
 
 ```text
 V1-002 — Resolve release-blocking defects
+```
+
+#### V1-002 — Resolve Release-Blocking Defects
+
+Status: Completed
+
+The frozen Version 1.0 contract, normal tests, package metadata, clean-install
+verifiers, documentation, and release evidence were audited for reproduced
+blockers. The task fixed only confirmed contract, correctness, and
+release-gate defects.
+
+Completed work:
+
+* made explicit configuration reject wrong runtime field types through
+  `AIConfigurationError` instead of leaking `AttributeError` or `TypeError`
+* required retry counts and embedding dimensions to use their documented
+  integer shapes
+* required custom input/output token prices together and rejected invalid,
+  negative, or non-finite values
+* required provider-returned tool arguments to decode to a JSON object
+* rejected invalid, duplicate, and missing OpenAI embedding indices
+* restored valid embedding batches to input order before attaching text and
+  metadata
+* isolated provider-factory tests from ambient proxy and SDK transport setup
+* corrected unsupported-provider coverage to execute the intended factory
+  failure
+* extended installed-core verification through deterministic plain and
+  structured `AIClient` requests
+* documented confirmed blockers, resolutions, non-blockers, and release
+  evidence in `docs/development/release_blocker_audit.md`
+* preserved all 71 frozen public symbols, module paths, signatures, fields,
+  return contracts, and exception hierarchy
+
+Completion verification:
+
+```text
+166 focused configuration, provider, package, and documentation checks passed
+440 normal tests passed on each supported Python version
+Black and Ruff passed all 131 Python files on Python 3.11 through 3.14
+pip check passed on Python 3.11 through 3.14
+strict Twine and offline validation passed the clean wheel and source archive
+wheel contained 46 entries; source archive contained 99 entries
+core-only clean installation, CLI help, and offline plain/structured requests passed
+Django-only and FastAPI-only clean integration checks passed
+```
+
+No public API shape, dependency, package version, classifier, release workflow,
+Git tag, GitHub deployment, PyPI project, distribution upload, or publication
+changed.
+
+Next task:
+
+```text
+V1-003 — Complete changelog
 ```
 
 ### Public API Freeze
@@ -3511,8 +3565,8 @@ Live provider smoke tests must be explicit and must not run as normal unit tests
 
 ### Exit Criteria
 
-* [ ] Stable public API approved
-* [ ] Full quality checks pass
+* [x] Stable public API approved
+* [x] Full quality checks pass
 * [ ] Documentation is complete
 * [ ] Package is published
 * [ ] Clean installation succeeds

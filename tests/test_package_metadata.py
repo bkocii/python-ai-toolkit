@@ -9,6 +9,7 @@ from scripts.verify_core_installation import (
     CORE_MODULES,
     EXPECTED_CORE_REQUIREMENTS,
     OPTIONAL_FRAMEWORKS,
+    assert_offline_client_requests,
     core_requirement_names,
     requirement_name,
 )
@@ -223,6 +224,10 @@ def test_core_installation_verifier_covers_every_non_framework_module():
         expected_modules.add(".".join(module_parts))
 
     assert set(CORE_MODULES) == expected_modules
+
+
+def test_core_installation_verifier_exercises_plain_and_structured_requests():
+    assert_offline_client_requests()
 
 
 def test_package_classifiers_describe_the_current_project():
