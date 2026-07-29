@@ -41,6 +41,10 @@ Completed PROD-006 release-automation tasks:
 * RELEASE-008 Document release procedure
 * RELEASE-009 Test release workflow without publishing production artifacts
 
+Completed PROD-007 release tasks:
+
+* V1-001 Freeze the Version 1.0 public API
+
 Completed PROD-001 benchmark tasks:
 
 * BENCH-000 Test-safe and benchmark-safe logging
@@ -116,7 +120,7 @@ PROD-007 — Version 1.0.0 Release
 Next roadmap task:
 
 ```text
-V1-001 — Freeze the Version 1.0 public API
+V1-002 — Resolve release-blocking defects
 ```
 
 ---
@@ -135,6 +139,7 @@ V1-001 — Freeze the Version 1.0 public API
 * estimated cost tracking
 * retry tracking
 * explicit `AIConfig` injection
+* automatic structural validation at both client-construction boundaries
 * environment-based default configuration
 
 ### Providers
@@ -985,13 +990,13 @@ PROD-007 — Version 1.0.0 Release
 
 ### Next Recommended Focus
 
-Begin `V1-001 — Freeze the Version 1.0 public API`.
+Begin `V1-002 — Resolve release-blocking defects`.
 
-`PROD-006` is complete. The next task should review and explicitly approve the
-stable public surface already inventoried by the API reference and roadmap,
-resolve each recorded Version 1.0 API decision, and avoid changing the package
-version, creating a release commit, or publishing until their later authorized
-tasks.
+`V1-001` approved and regression-protected the 71-symbol Version 1.0 public
+surface. The next task should perform a release-blocker audit against the
+frozen contracts and current test evidence, then fix only reproduced defects.
+It must not add Future Backlog features, change the package version, create a
+release tag, or publish.
 
 ---
 

@@ -357,10 +357,10 @@ The built-in `OpenAIProvider` implements the synchronous streaming, asynchronous
 text, tool-calling, and image-input methods described here. Availability for a
 specific model should be verified against current provider documentation.
 
-## Future review boundaries
+## Version 1.0 boundary and future work
 
-The current contracts are documented for the Version 1.0 API review and future
-improvement work. The roadmap tracks:
+Version 1.0 keeps the return contracts and application-owned tool-execution
+boundary documented above. The Future Backlog tracks:
 
 - metadata-bearing alternatives for streaming and tool responses
 - async streaming, tools, images, and embeddings
@@ -373,7 +373,8 @@ accidental omission. Future helpers must preserve application allow-listing,
 argument validation, authorization, and control of external actions rather
 than silently executing model-requested tools.
 
-See the [Version 1.0 review and Future Backlog](development/roadmap.md#future-backlog).
+See the [approved public API](api_reference.md#version-10-freeze-decisions) and
+[Future Backlog](development/roadmap.md#future-backlog).
 
 ## Related documentation
 

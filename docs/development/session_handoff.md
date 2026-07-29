@@ -6,7 +6,7 @@
 **Current version:** `0.7.0-dev`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-001 — Freeze the Version 1.0 public API`
+**Next task:** `V1-002 — Resolve release-blocking defects`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `V1-001`.
+The current next task is `V1-002`.
 
 ---
 
@@ -2277,20 +2277,52 @@ Release was created.
 
 ---
 
-# Exact Next Task — V1-001
+# V1-001 — Version 1.0 Public API Freeze
 
-Freeze the Version 1.0 public API.
+`V1-001` is complete.
+
+The task approved 71 public symbols, explicit module import paths, callable
+parameters, model fields, enums, exceptions, extension interfaces, advanced
+return boundaries, mutability, and partial-execution semantics.
+
+It also:
+
+1. added automatic structural configuration validation to both client
+   construction paths
+2. retained an empty top-level `ai` namespace
+3. kept direct executor, request-builder wiring, built-in adapters, and
+   low-level helpers internal
+4. removed duplicate current-message content from agent prompts
+5. added complete multi-agent name preflight
+6. made empty multi-agent responses unsuccessful
+7. added ADR-0017 and ADR-0018
+8. added permanent public-contract and behavior tests
+
+Completion evidence:
+
+```text
+53 focused public API, client, agent, and orchestration tests passed
+409 normal tests passed on each supported Python version
+```
+
+No package version, release tag, GitHub deployment, PyPI project, distribution
+upload, or publication changed.
+
+---
+
+# Exact Next Task — V1-002
+
+Resolve release-blocking defects.
 
 Required work:
 
-1. inspect the current public API reference and the roadmap's complete API
-   freeze list
-2. inventory all intentionally supported public symbols, signatures, return
-   contracts, exceptions, mutable state, and extension interfaces
-3. resolve every recorded Version 1.0 API-review decision explicitly
-4. preserve provider independence and create an ADR only for a real
-   architectural or public-contract change
-5. update tests and documentation for the approved stable surface
+1. audit current tests, documentation, package validation, and release evidence
+   for reproduced Version 1.0 blockers
+2. distinguish actual defects from new features or Future Backlog work
+3. fix only confirmed release-blocking defects
+4. preserve the frozen public API unless a blocker proves a contract must
+   change
+5. add focused regressions and update affected documentation
 6. do not change the package version, create `v1.0.0`, or publish; those belong
    to later V1 tasks
 
@@ -2826,17 +2858,16 @@ For the immediate next task, also provide:
 7. `CHANGELOG.md`
 8. `pyproject.toml`
 9. `docs/api_reference.md`
-10. `ai/__init__.py`
-11. the public client, configuration, schema, provider-interface, request,
-    retrieval, memory, agent, workflow, integration, and CLI modules named by
-    the roadmap review list
-12. tests covering those public contracts
+10. ADR-0017 and ADR-0018
+11. the modules changed by `V1-001`: clients, agent, and orchestrator
+12. public-contract, client, agent, and orchestrator tests
+13. current failing-check or reproduced-defect evidence, if any
 
 Profiling evidence, generated benchmark artifacts, release artifacts,
 deliverable ZIPs, caches, example media, and future-backlog implementation
-files are not required for `V1-001`. The API reference, roadmap review list,
-current public modules, focused guides, and contract tests are required so the
-freeze reviews real behavior rather than assumptions.
+files are not required for `V1-002`. The frozen API reference, ADRs, affected
+implementation, focused tests, and reproduced evidence are required so the
+defect audit distinguishes blockers from new feature work.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2850,9 +2881,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that V1-001 is still the correct next task.
-4. Read docs/api_reference.md and the complete PROD-007 public API freeze list.
-5. Inventory and review every recorded Version 1.0 public-contract decision before proposing changes.
+3. Verify the repository's current state and confirm that V1-002 is still the correct next task.
+4. Read docs/api_reference.md, ADR-0017, and ADR-0018.
+5. Audit reproduced release-blocking defects without adding Future Backlog features.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

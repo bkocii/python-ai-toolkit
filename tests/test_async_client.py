@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from ai.async_client import AsyncAIClient
 from ai.async_executor import AsyncRequestExecutor
 from ai.config import AIConfig
-from ai.exceptions import AIProviderError
+from ai.exceptions import AIConfigurationError, AIProviderError
 from ai.providers.base import BaseAIProvider
 from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse
@@ -155,6 +155,31 @@ def test_async_client_accepts_explicit_config(monkeypatch):
     assert isinstance(client.provider, ConfigurableFakeProvider)
     assert client.provider.api_key == "fake-key"
     assert client.executor.max_retries == 3
+
+
+def test_async_client_validates_explicit_config_before_provider_creation(monkeypatch):
+    provider_created = False
+
+    def create_provider(config):
+        nonlocal provider_created
+        provider_created = True
+        raise AssertionError("Provider creation must not run.")
+
+    monkeypatch.setattr(ProviderFactory, "create", create_provider)
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="AI provider cannot be empty",
+    ):
+        AsyncAIClient(
+            config=AIConfig(
+                provider="   ",
+                api_key="fake-key",
+                model="fake-model",
+            )
+        )
+
+    assert provider_created is False
 
 
 def test_async_client_loads_environment_config_when_config_not_supplied(

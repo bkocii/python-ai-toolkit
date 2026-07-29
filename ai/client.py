@@ -4,6 +4,7 @@ from typing import TypeVar, overload
 from pydantic import BaseModel
 
 from ai.config import AIConfig, get_ai_config
+from ai.config_validator import ConfigValidator
 from ai.embeddings import EmbeddingInput, EmbeddingResponse
 from ai.executor import RequestExecutor
 from ai.images import ImageInput
@@ -33,6 +34,7 @@ class AIClient:
 
     def __init__(self, config: AIConfig | None = None):
         resolved_config = config or get_ai_config()
+        ConfigValidator.validate(resolved_config)
 
         self.model = resolved_config.model
 

@@ -142,7 +142,9 @@ client = AIClient(config=config)
 ```
 
 An explicit `AIConfig` completely replaces environment loading; omitted fields
-use dataclass defaults rather than `.env` values. See the
+use dataclass defaults rather than `.env` values. Both client constructors
+validate the resolved configuration automatically; the explicit call above is
+useful when an application wants an earlier startup check. See the
 [configuration guide](docs/configuration.md) for the complete variable
 reference, defaults, precedence rules, validation boundary, and CLI checks.
 
@@ -507,7 +509,7 @@ concerns in focused documents:
 
 | Document | Purpose |
 | --- | --- |
-| [Public API reference](docs/api_reference.md) | Supported import paths, signatures, models, exceptions, lifecycle boundaries, and Version 1.0 review items |
+| [Public API reference](docs/api_reference.md) | Frozen Version 1.0 import paths, signatures, models, exceptions, behaviors, and compatibility policy |
 | [Installation guide](docs/installation.md) | Local installation, optional extras, and contributor setup |
 | [Configuration guide](docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
 | [Provider guide](docs/providers.md) | Built-in provider, custom registration, constructor contract, capabilities, and errors |

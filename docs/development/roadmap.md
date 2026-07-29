@@ -3397,7 +3397,7 @@ Publish the first stable release.
 
 ### Tasks
 
-* [ ] V1-001 Freeze the Version 1.0 public API
+* [x] V1-001 Freeze the Version 1.0 public API
 * [ ] V1-002 Resolve release-blocking defects
 * [ ] V1-003 Complete changelog
 * [ ] V1-004 Update project version to `1.0.0`
@@ -3409,6 +3409,56 @@ Publish the first stable release.
 * [ ] V1-010 Verify installation from PyPI
 * [ ] V1-011 Run post-release smoke tests
 * [ ] V1-012 Publish release notes
+
+#### V1-001 — Freeze the Version 1.0 Public API
+
+Status: Completed
+
+The Version 1.0 compatibility boundary was reviewed against the complete API
+reference, implementation, focused guides, examples, architecture decisions,
+and contract tests.
+
+Completed work:
+
+* approved 71 public symbols across explicit module paths
+* froze public callable parameter names, configuration fields, Pydantic model
+  fields, enum values, exception inheritance, and abstract extension methods
+* kept the top-level `ai` namespace empty rather than creating duplicate import
+  paths
+* made both client constructors structurally validate resolved configuration
+  before provider, logger, or executor construction
+* retained `AIClient.request()` as the supported builder-construction path and
+  kept direct executor wiring internal
+* kept built-in provider adapters and importable low-level helpers outside the
+  compatibility surface
+* preserved the distinct advanced-request return contracts and deferred
+  capability discovery
+* removed duplicate current-message content from agent prompts while
+  preserving message-count limits and partial-memory behavior
+* added preflight lookup for complete multi-agent sequences
+* defined empty multi-agent responses as unsuccessful
+* documented stability, mutability, exceptions, partial execution, and
+  semantic-versioning boundaries
+* added ADR-0017 for client-boundary configuration validation and ADR-0018 for
+  the complete Version 1.0 public API freeze
+* added permanent public-contract and behavioral regression coverage
+
+Completion verification:
+
+```text
+53 focused public API, client, agent, and orchestration tests passed
+409 normal tests passed on each supported Python version
+```
+
+No package version, dependency, provider SDK mapping, release workflow, Git
+tag, GitHub deployment, PyPI project, distribution upload, or publication
+changed.
+
+Next task:
+
+```text
+V1-002 — Resolve release-blocking defects
+```
 
 ### Public API Freeze
 
@@ -3428,28 +3478,20 @@ Before release, explicitly review:
 * workflow interfaces
 * integration helpers
 * CLI commands
-* whether client constructors should automatically validate explicitly supplied
-  `AIConfig` objects
-* whether `ai.__init__` should provide curated top-level re-exports and
-  `__all__`
-* whether direct `AIRequestBuilder` construction should depend on the internal
-  `RequestExecutor`
-* whether visible client implementation attributes such as `provider` and
-  `executor` are supported contracts
-* whether built-in provider adapter classes are public or factory-only
-* whether `ImageRequest`, `normalize_path()`, `estimate_cost_usd()`, and other
-  importable low-level or compatibility names remain public in Version 1.0
-* advanced-request return contracts and their current request-metadata
-  boundaries
-* whether capability discovery or preflight checks belong in the stable
-  provider interface
-* agent prompt construction, including whether the current message should
-  appear in both recent conversation text and the dedicated current-message
-  section
-* message-count memory limits, agent metadata exposure, workflow state and
-  failed-step semantics, unknown-agent sequence lookup, and partial-execution
-  result contracts
-* whether an empty `MultiAgentResponse` should report `success=True`
+* client-constructor validation for explicitly supplied `AIConfig`
+* top-level package exports and `__all__`
+* supported request-builder construction
+* visible client implementation attributes
+* built-in provider-adapter visibility
+* low-level and compatibility helper visibility
+* advanced-request return and metadata boundaries
+* provider capability discovery and preflight checks
+* agent prompt construction and message-count limits
+* agent metadata, workflow state, failed-step, and partial-execution semantics
+* multi-agent sequence lookup and empty-response success
+
+`V1-001` completed this review. The approved decisions and compatibility policy
+are recorded in `docs/api_reference.md`, ADR-0017, and ADR-0018.
 
 ### Release Verification
 

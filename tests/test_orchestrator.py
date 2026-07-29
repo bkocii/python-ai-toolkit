@@ -123,6 +123,12 @@ def test_multi_agent_response_success_is_false_when_any_result_fails():
     assert response.success is False
 
 
+def test_multi_agent_response_success_is_false_without_results():
+    response = MultiAgentResponse()
+
+    assert response.success is False
+
+
 def test_multi_agent_response_final_output_returns_last_successful_output():
     response = MultiAgentResponse(
         results=[
@@ -347,6 +353,26 @@ def test_orchestrator_run_sequence_stops_on_failure():
     assert response.results[0].agent_name == "first"
     assert response.results[1].agent_name == "failing"
     assert response.results[1].error == "Agent failed"
+
+
+def test_orchestrator_run_sequence_validates_all_names_before_execution():
+    first_agent = FakeAgent("First output")
+    orchestrator = MultiAgentOrchestrator(
+        agents={
+            "first": first_agent,
+        }
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="Unknown agent: missing",
+    ):
+        orchestrator.run_sequence(
+            agent_names=["first", "missing"],
+            message="Original message",
+        )
+
+    assert first_agent.received_message is None
 
 
 def test_orchestrator_run_sequence_rejects_empty_sequence():

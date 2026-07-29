@@ -7,6 +7,13 @@ The format loosely follows Keep a Changelog.
 ---
 ### Fixed
 
+* Both clients now reject invalid supplied `AIConfig` values before provider,
+  logger, or executor construction
+* Agent prompts include the current user message once while preserving the
+  message-count memory limit and partial-memory failure behavior
+* Multi-agent sequences validate every requested agent name before execution,
+  preventing lookup errors from occurring after earlier agents have run
+* Empty `MultiAgentResponse` objects now report `success=False`
 * Made distribution README validation independent of Windows `CRLF` versus
   Unix `LF` line endings while continuing to reject real content differences
 * Normalized the development package version to `0.7.0.dev0` instead of
@@ -23,6 +30,14 @@ The format loosely follows Keep a Changelog.
   behavior
 
 ### Added
+* Approved Version 1.0 public API contract covering supported module imports,
+  call signatures, data models, enum values, exceptions, extension interfaces,
+  return boundaries, orchestration semantics, and compatibility policy
+* Permanent public-contract regressions for the frozen symbol inventory,
+  callable parameters, model fields, enums, exception hierarchy, and abstract
+  extension methods
+* ADR-0017 establishing automatic client-boundary configuration validation
+* ADR-0018 approving the complete Version 1.0 compatibility boundary
 * Manual non-production release-workflow rehearsal that runs tag-shaped version
   validation, the Python 3.11–3.14 matrix, distribution construction, both
   artifact validators, and artifact retention while structurally skipping the
@@ -226,6 +241,9 @@ The format loosely follows Keep a Changelog.
 
 
 ### Improved
+* Replaced every deferred Version 1.0 API-review item with an explicit decision
+  while keeping internal executors, provider adapters, low-level helpers, and
+  top-level package re-exports outside the supported surface
 * Installation and compatibility guidance for the distribution name, import
   package, console command, development version, dependency floors, and
   intentionally unconfirmed project URLs

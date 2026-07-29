@@ -121,8 +121,8 @@ except AIConfigurationError as exc:
     raise RuntimeError("AI configuration must be corrected before startup.") from exc
 ```
 
-A manually constructed `AIConfig` currently bypasses automatic client
-validation. Validate it explicitly:
+A manually constructed `AIConfig` is validated automatically by both client
+constructors. It can also be validated earlier, without constructing a client:
 
 ```python
 from ai.config import AIConfig

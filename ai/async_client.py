@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from ai.async_executor import AsyncRequestExecutor
 from ai.config import AIConfig, get_ai_config
+from ai.config_validator import ConfigValidator
 from ai.logger import get_ai_logger
 from ai.providers.factory import ProviderFactory
 from ai.schemas import AIResult
@@ -21,6 +22,7 @@ class AsyncAIClient:
 
     def __init__(self, config: AIConfig | None = None):
         resolved_config = config if config is not None else get_ai_config()
+        ConfigValidator.validate(resolved_config)
         self.model = resolved_config.model
 
         self.provider = ProviderFactory.create(resolved_config)

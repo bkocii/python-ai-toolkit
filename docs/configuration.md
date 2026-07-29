@@ -158,12 +158,13 @@ async_client = AsyncAIClient(config=config)
 | Client construction | Configuration source |
 | --- | --- |
 | `AIClient()` or `AsyncAIClient()` | `get_ai_config()` loads and validates environment-based configuration |
-| `AIClient(config=config)` or `AsyncAIClient(config=config)` | The supplied object is used; environment configuration is not loaded or merged |
+| `AIClient(config=config)` or `AsyncAIClient(config=config)` | The supplied object is validated and used; environment configuration is not loaded or merged |
 
 `AIConfig` is a frozen dataclass. Constructing it does not perform validation,
-and the core clients do not call `ConfigValidator` for a supplied object.
-Applications that construct `AIConfig` directly should validate it before
-client construction, as shown above.
+but both core client constructors call `ConfigValidator.validate()` before
+creating a provider, logger, or executor. Applications may still call the
+validator directly when they need to check configuration earlier than client
+construction.
 
 Fields omitted from explicit construction use `AIConfig` defaults. They do not
 fall back to `.env`. For example, omitting `model` uses `gpt-5.4-mini` even if
@@ -175,8 +176,8 @@ use a lowercase registered provider name and an uppercase supported log level.
 
 ## Structural validation
 
-`get_ai_config()` calls `ConfigValidator.validate()` automatically. Structural
-validation checks that:
+`get_ai_config()`, `AIClient`, and `AsyncAIClient` call
+`ConfigValidator.validate()` automatically. Structural validation checks that:
 
 - provider, API key, request model, and embedding model are not blank
 - maximum retries is zero or greater

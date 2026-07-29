@@ -5,6 +5,30 @@ availability. A successful installation proves that Python and the resolved
 dependencies can load the toolkit; it does not prove that credentials, an
 account, a region, a model, or every optional capability is available.
 
+## Version 1 public API compatibility
+
+The [public API reference](api_reference.md) defines the frozen Version 1
+surface. Compatibility applies to the listed module paths, symbols,
+signatures, model fields, return contracts, and documented exceptions.
+
+After `1.0.0`:
+
+- patch releases may fix defects without intentionally breaking documented
+  contracts
+- minor releases may add backward-compatible symbols, fields, methods, or
+  optional behavior
+- removing or incompatibly changing a documented Version 1 contract requires a
+  new major version, except where a security or correctness emergency makes an
+  earlier break unavoidable and explicitly documented
+
+Importable names excluded by the reference are implementation details. Their
+presence in a module does not create a compatibility promise. Provider and
+model availability, network behavior, credentials, quotas, pricing, and
+third-party SDK behavior also remain outside the Python API guarantee.
+
+The package is still `0.7.0-dev`; this policy describes the approved target for
+the later `1.0.0` release.
+
 ## Compatibility layers
 
 Use the narrowest applicable compatibility claim:

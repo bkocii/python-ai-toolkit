@@ -1,12 +1,26 @@
 # Public API Reference
 
-This reference defines the intended supported Python and command-line surface
-of Python AI Toolkit `0.7.0-dev`.
+This reference defines the approved Version 1.0 Python and command-line surface
+of Python AI Toolkit. Package metadata remains `0.7.0-dev` until the later
+version-update release task; that does not change the frozen contract recorded
+here.
 
-The package is still a development release. The symbols below are the
-candidate stable surface for the Version 1.0 API freeze; final approval remains
-part of `V1-001`. Names that are importable but are not listed here are
-implementation details or explicit review items, not compatibility promises.
+Only the modules, symbols, signatures, models, enum values, exceptions, and
+behaviors documented below are compatibility promises. Importable names that
+are not listed remain implementation details.
+
+## Version 1.0 stability policy
+
+- Patch releases may fix defects without intentionally breaking this surface.
+- Minor releases may add backward-compatible symbols, methods, fields, or
+  capabilities.
+- Removing or incompatibly changing a documented contract requires a
+  deprecation path when practical and a new major version.
+- Exact provider SDK calls, private attributes, internal executors, prompt
+  formatting, logs, and undocumented import paths are not compatibility
+  promises.
+- A provider registration confirms construction only; it does not promise that
+  every model supports every optional capability.
 
 ## Import contract
 
@@ -19,8 +33,9 @@ from ai.config import AIConfig
 from ai.schemas import AIResult
 ```
 
-Do not assume that `from ai import AIClient` works. Whether Version 1.0 should
-add a curated top-level namespace is an API-freeze decision.
+The top-level package intentionally provides no re-exports. Imports such as
+`from ai import AIClient` are not part of Version 1.0. Keeping the documented
+module paths avoids a second, much larger namespace that must remain stable.
 
 ## Surface index
 
@@ -72,9 +87,10 @@ AIClient(config: AIConfig | None = None)
 ```
 
 If `config` is omitted, the client calls `get_ai_config()`. If it is supplied,
-the client uses it instead of merging with environment configuration. A
-manually constructed config is not currently validated automatically; call
-`ConfigValidator.validate(config)` first.
+the client uses it instead of merging with environment configuration. The
+client structurally validates both paths before provider, logger, or executor
+construction. Applications may call `ConfigValidator.validate(config)` earlier
+when they want a separate startup check.
 
 Client construction creates a provider and configures toolkit logging. The
 public lifecycle does not define `close()`, context-manager, or application-wide
@@ -121,7 +137,7 @@ Methods:
 | `await ask_text(prompt)` | `str` | Async data-only shortcut |
 
 The current async client does not expose streaming, tools, images, embeddings,
-retrieval, RAG, agents, workflows, or orchestration. It has the same explicit
+retrieval, RAG, agents, workflows, or orchestration. It has the same automatic
 configuration validation boundary and no public close/context-manager
 lifecycle.
 
@@ -175,10 +191,12 @@ ConfigValidator.validate(config: AIConfig) -> None
 ConfigValidator.validate_logging(config: AILoggingConfig) -> None
 ```
 
-Environment-based resolvers normalize and validate configuration and raise
-`AIConfigurationError` for invalid or missing values. The validators perform
-structural checks only; they do not verify credentials, models, accounts,
-regions, quotas, networks, or provider capabilities.
+Environment-based resolvers and both client constructors validate configuration
+and raise `AIConfigurationError` for invalid or missing values. Calling
+`ConfigValidator` directly remains useful when an application wants to check a
+configuration before client construction. The validators perform structural
+checks only; they do not verify credentials, models, accounts, regions, quotas,
+networks, or provider capabilities.
 
 ## Result models
 
@@ -242,9 +260,9 @@ execute() -> AIResult[str] | AIResult[T]
 
 The builder is mutable and reusable state is not guaranteed. `execute()` raises
 `ValueError` when no prompt has been set, and otherwise propagates the same
-request exceptions as `AIClient.ask()`. Its direct constructor currently
-requires the internal `RequestExecutor`; direct construction is an API-freeze
-review item.
+request exceptions as `AIClient.ask()`. Applications obtain it through
+`AIClient.request()`. The constructor's executor parameter is internal wiring,
+not a supported direct-construction contract.
 
 ### `PromptBuilder`
 
@@ -559,9 +577,12 @@ Agent.run(...) -> AgentResponse
 
 `Agent` raises `ValueError` for blank instructions, a non-positive
 `memory_limit`, or a blank message. The limit counts messages, not turns or
-tokens. The current user message is stored before recent memory is formatted.
-If the client request fails, that user message remains in memory; no rollback
-occurs. The agent is synchronous, text-only, and not an autonomous tool runner.
+tokens, and includes the current message. The current message is stored before
+the request and appears only in the prompt's dedicated current-message
+section; at most `memory_limit - 1` earlier messages appear in the conversation
+section. If the client request fails, the user message remains in memory; no
+rollback occurs. The agent is synchronous, text-only, and not an autonomous
+tool runner.
 
 ## Workflows and multi-agent orchestration
 
@@ -650,12 +671,13 @@ Registration rejects blank or duplicate names with `ValueError`.
 `run_agent()` raises `ValueError` for an unknown name but converts exceptions
 from a known agent into a failed `AgentRunResult`. `run_sequence()` rejects an
 empty sequence or blank message, passes each successful output to the next
-agent, and stops after the first failed result. An unknown name encountered
-mid-sequence raises instead of returning the results accumulated so far.
+agent, and stops after the first failed result. It validates every requested
+name before execution, so an unknown name raises without running an earlier
+agent.
 
-`MultiAgentResponse.success` is true only when every contained result succeeds;
-an empty response is therefore true. `final_output` is the last successful
-agent output, which can remain populated after a later failure.
+`MultiAgentResponse.success` is true only when at least one result exists and
+every contained result succeeds. `final_output` is the last successful agent
+output, which can remain populated after a later failure.
 
 ## Provider extension API
 
@@ -793,31 +815,33 @@ are not supported application APIs:
 - provider-specific conversion and parsing helpers
 - private names beginning with `_`
 
-`ImageRequest` and `normalize_path()` are deliberately not promoted by this
-reference because current public client workflows do not require them.
-Removing, promoting, or replacing importable-but-undocumented names remains an
-API-freeze decision.
+`ImageRequest`, `normalize_path()`, and other importable-but-undocumented names
+remain internal. Their current importability does not create a deprecation or
+compatibility obligation.
 
-## Version 1.0 API-freeze review items
+## Version 1.0 freeze decisions
 
-`V1-001` must explicitly decide:
+| Review area | Version 1.0 decision |
+| --- | --- |
+| Top-level `ai` namespace | Keep it empty; documented module paths are the stable imports |
+| Explicit `AIConfig` | Both clients validate it automatically before construction side effects |
+| Request builder construction | Support `AIClient.request()`; treat the executor-taking constructor as internal wiring |
+| Client attributes | `model` is observable metadata; `provider` and `executor` remain implementation exposure, not extension contracts |
+| Built-in provider adapter | Select OpenAI through configuration and the factory; direct `OpenAIProvider` use is internal |
+| Low-level names | Keep `ImageRequest`, `normalize_path()`, executors, repair helpers, logger helpers, and provider translation helpers internal |
+| Cost helper | Keep `estimate_cost_usd()` as a supported compatibility helper |
+| Advanced return values | Freeze the current split: `AIResult` for normal/image requests, `Iterator[str]` for streaming, `ToolResponse` for tools, and `EmbeddingResponse` for embeddings |
+| Capability discovery | Keep it outside `BaseAIProvider`; unsupported optional methods raise `AIProviderError` |
+| Agent prompt construction | Include the current user message once; preserve the documented memory lifecycle while treating exact prompt wording as implementation detail |
+| Memory limits and agent metadata | Keep message-count limits and the current `AgentResponse` fields |
+| Workflow failures | Keep shallow state updates from failed steps, stop-on-failure behavior, and failure-bearing results |
+| Orchestration failures | Validate every requested agent name before execution; unknown names raise `ValueError`, while known-agent failures remain typed partial results |
+| Empty orchestration result | Report `MultiAgentResponse.success == False`; success requires at least one result and no failures |
 
-- whether to add curated top-level `ai` re-exports and `__all__`
-- whether client constructors validate manually supplied `AIConfig`
-- whether `AIRequestBuilder` construction should expose an internal executor
-- whether public client attributes such as `provider` and `executor` remain
-  accessible contracts
-- whether built-in provider adapter classes are public or factory-only
-- whether `ImageRequest`, `normalize_path()`, and other currently importable
-  low-level names should be promoted, deprecated, or remain internal
-- whether the compatibility cost helper remains in Version 1.0
-- whether advanced requests gain metadata-bearing return contracts
-- whether provider/model capability discovery belongs in the provider
-  interface
-- whether current agent, workflow, and partial-execution semantics are approved
-
-This task records those decisions without changing runtime imports, signatures,
-or behavior.
+The decisions are documented by
+[ADR-0018](architecture/decisions/0018-version-1-public-api-freeze.md).
+Automatic client-boundary configuration validation is recorded separately in
+[ADR-0017](architecture/decisions/0017-client-configuration-validation.md).
 
 ## Related documentation
 

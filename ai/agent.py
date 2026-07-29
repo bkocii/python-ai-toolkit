@@ -94,9 +94,8 @@ class Agent(BaseAgent):
             metadata=metadata or {},
         )
 
-        conversation = format_conversation_messages(
-            self.memory.recent_messages(self.memory_limit)
-        )
+        recent_messages = self.memory.recent_messages(self.memory_limit)
+        conversation = format_conversation_messages(recent_messages[:-1])
 
         prompt = self._build_prompt(
             conversation=conversation,

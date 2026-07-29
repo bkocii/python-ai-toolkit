@@ -9,6 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from ai.config import AIConfig
+from ai.config_validator import ConfigValidator
 from ai.embeddings import EmbeddingResponse, EmbeddingVector
 from ai.exceptions import AIConfigurationError, AIProviderError
 from ai.integrations.fastapi import get_async_ai_client
@@ -365,7 +366,7 @@ def test_custom_provider_example_registers_and_runs_locally(
 ):
     module = importlib.import_module("examples.24_custom_provider")
     events = []
-    validate = module.ConfigValidator.validate
+    validate = ConfigValidator.validate
     create = module.ProviderFactory.create.__func__
 
     monkeypatch.setattr(
@@ -374,7 +375,7 @@ def test_custom_provider_example_registers_and_runs_locally(
         ProviderFactory._registry.copy(),
     )
     monkeypatch.setattr(
-        module.ConfigValidator,
+        ConfigValidator,
         "validate",
         staticmethod(lambda config: events.append("validate") or validate(config)),
     )

@@ -268,10 +268,10 @@ These checks are separate:
 2. `ProviderFactory` checks whether the selected provider name is registered.
 3. A live request checks credentials, connectivity, and model access.
 
-For a manually constructed `AIConfig`, call
-`ConfigValidator.validate(config)` before passing it to a client. This manual
-step should be reconsidered at the Version 1.0 public-API review so invalid
-explicit configuration cannot accidentally bypass the normal validation path.
+Both client constructors validate a manually constructed `AIConfig` before
+provider creation. Calling `ConfigValidator.validate(config)` directly remains
+useful when an application wants an earlier startup check, but it is not
+required to make client construction safe.
 
 ## What registration does not provide
 

@@ -24,9 +24,9 @@ class MultiAgentResponse(BaseModel):
     @property
     def success(self) -> bool:
         """
-        Return True only if all agent runs succeeded.
+        Return True only if at least one agent ran and every run succeeded.
         """
-        return all(result.success for result in self.results)
+        return bool(self.results) and all(result.success for result in self.results)
 
     @property
     def final_output(self) -> str | None:
@@ -135,6 +135,10 @@ class MultiAgentOrchestrator:
 
         if not message.strip():
             raise ValueError("Multi-agent message cannot be empty.")
+
+        for agent_name in agent_names:
+            if agent_name not in self._agents:
+                raise ValueError(f"Unknown agent: {agent_name}")
 
         results: list[AgentRunResult] = []
         current_message = message

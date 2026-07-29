@@ -162,9 +162,8 @@ def test_agent_prompt_includes_instructions_conversation_and_message():
     assert "Instructions:" in ai_client.received_prompt
     assert "You are a concise assistant." in ai_client.received_prompt
     assert "Conversation so far:" in ai_client.received_prompt
-    assert "USER:\nWhat is Redis?" in ai_client.received_prompt
     assert "Current user message:" in ai_client.received_prompt
-    assert "What is Redis?" in ai_client.received_prompt
+    assert ai_client.received_prompt.count("What is Redis?") == 1
 
 
 def test_agent_uses_recent_memory_limit():
@@ -188,7 +187,27 @@ def test_agent_uses_recent_memory_limit():
     assert "First" not in ai_client.received_prompt
     assert "Second" not in ai_client.received_prompt
     assert "Third" in ai_client.received_prompt
-    assert "Fourth" in ai_client.received_prompt
+    assert ai_client.received_prompt.count("Fourth") == 1
+
+
+def test_agent_memory_limit_of_one_includes_only_current_message():
+    ai_client = FakeAIClient()
+    memory = InMemoryConversationMemory()
+    memory.add_system_message("Older system message")
+
+    agent = Agent(
+        ai_client=ai_client,
+        instructions="You are helpful.",
+        memory=memory,
+        memory_limit=1,
+    )
+
+    agent.run("Current question")
+
+    assert ai_client.received_prompt is not None
+    assert "Older system message" not in ai_client.received_prompt
+    assert "No previous conversation." in ai_client.received_prompt
+    assert ai_client.received_prompt.count("Current question") == 1
 
 
 def test_agent_reuses_memory_across_runs():

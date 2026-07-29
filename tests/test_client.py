@@ -1,5 +1,8 @@
+import pytest
+
 from ai.client import AIClient
 from ai.config import AIConfig
+from ai.exceptions import AIConfigurationError
 from ai.providers.base import BaseAIProvider
 from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse
@@ -34,6 +37,31 @@ def test_client_accepts_explicit_config(monkeypatch):
     assert isinstance(client.provider, FakeProvider)
     assert client.provider.api_key == "fake-key"
     assert client.executor.max_retries == 3
+
+
+def test_client_validates_explicit_config_before_provider_creation(monkeypatch):
+    provider_created = False
+
+    def create_provider(config):
+        nonlocal provider_created
+        provider_created = True
+        raise AssertionError("Provider creation must not run.")
+
+    monkeypatch.setattr(ProviderFactory, "create", create_provider)
+
+    with pytest.raises(
+        AIConfigurationError,
+        match="AI provider cannot be empty",
+    ):
+        AIClient(
+            config=AIConfig(
+                provider="   ",
+                api_key="fake-key",
+                model="fake-model",
+            )
+        )
+
+    assert provider_created is False
 
 
 def test_client_loads_environment_config_when_config_not_supplied(monkeypatch):

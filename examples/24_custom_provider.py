@@ -8,7 +8,6 @@ Registration is process-local and must happen before client construction.
 
 from ai.client import AIClient
 from ai.config import AIConfig
-from ai.config_validator import ConfigValidator
 from ai.providers.base import BaseAIProvider
 from ai.providers.factory import ProviderFactory
 from ai.schemas import ProviderResponse, TokenUsage
@@ -46,7 +45,6 @@ def build_ai_client() -> AIClient:
         file_logging_enabled=False,
     )
 
-    ConfigValidator.validate(config)
     return AIClient(config=config)
 
 

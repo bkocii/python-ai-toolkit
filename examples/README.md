@@ -429,9 +429,11 @@ $env:EXAMPLE_AI_API_KEY = "replace_with_a_development_key"
 python -m examples.23_explicit_config
 ```
 
-**Boundary:** Manual `AIConfig` construction does not validate itself. The
-application owns secret lookup and must call `ConfigValidator.validate()`
-before client construction.
+**Boundary:** Manual `AIConfig` construction does not validate itself. In the
+example, the application owns secret lookup and calls
+`ConfigValidator.validate()` as an early startup check. Both client
+constructors also validate the resolved configuration before creating a
+provider, logger, or executor.
 
 See the [explicit configuration guide](../docs/configuration.md#explicit-aiconfig).
 

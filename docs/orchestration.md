@@ -202,9 +202,8 @@ One `Agent.run()` performs this lifecycle:
 7. return `AgentResponse`
 
 The current user message is appended before the recent-memory slice is built.
-It therefore appears in the formatted conversation and again in the prompt's
-separate `Current user message` section. This is the current prompt contract
-and is recorded for explicit review before the Version 1.0 API freeze.
+It is excluded from the formatted conversation and appears once in the prompt's
+separate `Current user message` section.
 
 Because `memory_limit` counts messages and includes the newly appended user
 message, a small limit can exclude an older system or assistant message. Agent
@@ -445,9 +444,9 @@ The orchestrator does not merge prompts, conversation histories, or structured
 state between agents. Each agent keeps its own configured memory. The only
 automatic handoff is the previous successful output string.
 
-If a sequence names an unknown agent, the lookup `ValueError` propagates rather
-than becoming a partial `MultiAgentResponse`. Validate an application-selected
-sequence against `agent_names()` before execution when names are dynamic.
+The orchestrator validates every requested name before execution. An unknown
+name therefore raises `ValueError` without running any earlier agent in the
+sequence.
 
 ### Orchestration results
 
@@ -461,7 +460,8 @@ sequence against `agent_names()` before execution when names are dynamic.
 | `error` | Captured agent error text on failure |
 
 `MultiAgentResponse.results` preserves execution order.
-`MultiAgentResponse.success` is true only when every recorded result succeeds.
+`MultiAgentResponse.success` is true only when at least one result exists and
+every recorded result succeeds. An empty response is unsuccessful.
 `final_output` returns the last successful agent output, including when a later
 agent failed; it returns `None` when no agent succeeded.
 
@@ -488,17 +488,13 @@ agent-to-agent debate, parallel agent execution, shared global memory, or
 automatic tool execution. These limits are intentional parts of the explicit,
 testable first architecture.
 
-## Future review boundaries
+## Version 1.0 boundary and future work
 
-The Version 1.0 public API review should explicitly inspect:
-
-- agent prompt construction and the current-message duplication described
-  above
-- whether `memory_limit` should remain message-count based
-- the selected metadata exposed by `AgentResponse`
-- workflow state-mutation and failed-step update semantics
-- unknown-agent lookup behavior in a sequence
-- result contracts for partial execution
+Version 1.0 approves the message-count memory limit, current `AgentResponse`
+metadata, shallow workflow state updates, failed-step stop behavior,
+unknown-agent `ValueError`, and known-agent partial-execution result contracts
+documented above. Exact prompt wording remains an implementation detail, but
+the current user message must not be duplicated.
 
 Future Backlog candidates include persistent and token-aware memory,
 configurable agent prompts, streaming and async agents, RAG- and tool-aware
@@ -508,7 +504,8 @@ patterns.
 Future orchestration helpers must preserve application control over external
 actions, authorization, resource limits, and stopping conditions.
 
-See the [Version 1.0 review and Future Backlog](development/roadmap.md#future-backlog).
+See the [approved public API](api_reference.md#version-10-freeze-decisions) and
+[Future Backlog](development/roadmap.md#future-backlog).
 
 ## Related documentation
 
