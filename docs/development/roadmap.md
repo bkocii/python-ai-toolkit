@@ -3401,7 +3401,7 @@ Publish the first stable release.
 * [x] V1-002 Resolve release-blocking defects
 * [x] V1-003 Complete changelog
 * [x] V1-004 Update project version to `1.0.0`
-* [ ] V1-005 Update project state
+* [x] V1-005 Update project state
 * [ ] V1-006 Complete release documentation
 * [ ] V1-007 Create release commit
 * [ ] V1-008 Create Git tag `v1.0.0`
@@ -3601,6 +3601,50 @@ Next task:
 V1-005 — Update project state
 ```
 
+#### V1-005 — Update Project State
+
+Status: Completed
+
+The authoritative project state was reconciled with the completed Version 1
+release-preparation work through `V1-004`.
+
+Completed work:
+
+* recorded `V1-001` through `V1-005` as completed release-preparation tasks
+* replaced stale `V1-003` and `V1-004` next-task pointers with `V1-006`
+* aligned the current package summary with version `1.0.0` and the
+  Production/Stable classifier
+* distinguished the prepared `1.0.0` source from a tagged and published
+  release
+* recorded the remaining `V1-006` through `V1-012` release sequence
+* corrected the profiling-quality status to reflect the later Black and Ruff
+  cleanup
+* preserved historical `0.7.0.dev0` build, installation, and workflow evidence
+* refreshed the session handoff and new-chat instructions for `V1-006`
+* added permanent project-state regressions for current status, release
+  boundaries, roadmap order, and handoff consistency
+
+Completion verification:
+
+```text
+7 focused project-state regressions passed
+460 normal tests passed
+Black passed all 134 Python files
+Ruff and dependency validation passed
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 102-entry source archive
+```
+
+No runtime API, dependency, package metadata, release workflow, changelog
+release date, Git tag, GitHub deployment, PyPI project, distribution upload, or
+publication changed.
+
+Next task:
+
+```text
+V1-006 — Complete release documentation
+```
+
 ### Public API Freeze
 
 Before release, explicitly review:
@@ -3663,12 +3707,12 @@ Live provider smoke tests must be explicit and must not run as normal unit tests
 
 ## Sprint 9 Exit Criteria
 
-* [ ] Representative benchmark coverage exists
-* [ ] Performance findings are documented
-* [ ] Documentation is complete and verified
-* [ ] Important example gaps are closed
-* [ ] Package distributions pass validation
-* [ ] CI tests supported Python versions
+* [x] Representative benchmark coverage exists
+* [x] Performance findings are documented
+* [x] Documentation is complete and verified
+* [x] Important example gaps are closed
+* [x] Package distributions pass validation
+* [x] CI tests supported Python versions
 * [x] Release automation is operational
 * [ ] Version 1.0.0 is published and smoke-tested
 

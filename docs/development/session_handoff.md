@@ -6,7 +6,7 @@
 **Current version:** `1.0.0`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-005 — Update project state`
+**Next task:** `V1-006 — Complete release documentation`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current next task is `V1-002`.
+The current release-preparation task is `V1-006`.
 
 ---
 
@@ -2406,19 +2406,53 @@ project, distribution upload, or publication changed.
 
 ---
 
-# Exact Next Task — V1-005
+# V1-005 — Update Project State
 
-Update the project state for the `1.0.0` release-preparation stage.
+`V1-005` is complete.
+
+The authoritative state now records the completed Version 1 preparation work
+through `V1-005`, identifies the source and package metadata as `1.0.0`, and
+keeps the release explicitly pending. The current package, milestone, quality,
+and next-task summaries no longer describe the old development build or
+already completed work.
+
+Historical `0.7.0.dev0` build, installation, and workflow evidence remains in
+its task-specific records. The changelog remains `Unreleased`, and no release
+tag, protected deployment approval, PyPI upload, or GitHub Release exists.
+
+Completion evidence:
+
+```text
+7 focused project-state regressions passed
+460 normal tests passed
+Black passed all 134 Python files
+Ruff and dependency validation passed
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 102-entry source archive
+```
+
+No runtime API, dependency, package metadata, release workflow, changelog
+release date, Git tag, GitHub deployment, PyPI project, distribution upload, or
+publication changed.
+
+---
+
+# Exact Next Task — V1-006
+
+Complete the final pre-release documentation review for `1.0.0`.
 
 Required work:
 
-1. reconcile the project-state summary with completed `V1-001` through
-   `V1-004` work
-2. remove stale next-task and pre-Version-1 status language
-3. preserve detailed historical completion evidence
-4. point the authoritative project state to
-   `V1-006 — Complete release documentation`
-5. do not create `v1.0.0`, approve a deployment, or publish
+1. verify README, installation, compatibility, API, changelog, and release
+   documentation against the frozen Version 1 contract
+2. resolve stale pre-release instructions or contradictory public status text
+3. confirm the maintainer checklist is complete through the later release
+   commit, tag, approval, PyPI verification, smoke-test, and release-note steps
+4. update the roadmap and handoff to
+   `V1-007 — Create release commit`
+5. keep the changelog unreleased until the roadmap authorizes its release-date
+   change
+6. do not create `v1.0.0`, approve a deployment, or publish
 
 ---
 
@@ -2954,15 +2988,16 @@ For the immediate next task, also provide:
 9. `docs/installation.md`
 10. `docs/compatibility.md`
 11. `docs/releasing.md`
-12. version-coupled scripts and tests
-13. current completed roadmap records
+12. `docs/api_reference.md`
+13. release- and documentation-focused tests
+14. current workflow files
 
 Profiling evidence, generated benchmark artifacts, release artifacts,
 deliverable ZIPs, caches, example media, and future-backlog implementation
-files are not required for `V1-004`. Package metadata, current-status
-documentation, installation examples, release commands, and version-coupled
-verifiers are required so the version update is complete without rewriting
-historical evidence.
+files are not required for `V1-006`. Public documentation, release
+instructions, current-status records, workflow contracts, and
+documentation-focused regressions are required so the final release guide is
+complete without changing runtime behavior.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -2976,9 +3011,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that V1-004 is still the correct next task.
+3. Verify the repository's current state and confirm that V1-006 is still the correct next task.
 4. Read pyproject.toml, CHANGELOG.md, README.md, docs/installation.md, docs/compatibility.md, and docs/releasing.md.
-5. Update the project version to 1.0.0 and every current-version coupling without creating a tag or publishing.
+5. Complete the Version 1 release documentation without creating a tag, approving a deployment, or publishing.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

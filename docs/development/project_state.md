@@ -46,6 +46,8 @@ Completed PROD-007 release tasks:
 * V1-001 Freeze the Version 1.0 public API
 * V1-002 Resolve release-blocking defects
 * V1-003 Complete changelog
+* V1-004 Update project version to 1.0.0
+* V1-005 Update project state
 
 Completed PROD-001 benchmark tasks:
 
@@ -122,8 +124,12 @@ PROD-007 — Version 1.0.0 Release
 Next roadmap task:
 
 ```text
-V1-003 — Complete changelog
+V1-006 — Complete release documentation
 ```
+
+The source and package metadata are prepared for Version 1.0, but the release
+is not complete. The changelog remains `Unreleased`; no `v1.0.0` tag,
+protected-environment approval, PyPI upload, or GitHub Release exists yet.
 
 ---
 
@@ -656,6 +662,24 @@ Remaining:
 
 * PROD-007 Version 1.0 Release
 
+Completed Version 1 release tasks:
+
+* V1-001 Freeze the Version 1.0 public API
+* V1-002 Resolve release-blocking defects
+* V1-003 Complete changelog
+* V1-004 Update project version to `1.0.0`
+* V1-005 Update project state
+
+Remaining Version 1 release tasks:
+
+* V1-006 Complete release documentation
+* V1-007 Create release commit
+* V1-008 Create Git tag `v1.0.0`
+* V1-009 Build and publish distributions
+* V1-010 Verify installation from PyPI
+* V1-011 Run post-release smoke tests
+* V1-012 Publish release notes
+
 Completed release-automation tasks:
 
 * RELEASE-001 Add continuous-integration workflow
@@ -686,14 +710,15 @@ Completed release-automation tasks:
 The current metadata now:
 
 * identifies the distribution as `python-ai-toolkit`
-* identifies the development build as `0.7.0.dev0`
+* identifies the release-preparation source as `1.0.0`
+* keeps `1.0.0` explicitly unreleased until the authorized tag workflow
 * requires Python `>=3.11`
 * uses `README.md` as the long description
 * records Burim Koci as the author
 * declares `openai>=1.66.0`, `pydantic>=2.4.2`, and `python-dotenv`
 * discovers all six current `ai*` package directories
 * omits unconfirmed project URLs instead of publishing placeholders
-* uses fourteen valid PyPI classifiers for beta status, console use, optional
+* uses fourteen valid PyPI classifiers for stable status, console use, optional
   Django and FastAPI integrations, developer audience, operating-system
   independence, Python 3-only support, the verified Python 3.11–3.14 range,
   artificial intelligence, and Python modules
@@ -708,13 +733,13 @@ The current metadata now:
 * declares `ai-toolkit = "ai.cli.main:main"` as the only console script
 * generates a working installed command with documented exit codes `0`, `1`,
   and `2`
-* builds `python_ai_toolkit-0.7.0.dev0.tar.gz` and
-  `python_ai_toolkit-0.7.0.dev0-py3-none-any.whl` with the isolated
+* builds `python_ai_toolkit-1.0.0.tar.gz` and
+  `python_ai_toolkit-1.0.0-py3-none-any.whl` with the isolated
   `python -m build` workflow
 * keeps reproducible `build/`, `dist/`, and `*.egg-info/` output outside source
   control
 
-The wheel and source distribution build successfully. Twine strict validation
+The Version 1 wheel and source distribution build successfully. Twine strict validation
 accepts both artifacts, including the UTF-8 Markdown long description and
 modern MIT metadata. The reusable offline validator confirms safe paths, exact
 agreement with all reviewed `ai` modules, matching metadata and required files,
@@ -722,7 +747,7 @@ valid wheel `RECORD` hashes, and no secret, cache, compiled, log, deliverable,
 or nested build content.
 
 Separate clean environments now prove that both the wheel and source
-distribution install successfully, report version `0.7.0.dev0`, import the
+distribution install successfully, report version `1.0.0`, import the
 toolkit from isolated `site-packages` directories, run representative offline
 prompt and vector-store operations, generate the working console command, and
 pass dependency validation. The archive validator now handles Windows and Unix
@@ -743,6 +768,11 @@ FastAPI `0.140.7` and every FastAPI adapter module while Django remains absent.
 Both adapters construct clients through a deterministic offline provider,
 complete an offline request, and pass `pip check`. The reusable verifier keeps
 the installed metadata and adapter-module inventory aligned.
+
+The earlier `0.7.0.dev0` build and installation results remain preserved in
+their task-specific roadmap and handoff records. They are historical
+development evidence, not the current package state and not a separate stable
+release.
 
 Twine proves that the packaged Markdown is renderable but does not visit link
 destinations. The README's repository-relative documentation links remain
@@ -970,9 +1000,10 @@ The profiling work:
   architectural risk
 
 Completion verification passed all functional and benchmark checks. Current
-unpinned Black and Ruff versions still report pre-existing repository-wide
-quality findings; those findings were not mixed into the documentation-only
-`PROF-009` change and remain open before the Sprint 9 full-quality exit.
+quality gates are clean. The repository-wide Black and Ruff findings that were
+deliberately left outside the documentation-only `PROF-009` task were later
+resolved by `RELEASE-003`; subsequent release gates pass on Python 3.11 through
+3.14.
 
 Representative comparable improvements:
 
@@ -998,15 +1029,14 @@ PROD-007 — Version 1.0.0 Release
 
 ### Next Recommended Focus
 
-Begin `V1-004 — Update project version to 1.0.0`.
+Begin `V1-006 — Complete release documentation`.
 
-`V1-003` consolidated the complete unreleased history into one release-ready
-Version 1 section with user-visible additions, behavior changes, fixes,
-security, compatibility boundaries, upgrade implications, and maintainer
-release evidence. The next task should change the authoritative package and
-documentation version from `0.7.0.dev0` / `0.7.0-dev` to `1.0.0`, including
-every version-coupled test and installation verifier. It must not create a Git
-tag or publish.
+The frozen API, confirmed blocker fixes, consolidated changelog, coordinated
+`1.0.0` metadata, and authoritative project state are complete. The next task
+should perform the final pre-release documentation review, make the release
+instructions and public status mutually consistent, and prepare the
+documentation for the later release commit. It must not create `v1.0.0`,
+approve a deployment, or publish.
 
 ---
 
