@@ -400,9 +400,9 @@ short-lived credential only when the protected publishing job runs.
 
 Complete account setup is only the prerequisite. The
 [release procedure](releasing.md) covers the maintainer preflight, version
-change, tag creation, protected approval, PyPI smoke test, and failure recovery.
-Do not create a production tag until that checklist and the roadmap-authorized
-rehearsal are complete.
+change, tag creation, protected approval, PyPI verification, installed-package
+smoke tests, release notes, and failure recovery. Do not create a production
+tag until that checklist and the roadmap-authorized rehearsal are complete.
 
 The generated `build/`, `dist/`, and `*.egg-info/` paths are ignored because
 they are reproducible outputs rather than source files. Do not upload these
@@ -427,8 +427,9 @@ build or editable installation.
 
 Keep the wheel and source distribution together in the local `dist\` directory
 while validating them. They are ignored build outputs, not normal Git source
-files. A later release process uploads the final validated files to the package
-index or attaches them to a release.
+files. The production workflow uploads the final validated files to PyPI.
+Later GitHub release notes link users to PyPI instead of attaching duplicate
+distribution files.
 
 ### Validate both distributions on Windows
 

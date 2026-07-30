@@ -48,6 +48,7 @@ Completed PROD-007 release tasks:
 * V1-003 Complete changelog
 * V1-004 Update project version to 1.0.0
 * V1-005 Update project state
+* V1-006 Complete release documentation
 
 Completed PROD-001 benchmark tasks:
 
@@ -124,12 +125,14 @@ PROD-007 — Version 1.0.0 Release
 Next roadmap task:
 
 ```text
-V1-006 — Complete release documentation
+V1-007 — Create release commit
 ```
 
 The source and package metadata are prepared for Version 1.0, but the release
 is not complete. The changelog remains `Unreleased`; no `v1.0.0` tag,
 protected-environment approval, PyPI upload, or GitHub Release exists yet.
+The release guide now defines the exact commit, tag, publication, PyPI
+verification, installed-package smoke-test, and release-note boundaries.
 
 ---
 
@@ -669,10 +672,10 @@ Completed Version 1 release tasks:
 * V1-003 Complete changelog
 * V1-004 Update project version to `1.0.0`
 * V1-005 Update project state
+* V1-006 Complete release documentation
 
 Remaining Version 1 release tasks:
 
-* V1-006 Complete release documentation
 * V1-007 Create release commit
 * V1-008 Create Git tag `v1.0.0`
 * V1-009 Build and publish distributions
@@ -792,6 +795,40 @@ environments loaded only their selected framework, imported every corresponding
 adapter module, completed an offline integration request, and passed dependency
 validation. Documentation verification inventoried 202 fenced blocks, compiled
 82 Python blocks, and validated 183 repository-relative links.
+
+---
+
+## Version 1 Release Documentation Status
+
+`V1-006 — Complete Release Documentation` is complete.
+
+The README, installation guide, compatibility guide, API reference, changelog,
+release guide, workflow, roadmap, project state, and handoff now agree that
+package metadata is `1.0.0` while tagging and publication remain pending. The
+changelog is still `Unreleased`.
+
+The maintainer guide now maps `V1-007` through `V1-012` to distinct release
+commit, tag, protected publication, PyPI verification, installed-package smoke,
+and GitHub release-note gates. It includes deterministic core, Django-only, and
+FastAPI-only PyPI smoke commands and explicitly excludes live provider requests
+from the required offline gate.
+
+Completion verification:
+
+```text
+13 focused release-documentation regressions passed
+54 focused release, state, version, changelog, and package checks passed
+466 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 134 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 102-entry source archive
+wheel and source-archive core installations passed
+Django-only and FastAPI-only wheel installations passed
+```
+
+No release date, tag, deployment approval, upload, PyPI project, or GitHub
+Release was created.
 
 ---
 
@@ -1029,14 +1066,15 @@ PROD-007 — Version 1.0.0 Release
 
 ### Next Recommended Focus
 
-Begin `V1-006 — Complete release documentation`.
+Begin `V1-007 — Create release commit`.
 
 The frozen API, confirmed blocker fixes, consolidated changelog, coordinated
-`1.0.0` metadata, and authoritative project state are complete. The next task
-should perform the final pre-release documentation review, make the release
-instructions and public status mutually consistent, and prepare the
-documentation for the later release commit. It must not create `v1.0.0`,
-approve a deployment, or publish.
+`1.0.0` metadata, authoritative project state, and final release procedure are
+complete. The next task should choose the actual release date, convert the
+public package documentation from pre-release wording to release-ready wording,
+verify canonical public links and package metadata, run every final source and
+artifact gate, and create the exact reviewed release commit. It must not create
+or push `v1.0.0`, approve a deployment, or publish.
 
 ---
 

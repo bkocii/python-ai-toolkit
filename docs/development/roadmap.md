@@ -3402,7 +3402,7 @@ Publish the first stable release.
 * [x] V1-003 Complete changelog
 * [x] V1-004 Update project version to `1.0.0`
 * [x] V1-005 Update project state
-* [ ] V1-006 Complete release documentation
+* [x] V1-006 Complete release documentation
 * [ ] V1-007 Create release commit
 * [ ] V1-008 Create Git tag `v1.0.0`
 * [ ] V1-009 Build and publish distributions
@@ -3645,6 +3645,61 @@ Next task:
 V1-006 — Complete release documentation
 ```
 
+#### V1-006 — Complete Release Documentation
+
+Status: Completed
+
+The final pre-release documentation review compared the README, installation
+guide, compatibility guide, API reference, changelog, release guide, workflow,
+and current-state records against the frozen Version 1 contract and remaining
+release tasks.
+
+Completed work:
+
+* preserved one coherent pre-release status: package metadata is `1.0.0`, the
+  changelog remains `Unreleased`, and no tag or publication is claimed
+* added an explicit `V1-006` through `V1-012` execution map with a stop boundary
+  after every authorization step
+* defined the `V1-007` release-commit gate for the dated changelog, release-ready
+  public status, canonical project URLs, and PyPI-safe README links
+* separated tag creation from protected publication approval
+* separated exact-version PyPI installation verification from deterministic
+  installed-package behavior checks
+* documented clean core, Django-only, and FastAPI-only post-release smoke tests
+  using the existing installation verifiers
+* made live provider requests explicitly optional and outside deterministic
+  release evidence
+* defined `V1-012` as a manual GitHub Release for the existing verified tag
+* removed stale guidance suggesting duplicate wheel and source-archive uploads
+  to the GitHub Release
+* expanded release-documentation regressions across task ordering, public
+  pre-release status, release-commit requirements, post-release smoke tests,
+  and release-note boundaries
+
+Completion verification:
+
+```text
+13 focused release-documentation regressions passed
+54 focused release, state, version, changelog, and package checks passed
+466 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 134 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 102-entry source archive
+wheel and source-archive core installations passed
+Django-only and FastAPI-only wheel installations passed
+```
+
+No runtime API, dependency, package metadata, release workflow, changelog
+release date, Git tag, GitHub deployment, PyPI project, distribution upload,
+or publication changed.
+
+Next task:
+
+```text
+V1-007 — Create release commit
+```
+
 ### Public API Freeze
 
 Before release, explicitly review:
@@ -3698,7 +3753,7 @@ Live provider smoke tests must be explicit and must not run as normal unit tests
 
 * [x] Stable public API approved
 * [x] Full quality checks pass
-* [ ] Documentation is complete
+* [x] Documentation is complete
 * [ ] Package is published
 * [ ] Clean installation succeeds
 * [ ] Version 1.0.0 is tagged and documented

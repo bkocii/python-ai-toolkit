@@ -22,7 +22,11 @@ protected PyPI approval
         ↓
 trusted publication
         ↓
-clean installation smoke test
+clean PyPI installation verification
+        ↓
+installed-package smoke tests
+        ↓
+GitHub release notes
 ```
 
 Pushing a matching version tag starts this process. An ordinary branch push or
@@ -45,7 +49,7 @@ The automated workflow:
 - accepts a manual rehearsal with a tag-shaped label but creates no Git tag
 - requires the tag to equal `v` plus the version in `pyproject.toml`
 - rebuilds from the exact selected commit
-- publishes no GitHub Release
+- publishes no GitHub Release; the later `V1-012` task creates one manually
 - uses no stored PyPI API token or password
 
 ## Non-production workflow rehearsal
@@ -154,6 +158,28 @@ Official references:
 | [`installation.md`](installation.md) | Detailed local artifact and clean-install checks |
 | [`project_state.md`](development/project_state.md) | Current milestone and completed work |
 
+## Version 1.0 execution map
+
+The roadmap deliberately separates the remaining release work into small
+authorization boundaries. Complete each task in order and stop when its
+completion evidence has been recorded:
+
+| Task | Authorized outcome | Stop boundary |
+| --- | --- | --- |
+| `V1-006` | Complete and verify this release documentation | No release commit, tag, approval, or publication |
+| `V1-007` | Create and merge the exact release commit | No Git tag |
+| `V1-008` | Create, verify, and push annotated tag `v1.0.0` | Observe the workflow start; do not approve `pypi` |
+| `V1-009` | Verify the tag workflow, approve `pypi`, and publish both distributions | Do not claim installation success until PyPI is checked independently |
+| `V1-010` | Verify the PyPI page and an exact-version clean installation | Do not mark post-release behavior verified yet |
+| `V1-011` | Run deterministic installed-package and optional-extra smoke tests | Do not publish release notes until every required smoke test passes |
+| `V1-012` | Publish GitHub release notes for the existing tag and record final release state | Version 1.0 release milestone may then be closed |
+
+`V1-008` and `V1-009` are operationally adjacent because pushing the tag starts
+the publishing workflow. The required reviewer on the `pypi` environment is
+the intended pause between them. If the repository cannot enforce that pause,
+do not push the tag until the maintainer has also authorized the `V1-009`
+publication step.
+
 ## Phase 1 — Prepare the release
 
 ### 1. Confirm release authority and scope
@@ -190,7 +216,20 @@ For a Version 1.0 release, for example:
 version = "1.0.0"
 ```
 
-Do not create the tag yet. First review the complete change:
+For the Version 1.0 release commit in `V1-007`, also:
+
+- replace the `1.0.0 — Unreleased` changelog heading with the actual release
+  date
+- replace public "not published yet" wording with release-ready installation
+  and status text that will remain correct in the PyPI long description
+- confirm canonical repository, documentation, issue-tracker, and changelog
+  URLs instead of publishing placeholder or broken relative destinations
+- verify every README link in the built long description resolves from PyPI
+- keep process-oriented project-state text honest until publication and
+  post-release checks really complete
+
+Do not make those release-date or published-status changes during an earlier
+roadmap task. Do not create the tag yet. First review the complete change:
 
 ```powershell
 git status --short
@@ -267,9 +306,10 @@ exercise the console command, and pass `pip check`.
 
 ## Phase 2 — Approve the exact commit
 
-### 6. Commit and review the release changes
+### 6. Create and review the release commit (`V1-007`)
 
-Create a normal branch commit and push it for review:
+Choose the actual release date and complete the release-source changes from
+Phase 1. Then create a normal branch commit and push it for review:
 
 ```powershell
 git add pyproject.toml CHANGELOG.md README.md docs
@@ -279,7 +319,10 @@ git push
 ```
 
 Adjust the `git add` targets to the files actually changed by the release task.
-Never use a broad add command without reviewing its scope.
+If `git add -A` is used intentionally, inspect `git status --short`,
+`git diff --cached --stat`, and the complete `git diff --cached` before
+committing. Generated output, local environments, secrets, logs, benchmarks,
+and unrelated changes must not be staged.
 
 The pull request or protected-branch process must complete successfully:
 
@@ -309,7 +352,7 @@ git log -1 --oneline
 
 ## Phase 3 — Create and push the tag
 
-### 8. Create one annotated tag
+### 8. Create one annotated tag (`V1-008`)
 
 Create the tag only after the exact `main` commit is approved:
 
@@ -349,7 +392,7 @@ commit with a new version and tag.
 
 ## Phase 4 — Monitor and approve publication
 
-### 10. Inspect the GitHub Actions run
+### 10. Inspect and approve the GitHub Actions run (`V1-009`)
 
 Open the repository **Actions** page and select the run named
 **Release candidate** for the exact tag.
@@ -377,7 +420,7 @@ Reject or cancel the deployment if anything is unexpected.
 The final job obtains a short-lived identity from PyPI and publishes the
 already validated artifacts. It does not rebuild them.
 
-## Phase 5 — Verify the published release
+## Phase 5 — Verify installation from PyPI (`V1-010`)
 
 ### 11. Inspect PyPI
 
@@ -427,19 +470,123 @@ Expected:
 This smoke test does not need provider credentials or make a network request
 after installation.
 
-### 13. Record completion
+### 13. Record PyPI verification evidence
 
 After verification:
 
-- record the released version, tag, and commit in project state
-- mark the roadmap release tasks complete
-- record the CI run and PyPI verification result
-- ensure the changelog and README show the published status
-- preserve any release hashes or evidence required by the release milestone
+- record the exact PyPI project URL and installed version
+- record the workflow run URL, tag, and release commit
+- record the wheel and source filenames and their published SHA-256 values
+- preserve the clean-install command and result
+- mark only `V1-010` complete
 
-The current workflow does not create a GitHub Release. Adding release notes or
-assets on GitHub is a separate future decision and must not be assumed complete
-by this procedure.
+Do not close the release milestone yet. Installed behavior and release notes
+remain separate roadmap tasks.
+
+## Phase 6 — Run post-release smoke tests (`V1-011`)
+
+The clean PyPI installation proves that the package resolves and imports.
+Now exercise representative behavior from installed files, outside the source
+checkout, without provider credentials or live network requests.
+
+From the repository root, reuse the clean core environment created in Phase 5:
+
+```powershell
+$projectRoot = (Get-Location).Path
+$smokeRoot = Join-Path (Split-Path $projectRoot) "python-ai-toolkit-pypi-smoke"
+
+Push-Location (Split-Path $projectRoot)
+& "$smokeRoot\Scripts\python.exe" `
+    "$projectRoot\scripts\verify_core_installation.py"
+& "$smokeRoot\Scripts\python.exe" -m pip check
+& "$smokeRoot\Scripts\ai-toolkit.exe" --help
+Pop-Location
+```
+
+The verifier imports every core module, confirms the installed version and
+dependency boundary, exercises prompt and vector-store behavior, registers a
+deterministic local provider, and completes plain and structured client
+requests.
+
+Verify each optional framework in its own clean environment:
+
+```powershell
+$version = "1.0.0"
+$projectRoot = (Get-Location).Path
+$extraRoot = Join-Path (Split-Path $projectRoot) `
+    "python-ai-toolkit-pypi-extras"
+
+Remove-Item $extraRoot -Recurse -Force -ErrorAction SilentlyContinue
+py -m venv "$extraRoot\django-env"
+py -m venv "$extraRoot\fastapi-env"
+
+& "$extraRoot\django-env\Scripts\python.exe" -m pip install --no-cache-dir `
+    --index-url https://pypi.org/simple/ "python-ai-toolkit[django]==$version"
+& "$extraRoot\fastapi-env\Scripts\python.exe" -m pip install --no-cache-dir `
+    --index-url https://pypi.org/simple/ "python-ai-toolkit[fastapi]==$version"
+
+Push-Location (Split-Path $projectRoot)
+& "$extraRoot\django-env\Scripts\python.exe" `
+    "$projectRoot\scripts\verify_framework_extra_installation.py" django
+& "$extraRoot\django-env\Scripts\python.exe" -m pip check
+& "$extraRoot\fastapi-env\Scripts\python.exe" `
+    "$projectRoot\scripts\verify_framework_extra_installation.py" fastapi
+& "$extraRoot\fastapi-env\Scripts\python.exe" -m pip check
+Pop-Location
+```
+
+Required results:
+
+- core verification passes from the PyPI-installed package
+- plain and structured offline client requests pass
+- Django and FastAPI extras each pass with the unselected framework absent
+- every `pip check` succeeds
+- `ai-toolkit --help` succeeds
+
+A live OpenAI request is optional, credentialed, billable, model-dependent,
+and outside this deterministic release gate. Run one only when separately
+authorized; never place a real key in the command, logs, or release evidence.
+
+Record the operating system, Python version, exact commands, and results, then
+mark only `V1-011` complete.
+
+## Phase 7 — Publish release notes (`V1-012`)
+
+The release workflow intentionally does not create a GitHub Release. After
+PyPI verification and post-release smoke tests pass:
+
+1. Open the repository's **Releases** page.
+2. Select **Draft a new release**.
+3. Choose the existing `v1.0.0` tag. Do not create another tag.
+4. Set the title to `Python AI Toolkit 1.0.0`.
+5. Write concise notes from the dated `1.0.0` changelog section:
+   - major capabilities and public API status
+   - installation command
+   - Python and optional-extra compatibility
+   - important upgrade and behavior notes
+   - links to the changelog, API reference, and PyPI project
+6. Confirm **Set as a pre-release** is not selected.
+7. Publish the release and verify it points to the recorded tag and commit.
+
+Do not upload a second copy of the wheel or source distribution as GitHub
+release assets. PyPI is the distribution source; GitHub already exposes source
+archives for the tag.
+
+GitHub's official [release-management
+guide](https://docs.github.com/repositories/releasing-projects-on-github/managing-releases-in-a-repository)
+documents the current release form and existing-tag flow.
+
+After the GitHub Release is visible:
+
+- record its URL
+- mark `V1-012` and `PROD-007` complete
+- update roadmap, project state, handoff, README status, and any remaining
+  release records
+- confirm the changelog is dated and contains no `Unreleased` marker for
+  `1.0.0`
+- preserve workflow, PyPI, installation, smoke-test, and release-note evidence
+
+Only then is the Version 1.0 release milestone complete.
 
 ## Failure and recovery
 
@@ -456,6 +603,7 @@ approval is uncertain.
 | PyPI shows only part of the release | Do not blindly rerun; inspect which filenames exist, treat the version as used, and prepare a corrected new version |
 | Published release is defective | Yank the defective release when appropriate, document the problem, fix it, and publish a new version |
 | A release or file was deleted from PyPI | Treat deletion as permanent; do not expect to restore or reuse its filename |
+| GitHub release notes are wrong | Correct the release notes without moving or recreating the tag; do not replace PyPI files |
 
 PyPI does not allow an existing filename to be overwritten, including after
 deletion. Never delete a release as an attempt to repair and republish the same
@@ -501,4 +649,7 @@ Official recovery references:
 - [ ] PyPI metadata and README render correctly
 - [ ] Clean exact-version installation succeeds
 - [ ] `pip check`, offline import smoke, and console help pass
-- [ ] Roadmap, project state, and changelog record completion
+- [ ] Core plain and structured installed-package smoke tests pass
+- [ ] Django-only and FastAPI-only installed-package smoke tests pass
+- [ ] GitHub Release uses the existing tag and contains verified release notes
+- [ ] Roadmap, project state, README, handoff, and changelog record completion

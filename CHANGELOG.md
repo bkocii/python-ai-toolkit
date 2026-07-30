@@ -129,6 +129,9 @@ here rather than duplicated in a second release section.
 * A manual rehearsal exercises the production workflow without creating a tag,
   requesting an identity token, entering the protected environment, or
   publishing
+* The maintainer release guide separates the release commit, tag trigger,
+  protected publication, PyPI installation verification, deterministic
+  installed-package smoke tests, and GitHub release notes into explicit gates
 
 ---
 

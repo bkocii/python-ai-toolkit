@@ -18,7 +18,7 @@ def test_project_state_header_identifies_the_current_release_stage():
     assert "1.0.0" in header
     assert "Sprint 9 is in progress." in header
     assert "PROD-007 — Version 1.0.0 Release" in header
-    assert "V1-006 — Complete release documentation" in header
+    assert "V1-007 — Create release commit" in header
     assert "no `v1.0.0` tag" in header
     assert "PyPI upload" in header
 
@@ -31,14 +31,15 @@ def test_project_state_records_completed_and_remaining_release_tasks():
         "## PyPI Package Status",
     )
 
-    for task_number in range(1, 6):
+    for task_number in range(1, 7):
         assert f"V1-{task_number:03d}" in progress
 
-    for task_number in range(6, 13):
+    for task_number in range(7, 13):
         assert f"V1-{task_number:03d}" in progress
 
     assert "* V1-005 Update project state" in progress
     assert "* V1-006 Complete release documentation" in progress
+    assert "* V1-007 Create release commit" in progress
     assert "* V1-012 Publish release notes" in progress
 
 
@@ -47,7 +48,7 @@ def test_current_package_status_uses_version_1_without_rewriting_history():
     package_status = section(
         text,
         "## PyPI Package Status",
-        "## Continuous Integration Status",
+        "## Version 1 Release Documentation Status",
     )
 
     assert "release-preparation source as `1.0.0`" in package_status
@@ -58,6 +59,26 @@ def test_current_package_status_uses_version_1_without_rewriting_history():
     assert "The earlier `0.7.0.dev0` build" in package_status
     assert "historical" in package_status
     assert "development evidence" in package_status
+
+
+def test_project_state_records_completed_release_documentation():
+    text = read("docs/development/project_state.md")
+    release_documentation = section(
+        text,
+        "## Version 1 Release Documentation Status",
+        "## Continuous Integration Status",
+    )
+
+    assert "`V1-006 — Complete Release Documentation` is complete." in (
+        release_documentation
+    )
+    assert "13 focused release-documentation regressions passed" in (
+        release_documentation
+    )
+    assert "466 normal tests passed" in release_documentation
+    assert "changelog is still `Unreleased`" in release_documentation
+    assert "`V1-007` through `V1-012`" in release_documentation
+    assert "No release date, tag, deployment approval, upload" in release_documentation
 
 
 def test_project_state_reports_the_resolved_quality_status():
@@ -73,7 +94,7 @@ def test_project_state_reports_the_resolved_quality_status():
     assert "remain open before the Sprint 9 full-quality exit" not in profiling_status
 
 
-def test_roadmap_closes_v1_005_and_preserves_release_order():
+def test_roadmap_closes_v1_006_and_preserves_release_order():
     text = read("docs/development/roadmap.md")
     release = section(
         text,
@@ -82,24 +103,26 @@ def test_roadmap_closes_v1_005_and_preserves_release_order():
     )
 
     assert "* [x] V1-005 Update project state" in release
-    assert "* [ ] V1-006 Complete release documentation" in release
-    assert "#### V1-005 — Update Project State" in release
+    assert "* [x] V1-006 Complete release documentation" in release
+    assert "* [ ] V1-007 Create release commit" in release
+    assert "#### V1-006 — Complete Release Documentation" in release
     assert "Status: Completed" in section(
         release,
-        "#### V1-005 — Update Project State",
+        "#### V1-006 — Complete Release Documentation",
         "### Public API Freeze",
     )
-    assert "V1-006 — Complete release documentation" in release
+    assert "V1-007 — Create release commit" in release
 
 
-def test_handoff_points_the_next_session_to_v1_006():
+def test_handoff_points_the_next_session_to_v1_007():
     text = read("docs/development/session_handoff.md")
     header = "\n".join(text.splitlines()[:12])
 
-    assert "**Next task:** `V1-006 — Complete release documentation`" in header
+    assert "**Next task:** `V1-007 — Create release commit`" in header
     assert "# V1-005 — Update Project State" in text
-    assert "# Exact Next Task — V1-006" in text
-    assert "confirm that V1-006 is still the correct next task" in text
+    assert "# V1-006 — Complete Release Documentation" in text
+    assert "# Exact Next Task — V1-007" in text
+    assert "confirm that V1-007 is still the correct next task" in text
     assert "confirm that V1-004 is still the correct next task" not in text
 
 
@@ -112,4 +135,4 @@ def test_release_boundary_remains_unreleased_and_non_publishing():
     assert "## [1.0.0] - Unreleased" in changelog
     assert "no `v1.0.0` tag" in project_state
     assert "No runtime API, dependency, package metadata" in roadmap
-    assert "do not create `v1.0.0`, approve a deployment, or publish" in handoff
+    assert "do not create or push the tag, approve a deployment, or publish" in handoff

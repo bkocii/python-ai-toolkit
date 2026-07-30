@@ -4,6 +4,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RELEASE_GUIDE_PATH = PROJECT_ROOT / "docs" / "releasing.md"
 README_PATH = PROJECT_ROOT / "README.md"
 INSTALLATION_GUIDE_PATH = PROJECT_ROOT / "docs" / "installation.md"
+COMPATIBILITY_GUIDE_PATH = PROJECT_ROOT / "docs" / "compatibility.md"
+API_REFERENCE_PATH = PROJECT_ROOT / "docs" / "api_reference.md"
+CHANGELOG_PATH = PROJECT_ROOT / "CHANGELOG.md"
 
 
 def guide_text() -> str:
@@ -23,7 +26,9 @@ def test_release_guide_covers_complete_release_lifecycle():
         "## Phase 2 — Approve the exact commit",
         "## Phase 3 — Create and push the tag",
         "## Phase 4 — Monitor and approve publication",
-        "## Phase 5 — Verify the published release",
+        "## Phase 5 — Verify installation from PyPI (`V1-010`)",
+        "## Phase 6 — Run post-release smoke tests (`V1-011`)",
+        "## Phase 7 — Publish release notes (`V1-012`)",
         "## Failure and recovery",
         "## Final checklist",
     ]
@@ -133,3 +138,85 @@ def test_release_guide_is_linked_from_primary_maintainer_docs():
 
     assert "[Release procedure](docs/releasing.md)" in readme
     assert "[release procedure](releasing.md)" in installation
+
+
+def test_version_1_release_tasks_are_explicit_and_ordered():
+    complete_text = guide_text()
+    text = complete_text[
+        complete_text.index("## Version 1.0 execution map") : complete_text.index(
+            "## Phase 1 — Prepare the release"
+        )
+    ]
+    tasks = [
+        "`V1-006`",
+        "`V1-007`",
+        "`V1-008`",
+        "`V1-009`",
+        "`V1-010`",
+        "`V1-011`",
+        "`V1-012`",
+    ]
+
+    positions = [text.index(task) for task in tasks]
+
+    assert positions == sorted(positions)
+    assert "No release commit, tag, approval, or publication" in text
+    assert "No Git tag" in text
+    assert "do not approve `pypi`" in text
+    assert "required reviewer on the `pypi` environment" in text
+
+
+def test_release_commit_gate_covers_public_package_documentation():
+    text = guide_text()
+
+    assert "actual release date" in text
+    assert "`1.0.0 — Unreleased` changelog heading" in text
+    assert 'public "not published yet" wording' in text
+    assert "canonical repository, documentation, issue-tracker, and changelog" in text
+    assert "README link in the built long description resolves from PyPI" in text
+    assert "Do not make those release-date or published-status changes" in text
+
+
+def test_post_release_smoke_gate_uses_installed_public_behavior():
+    text = guide_text()
+
+    for expected_command in [
+        '"$projectRoot\\scripts\\verify_core_installation.py"',
+        '"python-ai-toolkit[django]==$version"',
+        '"python-ai-toolkit[fastapi]==$version"',
+        '"$projectRoot\\scripts\\verify_framework_extra_installation.py" django',
+        '"$projectRoot\\scripts\\verify_framework_extra_installation.py" fastapi',
+    ]:
+        assert expected_command in text
+
+    assert "plain and structured offline client requests pass" in text
+    assert "unselected framework absent" in text
+    assert "A live OpenAI request is optional" in text
+    assert "never place a real key" in text
+
+
+def test_release_notes_use_the_existing_verified_tag():
+    text = guide_text()
+
+    assert "Choose the existing `v1.0.0` tag." in text
+    assert "Do not create another tag." in text
+    assert "Set as a pre-release" in text
+    assert "Do not upload a second copy of the wheel or source distribution" in text
+    assert "GitHub Release is visible" in text
+    assert "Only then is the Version 1.0 release milestone complete." in text
+
+
+def test_public_documents_preserve_the_current_pre_release_boundary():
+    readme = README_PATH.read_text(encoding="utf-8")
+    installation = INSTALLATION_GUIDE_PATH.read_text(encoding="utf-8")
+    compatibility = COMPATIBILITY_GUIDE_PATH.read_text(encoding="utf-8")
+    api_reference = API_REFERENCE_PATH.read_text(encoding="utf-8")
+    changelog = CHANGELOG_PATH.read_text(encoding="utf-8")
+
+    assert "has not yet been tagged or published" in readme
+    assert "not published on PyPI yet" in readme
+    assert "not yet\npublished on PyPI" in installation
+    assert "release has not yet been tagged or\npublished" in compatibility
+    assert "tagging and publication\nremain separate release tasks" in api_reference
+    assert "## [1.0.0] - Unreleased" in changelog
+    assert "has not yet been tagged or published" in changelog

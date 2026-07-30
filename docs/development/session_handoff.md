@@ -6,7 +6,7 @@
 **Current version:** `1.0.0`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-006 — Complete release documentation`
+**Next task:** `V1-007 — Create release commit`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current release-preparation task is `V1-006`.
+The current release-preparation task is `V1-007`.
 
 ---
 
@@ -2437,22 +2437,68 @@ publication changed.
 
 ---
 
-# Exact Next Task — V1-006
+# V1-006 — Complete Release Documentation
 
-Complete the final pre-release documentation review for `1.0.0`.
+`V1-006` is complete.
+
+The final review preserved one coherent pre-release state across README,
+installation, compatibility, API, changelog, release, workflow, and status
+documents. Package metadata is `1.0.0`, but the changelog remains `Unreleased`
+and no release action is claimed.
+
+The maintainer guide now:
+
+* maps `V1-007` through `V1-012` to explicit authorization and stop boundaries
+* defines release-commit changes for the changelog date, public status,
+  canonical project URLs, and PyPI-safe README links
+* separates tag creation from protected PyPI approval
+* separates exact-version PyPI installation from installed behavior checks
+* provides deterministic core, Django-only, and FastAPI-only smoke commands
+* keeps live provider calls optional and outside required release evidence
+* defines `V1-012` as a GitHub Release for the existing verified tag
+* prevents duplicate wheel and source-archive uploads to GitHub
+
+Completion evidence:
+
+```text
+13 focused release-documentation regressions passed
+54 focused release, state, version, changelog, and package checks passed
+466 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 134 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 102-entry source archive
+wheel and source-archive core installations passed
+Django-only and FastAPI-only wheel installations passed
+```
+
+No runtime API, dependency, package metadata, release workflow, changelog
+release date, Git tag, GitHub deployment, PyPI project, distribution upload, or
+publication changed.
+
+---
+
+# Exact Next Task — V1-007
+
+Create the exact Version 1.0 release commit.
 
 Required work:
 
-1. verify README, installation, compatibility, API, changelog, and release
-   documentation against the frozen Version 1 contract
-2. resolve stale pre-release instructions or contradictory public status text
-3. confirm the maintainer checklist is complete through the later release
-   commit, tag, approval, PyPI verification, smoke-test, and release-note steps
-4. update the roadmap and handoff to
-   `V1-007 — Create release commit`
-5. keep the changelog unreleased until the roadmap authorizes its release-date
-   change
-6. do not create `v1.0.0`, approve a deployment, or publish
+1. confirm the planned release date and replace
+   `## [1.0.0] - Unreleased` with that date
+2. convert README, installation, compatibility, and API status text from
+   pre-release wording to release-ready wording that will remain correct on
+   PyPI
+3. confirm the canonical public repository, documentation, issue-tracker, and
+   changelog URLs in package metadata
+4. make every non-anchor README link resolve correctly from the PyPI long
+   description
+5. run the complete Python 3.11–3.14, Black, Ruff, dependency, tag-identity,
+   distribution, and clean-install gates
+6. review and create the exact release commit on `main`
+7. update the roadmap and handoff to
+   `V1-008 — Create Git tag v1.0.0`
+8. do not create or push the tag, approve a deployment, or publish
 
 ---
 
@@ -2994,10 +3040,10 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, release artifacts,
 deliverable ZIPs, caches, example media, and future-backlog implementation
-files are not required for `V1-006`. Public documentation, release
-instructions, current-status records, workflow contracts, and
-documentation-focused regressions are required so the final release guide is
-complete without changing runtime behavior.
+files are not required for `V1-007`. Public package documentation, package
+metadata, release instructions, current-status records, workflow contracts,
+and documentation/package regressions are required so the exact release source
+can be reviewed and committed without tagging or publishing.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -3011,9 +3057,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that V1-006 is still the correct next task.
+3. Verify the repository's current state and confirm that V1-007 is still the correct next task.
 4. Read pyproject.toml, CHANGELOG.md, README.md, docs/installation.md, docs/compatibility.md, and docs/releasing.md.
-5. Complete the Version 1 release documentation without creating a tag, approving a deployment, or publishing.
+5. Create the exact Version 1 release commit without creating a tag, approving a deployment, or publishing.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.
