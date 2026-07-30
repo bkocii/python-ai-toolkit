@@ -72,13 +72,13 @@ def test_release_rehearsal_and_installation_commands_match_version_1():
     assert f"python_ai_toolkit-{CURRENT_VERSION}.tar.gz" in installation_guide
 
 
-def test_changelog_remains_unreleased_until_tagging_is_authorized():
+def test_changelog_uses_the_version_1_release_date():
     changelog = read("CHANGELOG.md")
-    version_heading = f"## [{CURRENT_VERSION}] - Unreleased"
+    version_heading = f"## [{CURRENT_VERSION}] - 2026-07-30"
 
     assert changelog.count(version_heading) == 1
-    assert f"package metadata remains\n`{CURRENT_VERSION}`" in changelog
-    assert "has not yet been tagged or published" in changelog
+    assert f"Version {CURRENT_VERSION} is the first stable API release." in changelog
+    assert f"## [{CURRENT_VERSION}] - Unreleased" not in changelog
 
 
 def test_historical_development_version_evidence_is_preserved():

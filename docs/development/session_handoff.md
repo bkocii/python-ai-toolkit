@@ -6,7 +6,7 @@
 **Current version:** `1.0.0`  
 **Current milestone:** Sprint 9 — Production Readiness  
 **Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-007 — Create release commit`
+**Next task:** `V1-008 — Create Git tag v1.0.0`
 
 ---
 
@@ -218,7 +218,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current release-preparation task is `V1-007`.
+The current release task is `V1-008`.
 
 ---
 
@@ -2478,27 +2478,55 @@ publication changed.
 
 ---
 
-# Exact Next Task — V1-007
+# V1-007 — Create Release Commit
 
-Create the exact Version 1.0 release commit.
+`V1-007` is complete.
+
+The exact Version 1.0 release source:
+
+* dates the changelog `2026-07-30`
+* presents `1.0.0` as the first stable release in public package documentation
+* uses PyPI installation commands for the distribution and optional extras
+* records canonical repository, documentation, issue-tracker, and changelog
+  URLs
+* uses canonical absolute destinations for every non-anchor README link
+* retains the release boundary: no tag, deployment approval, upload, or GitHub
+  Release is claimed
+* adds permanent release-commit regressions
+
+Completion evidence:
+
+```text
+6 focused release-commit regressions passed
+84 focused release, documentation, state, version, changelog, package, and link checks passed
+474 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 135 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 103-entry source archive
+wheel and source-archive core installations passed
+Django-only and FastAPI-only wheel installations passed
+```
+
+No Git tag, deployment approval, PyPI upload, or GitHub Release was created.
+
+---
+
+# Exact Next Task — V1-008
+
+Create annotated Git tag `v1.0.0` for the exact reviewed release commit.
 
 Required work:
 
-1. confirm the planned release date and replace
-   `## [1.0.0] - Unreleased` with that date
-2. convert README, installation, compatibility, and API status text from
-   pre-release wording to release-ready wording that will remain correct on
-   PyPI
-3. confirm the canonical public repository, documentation, issue-tracker, and
-   changelog URLs in package metadata
-4. make every non-anchor README link resolve correctly from the PyPI long
-   description
-5. run the complete Python 3.11–3.14, Black, Ruff, dependency, tag-identity,
-   distribution, and clean-install gates
-6. review and create the exact release commit on `main`
-7. update the roadmap and handoff to
-   `V1-008 — Create Git tag v1.0.0`
-8. do not create or push the tag, approve a deployment, or publish
+1. confirm `main` contains the `V1-006` documentation commit followed by the
+   exact `V1-007` release commit
+2. confirm the working tree is clean and local `main` matches `origin/main`
+3. run `python scripts\validate_release_tag.py v1.0.0`
+4. create annotated tag `v1.0.0` pointing to the exact release commit
+5. verify the tag resolves to the same commit as `main`
+6. push only `v1.0.0`, never all local tags
+7. observe that the tag-triggered release workflow starts
+8. do not approve the protected `pypi` deployment or claim publication
 
 ---
 
@@ -3040,10 +3068,9 @@ For the immediate next task, also provide:
 
 Profiling evidence, generated benchmark artifacts, release artifacts,
 deliverable ZIPs, caches, example media, and future-backlog implementation
-files are not required for `V1-007`. Public package documentation, package
-metadata, release instructions, current-status records, workflow contracts,
-and documentation/package regressions are required so the exact release source
-can be reviewed and committed without tagging or publishing.
+files are not required for `V1-008`. The exact release commit, release guide,
+tag validator, workflow, and current status records are required so the tag can
+be created for the reviewed source without approving or publishing.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -3057,9 +3084,9 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that V1-007 is still the correct next task.
+3. Verify the repository's current state and confirm that V1-008 is still the correct next task.
 4. Read pyproject.toml, CHANGELOG.md, README.md, docs/installation.md, docs/compatibility.md, and docs/releasing.md.
-5. Create the exact Version 1 release commit without creating a tag, approving a deployment, or publishing.
+5. Create and verify annotated tag v1.0.0 for the exact release commit, push only that tag, and stop before protected PyPI approval.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

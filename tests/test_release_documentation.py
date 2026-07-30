@@ -136,7 +136,11 @@ def test_release_guide_is_linked_from_primary_maintainer_docs():
     readme = README_PATH.read_text(encoding="utf-8")
     installation = INSTALLATION_GUIDE_PATH.read_text(encoding="utf-8")
 
-    assert "[Release procedure](docs/releasing.md)" in readme
+    assert (
+        "[Release procedure]"
+        "(https://github.com/bkocii/python-ai-toolkit/blob/main/docs/releasing.md)"
+        in readme
+    )
     assert "[release procedure](releasing.md)" in installation
 
 
@@ -206,17 +210,21 @@ def test_release_notes_use_the_existing_verified_tag():
     assert "Only then is the Version 1.0 release milestone complete." in text
 
 
-def test_public_documents_preserve_the_current_pre_release_boundary():
+def test_public_documents_are_ready_for_the_stable_release():
     readme = README_PATH.read_text(encoding="utf-8")
     installation = INSTALLATION_GUIDE_PATH.read_text(encoding="utf-8")
     compatibility = COMPATIBILITY_GUIDE_PATH.read_text(encoding="utf-8")
     api_reference = API_REFERENCE_PATH.read_text(encoding="utf-8")
     changelog = CHANGELOG_PATH.read_text(encoding="utf-8")
 
-    assert "has not yet been tagged or published" in readme
-    assert "not published on PyPI yet" in readme
-    assert "not yet\npublished on PyPI" in installation
-    assert "release has not yet been tagged or\npublished" in compatibility
-    assert "tagging and publication\nremain separate release tasks" in api_reference
-    assert "## [1.0.0] - Unreleased" in changelog
-    assert "has not yet been tagged or published" in changelog
+    assert "Version `1.0.0` is the first stable release" in readme
+    assert "python -m pip install python-ai-toolkit" in readme
+    assert "distributed through PyPI" in installation
+    assert "stable package metadata is `1.0.0`" in compatibility
+    assert "Version `1.0.0` is the first stable release" in api_reference
+    assert "## [1.0.0] - 2026-07-30" in changelog
+
+    public_documents = [readme, installation, compatibility, api_reference, changelog]
+    for text in public_documents:
+        assert "has not yet been tagged or published" not in text
+        assert "not published on PyPI yet" not in text

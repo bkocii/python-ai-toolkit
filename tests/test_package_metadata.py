@@ -57,6 +57,12 @@ EXPECTED_OPTIONAL_DEPENDENCIES = {
         "pytest-benchmark",
     ],
 }
+EXPECTED_PROJECT_URLS = {
+    "Repository": "https://github.com/bkocii/python-ai-toolkit",
+    "Documentation": "https://github.com/bkocii/python-ai-toolkit/tree/main/docs",
+    "Issues": "https://github.com/bkocii/python-ai-toolkit/issues",
+    "Changelog": ("https://github.com/bkocii/python-ai-toolkit/blob/main/CHANGELOG.md"),
+}
 
 
 def load_pyproject() -> dict:
@@ -82,7 +88,11 @@ def test_readme_metadata_uses_the_project_readme():
 
     assert project["readme"] == "README.md"
     assert readme.startswith("# Python AI Toolkit\n")
-    assert "`1.0.0` release preparation" in readme
+    assert "Version `1.0.0` is the first stable release" in readme
+
+
+def test_project_metadata_uses_canonical_public_urls():
+    assert load_pyproject()["project"]["urls"] == EXPECTED_PROJECT_URLS
 
 
 def test_distribution_readme_comparison_is_platform_independent():

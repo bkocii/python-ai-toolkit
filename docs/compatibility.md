@@ -26,8 +26,7 @@ presence in a module does not create a compatibility promise. Provider and
 model availability, network behavior, credentials, quotas, pricing, and
 third-party SDK behavior also remain outside the Python API guarantee.
 
-The package metadata is `1.0.0`. The release has not yet been tagged or
-published.
+The stable package metadata is `1.0.0`.
 
 ## Compatibility layers
 

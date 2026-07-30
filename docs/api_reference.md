@@ -1,9 +1,7 @@
 # Public API Reference
 
 This reference defines the approved Version 1.0 Python and command-line surface
-of Python AI Toolkit. Package metadata is `1.0.0`; tagging and publication
-remain separate release tasks and do not change the frozen contract recorded
-here.
+of Python AI Toolkit. Version `1.0.0` is the first stable release.
 
 Only the modules, symbols, signatures, models, enum values, exceptions, and
 behaviors documented below are compatibility promises. Importable names that

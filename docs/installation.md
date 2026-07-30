@@ -2,9 +2,9 @@
 
 Python AI Toolkit requires Python 3.11 or newer.
 
-The project is currently installed from a local source checkout. It is not yet
-published on PyPI, so commands such as `pip install python-ai-toolkit` are
-reserved for the later package-release milestone.
+The stable package is distributed through PyPI as `python-ai-toolkit`. Source
+checkout and local-artifact installations remain available for contributors
+and release verification.
 
 The [compatibility guide](compatibility.md) distinguishes this declared
 installation floor from the Python 3.11–3.14 versions continuously tested for
@@ -17,16 +17,15 @@ and terminal command:
 
 | Purpose | Name | Where it is used |
 | --- | --- | --- |
-| Distribution | `python-ai-toolkit` | `pip` and, after release, PyPI |
+| Distribution | `python-ai-toolkit` | `pip` and PyPI |
 | Import package | `ai` | Python imports such as `from ai.client import AIClient` |
 | Console command | `ai-toolkit` | Terminal commands such as `ai-toolkit --help` |
 
-The current machine-readable package version is `1.0.0`. The stable API is
-frozen, but the release has not yet been tagged or published.
+The current machine-readable package version is `1.0.0`. Its stable public API
+is frozen across the documented Version 1 surface.
 
-The author name is recorded in the package metadata. Canonical repository,
-documentation, and issue-tracker URLs have not yet been confirmed, so the
-metadata intentionally contains no placeholder links.
+The author name and canonical repository, documentation, issue-tracker, and
+changelog URLs are recorded in the package metadata.
 
 ## PyPI classifiers
 
@@ -102,10 +101,10 @@ Using `python -m pip` keeps installation tied to that same interpreter.
 
 ## Install for normal use
 
-Install the core toolkit from the current source tree:
+Install the core toolkit from PyPI:
 
 ```bash
-python -m pip install .
+python -m pip install python-ai-toolkit
 ```
 
 The core installation includes:

@@ -3403,7 +3403,7 @@ Publish the first stable release.
 * [x] V1-004 Update project version to `1.0.0`
 * [x] V1-005 Update project state
 * [x] V1-006 Complete release documentation
-* [ ] V1-007 Create release commit
+* [x] V1-007 Create release commit
 * [ ] V1-008 Create Git tag `v1.0.0`
 * [ ] V1-009 Build and publish distributions
 * [ ] V1-010 Verify installation from PyPI
@@ -3698,6 +3698,52 @@ Next task:
 
 ```text
 V1-007 — Create release commit
+```
+
+#### V1-007 — Create Release Commit
+
+Status: Completed
+
+The exact Version 1.0 release source was prepared on top of the completed
+release documentation.
+
+Completed work:
+
+* dated the `1.0.0` changelog `2026-07-30`
+* presented `1.0.0` as the first stable release in README, installation,
+  compatibility, and API documentation
+* changed primary user installation commands to the published
+  `python-ai-toolkit` distribution and optional extras
+* added canonical repository, documentation, issue-tracker, and changelog URLs
+  to package metadata
+* changed every non-anchor README destination to a canonical absolute GitHub
+  URL for PyPI long-description rendering
+* retained honest maintainer state: the release commit exists, but the tag,
+  protected deployment, PyPI files, and GitHub Release do not
+* added permanent release-commit regressions
+* ran the complete supported-version, quality, distribution, and isolated
+  installation gates before committing
+
+Completion verification:
+
+```text
+6 focused release-commit regressions passed
+84 focused release, documentation, state, version, changelog, package, and link checks passed
+474 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 135 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 103-entry source archive
+wheel and source-archive core installations passed
+Django-only and FastAPI-only wheel installations passed
+```
+
+No Git tag, deployment approval, or publication occurred.
+
+Next task:
+
+```text
+V1-008 — Create Git tag v1.0.0
 ```
 
 ### Public API Freeze

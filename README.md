@@ -7,10 +7,10 @@ It keeps provider communication, response validation, retries, usage metadata,
 logging, retrieval, and workflow primitives behind consistent interfaces so
 application business logic can remain in Python.
 
-> **Project status:** `1.0.0` release preparation. The stable Version 1.0 API
-> is frozen but has not yet been tagged or published. The built-in provider is
-> currently OpenAI; custom
-> providers can be registered through the provider abstraction.
+> **Project status:** Version `1.0.0` is the first stable release. Its public
+> API is frozen across the documented Version 1 surface. The built-in provider
+> is currently OpenAI; custom providers can be registered through the provider
+> abstraction.
 
 ## Contents
 
@@ -23,7 +23,7 @@ application business logic can remain in Python.
 - [Major capabilities](#major-capabilities)
 - [Examples](#examples)
 - [Documentation](#documentation)
-- [Public API reference](docs/api_reference.md)
+- [Public API reference](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/api_reference.md)
 - [Development](#development)
 - [Project status](#project-status)
 
@@ -61,8 +61,7 @@ access, tool execution, and decisions based on model output.
 
 Python `3.11` or newer is required.
 
-The project is not published on PyPI yet. From a local source checkout, create
-and activate a virtual environment:
+Create and activate a virtual environment:
 
 ```bash
 cd python-ai-toolkit
@@ -79,30 +78,30 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-Then install the toolkit:
+Then install the toolkit from PyPI:
 
 ```bash
-python -m pip install .
+python -m pip install python-ai-toolkit
 ```
 
 Add an optional extra only when you need it:
 
 ```bash
-python -m pip install ".[django]"
-python -m pip install ".[fastapi]"
+python -m pip install "python-ai-toolkit[django]"
+python -m pip install "python-ai-toolkit[fastapi]"
 ```
 
-Contributors should use an editable installation with the development and
-benchmark dependencies:
+Contributors working from a source checkout should use an editable installation
+with the development and benchmark dependencies:
 
 ```bash
 python -m pip install -e ".[dev,benchmark]"
 ```
 
-See the [installation guide](docs/installation.md) for the complete extras
+See the [installation guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/installation.md) for the complete extras
 matrix, clean-environment verification, and the difference between user and
 contributor installations. The
-[compatibility guide](docs/compatibility.md) separates the declared Python
+[compatibility guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/compatibility.md) separates the declared Python
 range from verified environments, dependency resolution, framework support,
 and live provider/model availability.
 
@@ -146,7 +145,7 @@ An explicit `AIConfig` completely replaces environment loading; omitted fields
 use dataclass defaults rather than `.env` values. Both client constructors
 validate the resolved configuration automatically; the explicit call above is
 useful when an application wants an earlier startup check. See the
-[configuration guide](docs/configuration.md) for the complete variable
+[configuration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/configuration.md) for the complete variable
 reference, defaults, precedence rules, validation boundary, and CLI checks.
 
 The placeholder above is illustrative. Production credentials should come from
@@ -168,9 +167,9 @@ factory uses an exact provider name and a small constructor contract while
 `BaseAIProvider` separates required plain-text behavior from optional
 capabilities.
 
-See the [provider guide](docs/providers.md) for custom registration, constructor
+See the [provider guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/providers.md) for custom registration, constructor
 requirements, capability methods, registration lifecycle, and expected errors.
-See the [compatibility guide](docs/compatibility.md) before treating a
+See the [compatibility guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/compatibility.md) before treating a
 registered adapter as proof that a selected model supports a capability.
 
 ## Quick start
@@ -200,7 +199,7 @@ print(result.estimated_cost_usd)
 ```
 
 Use `client.ask_text(prompt)` only when the response string is all you need.
-See the [request guide](docs/requests.md) for the return-value difference,
+See the [request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/requests.md) for the return-value difference,
 metadata semantics, and retry boundaries.
 
 ## Structured responses
@@ -230,7 +229,7 @@ print(result.data.reason)
 
 The toolkit builds a schema-aware prompt, parses the provider response, validates
 it with Pydantic, and can request a repaired response when parsing or validation
-fails. The [request guide](docs/requests.md) explains the complete structured
+fails. The [request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/requests.md) explains the complete structured
 lifecycle and the boundary between schema validation and application business
 rules.
 
@@ -289,7 +288,7 @@ asyncio.run(main())
 
 Streaming returns chunks rather than `AIResult`, while `AsyncAIClient` currently
 supports async plain and structured requests but not async streaming, tools, or
-images. See the [advanced request guide](docs/advanced_requests.md) for the
+images. See the [advanced request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/advanced_requests.md) for the
 return contracts and capability boundaries.
 
 ### Tool calling
@@ -322,7 +321,7 @@ response = client.ask_with_tools(
 The toolkit does not automatically execute requested tools. Application code
 must allow-list the tool, validate its arguments, authorize the operation, and
 perform any external action. See the
-[advanced request guide](docs/advanced_requests.md#tool-calling).
+[advanced request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/advanced_requests.md#tool-calling).
 
 ### Image inputs
 
@@ -340,7 +339,7 @@ result = client.ask_with_images(
 Plain-text and structured Pydantic responses are supported for image requests.
 The source must already be a URL or Base64 data URL; `ImageInput` does not read
 local paths. See the
-[advanced request guide](docs/advanced_requests.md#image-inputs).
+[advanced request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/advanced_requests.md#image-inputs).
 
 ### Embeddings, retrieval, and RAG
 
@@ -373,14 +372,14 @@ Main public components include:
 and small local workflows. Production applications can implement persistent
 storage behind `BaseVectorStore`.
 
-See the [retrieval and RAG guide](docs/retrieval.md) for embedding return
+See the [retrieval and RAG guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/retrieval.md) for embedding return
 contracts, batch ordering, vector scores and filters, document-loading
 boundaries, RAG metadata, and grounding limitations.
 
 See examples
-[10 through 14](examples/README.md#10--embeddings) for the complete progression
+[10 through 14](https://github.com/bkocii/python-ai-toolkit/blob/main/examples/README.md#10--embeddings) for the complete progression
 from embeddings to document-backed RAG. The release-focused
-[end-to-end indexing example](examples/27_document_indexing_and_rag.py) adds
+[end-to-end indexing example](https://github.com/bkocii/python-ai-toolkit/blob/main/examples/27_document_indexing_and_rag.py) adds
 stable document IDs, batch-order restoration, and deterministic verification
 of the complete grounded-answer workflow.
 
@@ -395,10 +394,10 @@ The orchestration stack remains explicit and composable:
 
 Tool execution, routing, and business decisions remain under application
 control. See the
-[memory, agents, workflows, and orchestration guide](docs/orchestration.md) for
+[memory, agents, workflows, and orchestration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/orchestration.md) for
 message, state, failure, metadata, persistence, and autonomy boundaries. See
 examples
-[15 through 18](examples/README.md#15--conversation-memory).
+[15 through 18](https://github.com/bkocii/python-ai-toolkit/blob/main/examples/README.md#15--conversation-memory).
 
 ### Framework integrations
 
@@ -418,10 +417,10 @@ from ai.integrations.fastapi import AIClientDependency
 ```
 
 Install the corresponding optional dependency group before using an integration.
-See the [framework and CLI integration guide](docs/integrations.md) for
+See the [framework and CLI integration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/integrations.md) for
 configuration sources, client lifetimes, dependency overrides, CLI behavior,
 and failure boundaries. The
-[Django and FastAPI examples](examples/README.md#19--django-integration) provide
+[Django and FastAPI examples](https://github.com/bkocii/python-ai-toolkit/blob/main/examples/README.md#19--django-integration) provide
 application-focused starting points.
 
 ### Command-line interface
@@ -437,9 +436,9 @@ ai-toolkit config validate
 
 Configuration display masks API keys, and structural validation does not contact
 the configured provider. The
-[framework and CLI integration guide](docs/integrations.md#command-line-interface)
+[framework and CLI integration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/integrations.md#command-line-interface)
 documents command scope, output, and exit codes. The
-[installation guide](docs/installation.md#verify-the-console-command-on-windows)
+[installation guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/installation.md#verify-the-console-command-on-windows)
 includes a local PowerShell verification procedure.
 
 ### Logging and errors
@@ -457,7 +456,7 @@ Expected failures use toolkit-specific exceptions such as
 `AIConfigurationError`, `AIProviderError`, `AIJSONParseError`, and
 `AISchemaValidationError`.
 
-See the [exception and error-handling guide](docs/error_handling.md) for the
+See the [exception and error-handling guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/error_handling.md) for the
 complete hierarchy, catch boundaries, repair and retry behavior, ordinary
 Python exceptions, failed result objects, framework propagation, and CLI error
 handling.
@@ -469,14 +468,14 @@ environment or an application-owned secret manager. Treat prompts, provider
 responses, raw result fields, RAG contexts, memory, tool arguments, image data
 URLs, CLI output, and provider errors as potentially sensitive.
 
-The [security and secret-handling guide](docs/security.md) covers local,
+The [security and secret-handling guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/security.md) covers local,
 testing, CI, and production secret sources; repository and logging safety;
 provider data governance; tool authorization; multi-tenant boundaries; and
 incident response.
 
 ## Examples
 
-The [example gallery](examples/README.md) provides a numbered learning path:
+The [example gallery](https://github.com/bkocii/python-ai-toolkit/blob/main/examples/README.md) provides a numbered learning path:
 
 | Area | Examples |
 | --- | --- |
@@ -510,27 +509,27 @@ concerns in focused documents:
 
 | Document | Purpose |
 | --- | --- |
-| [Public API reference](docs/api_reference.md) | Frozen Version 1.0 import paths, signatures, models, exceptions, behaviors, and compatibility policy |
-| [Installation guide](docs/installation.md) | Local installation, optional extras, and contributor setup |
-| [Configuration guide](docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
-| [Provider guide](docs/providers.md) | Built-in provider, custom registration, constructor contract, capabilities, and errors |
-| [Request guide](docs/requests.md) | Plain and structured requests, `AIResult`, parsing, validation, and repair |
-| [Advanced request guide](docs/advanced_requests.md) | Streaming, async requests, tool calling, image inputs, and capability limits |
-| [Retrieval and RAG guide](docs/retrieval.md) | Embeddings, vector storage, retrieval, document loading, RAG responses, and grounding limits |
-| [Orchestration guide](docs/orchestration.md) | Memory, agents, workflows, multi-agent sequencing, state, and failure boundaries |
-| [Framework and CLI integration guide](docs/integrations.md) | Django settings, FastAPI dependencies and test overrides, CLI commands, output, and exit codes |
-| [Exception and error-handling guide](docs/error_handling.md) | Toolkit exception hierarchy, retry decisions, ordinary Python failures, failed result objects, and application catch boundaries |
-| [Security and secret-handling guide](docs/security.md) | Credentials, sensitive data, logging, provider governance, tool authorization, and incident response |
-| [Compatibility guide](docs/compatibility.md) | Python versions, dependency resolution, provider SDKs and models, optional frameworks, and verification evidence |
-| [Release procedure](docs/releasing.md) | Maintainer preflight, version tags, protected PyPI approval, installed-package smoke tests, release notes, and recovery |
-| [Example gallery](examples/README.md) | Numbered, runnable usage examples |
-| [Architecture](docs/architecture/architecture.md) | Components, boundaries, and request flows |
-| [Architecture decisions](docs/architecture/decisions/) | Reasons behind important design choices |
-| [Benchmark guide](benchmarks/README.md) | Running and interpreting deterministic benchmarks |
-| [Profiling report](docs/development/performance_profiling.md) | Performance evidence and optimization decisions |
-| [Roadmap](docs/development/roadmap.md) | Active and planned development |
-| [Project state](docs/development/project_state.md) | Current milestone and implemented capabilities |
-| [Changelog](CHANGELOG.md) | User-visible changes by version |
+| [Public API reference](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/api_reference.md) | Frozen Version 1.0 import paths, signatures, models, exceptions, behaviors, and compatibility policy |
+| [Installation guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/installation.md) | PyPI, local, optional-extra, and contributor installation |
+| [Configuration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/configuration.md) | Environment variables, defaults, precedence, explicit configuration, and validation |
+| [Provider guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/providers.md) | Built-in provider, custom registration, constructor contract, capabilities, and errors |
+| [Request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/requests.md) | Plain and structured requests, `AIResult`, parsing, validation, and repair |
+| [Advanced request guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/advanced_requests.md) | Streaming, async requests, tool calling, image inputs, and capability limits |
+| [Retrieval and RAG guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/retrieval.md) | Embeddings, vector storage, retrieval, document loading, RAG responses, and grounding limits |
+| [Orchestration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/orchestration.md) | Memory, agents, workflows, multi-agent sequencing, state, and failure boundaries |
+| [Framework and CLI integration guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/integrations.md) | Django settings, FastAPI dependencies and test overrides, CLI commands, output, and exit codes |
+| [Exception and error-handling guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/error_handling.md) | Toolkit exception hierarchy, retry decisions, ordinary Python failures, failed result objects, and application catch boundaries |
+| [Security and secret-handling guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/security.md) | Credentials, sensitive data, logging, provider governance, tool authorization, and incident response |
+| [Compatibility guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/compatibility.md) | Python versions, dependency resolution, provider SDKs and models, optional frameworks, and verification evidence |
+| [Release procedure](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/releasing.md) | Maintainer preflight, version tags, protected PyPI approval, installed-package smoke tests, release notes, and recovery |
+| [Example gallery](https://github.com/bkocii/python-ai-toolkit/blob/main/examples/README.md) | Numbered, runnable usage examples |
+| [Architecture](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/architecture/architecture.md) | Components, boundaries, and request flows |
+| [Architecture decisions](https://github.com/bkocii/python-ai-toolkit/tree/main/docs/architecture/decisions) | Reasons behind important design choices |
+| [Benchmark guide](https://github.com/bkocii/python-ai-toolkit/blob/main/benchmarks/README.md) | Running and interpreting deterministic benchmarks |
+| [Profiling report](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/development/performance_profiling.md) | Performance evidence and optimization decisions |
+| [Roadmap](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/development/roadmap.md) | Active and planned development |
+| [Project state](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/development/project_state.md) | Current milestone and implemented capabilities |
+| [Changelog](https://github.com/bkocii/python-ai-toolkit/blob/main/CHANGELOG.md) | User-visible changes by version |
 
 The README should not duplicate the roadmap, architecture, benchmark manual, or
 full example catalog.
@@ -573,7 +572,7 @@ python -m twine check --strict dist/*
 python scripts/validate_distributions.py
 ```
 
-See the [compatibility guide](docs/compatibility.md) for the tested-version
+See the [compatibility guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/compatibility.md) for the tested-version
 matrix and local multi-version procedure. CI uploads the distributions only
 after both validation commands pass. Ordinary pushes and pull requests never
 publish packages, and the CI workflow requires only read access to repository
@@ -590,9 +589,9 @@ For a real tag, a final isolated job downloads the validated files and
 publishes them through PyPI trusted publishing. Only that job can request a
 short-lived identity token; the repository stores no PyPI password or API
 token. The protected `pypi` environment can require manual approval before
-upload. See the [installation guide](docs/installation.md#configure-trusted-pypi-publishing)
+upload. See the [installation guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/installation.md#configure-trusted-pypi-publishing)
 for the one-time account configuration and the
-[release procedure](docs/releasing.md) for the complete maintainer checklist,
+[release procedure](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/releasing.md) for the complete maintainer checklist,
 safe rehearsal, verification, and recovery path.
 
 Format and lint:
@@ -616,14 +615,14 @@ python -m build
 ```
 
 Benchmark methodology and comparison rules are documented in
-[`benchmarks/README.md`](benchmarks/README.md).
-The [installation guide](docs/installation.md#build-distributions-locally)
+[`benchmarks/README.md`](https://github.com/bkocii/python-ai-toolkit/blob/main/benchmarks/README.md).
+The [installation guide](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/installation.md#build-distributions-locally)
 explains the generated files, clean Windows build steps, and the boundary
 between building and validating a release.
 
 ## Project status
 
-The current package version is `1.0.0`; publication is still pending.
+The current stable package version is `1.0.0`.
 
 Completed capability milestones include:
 
@@ -638,7 +637,7 @@ Completed capability milestones include:
 Sprint 9 focuses on documentation, additional examples, packaging, continuous
 integration, security review, API stability, and the Version 1.0 release.
 
-See the authoritative [roadmap](docs/development/roadmap.md) instead of
+See the authoritative [roadmap](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/development/roadmap.md) instead of
 maintaining a second roadmap in this README.
 
 ## Design principles
@@ -652,7 +651,7 @@ maintaining a second roadmap in this README.
 
 ## License
 
-Python AI Toolkit is released under the [MIT License](LICENSE).
+Python AI Toolkit is released under the [MIT License](https://github.com/bkocii/python-ai-toolkit/blob/main/LICENSE).
 
 This permissive license allows use, modification, redistribution, and
 commercial use, including inside closed-source applications. Copies or

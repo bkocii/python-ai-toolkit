@@ -5,6 +5,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CHANGELOG_PATH = PROJECT_ROOT / "CHANGELOG.md"
 PYPROJECT_PATH = PROJECT_ROOT / "pyproject.toml"
+VERSION_1_HEADING = "## [1.0.0] - 2026-07-30"
 
 
 def changelog_text() -> str:
@@ -13,7 +14,7 @@ def changelog_text() -> str:
 
 def version_1_section() -> str:
     text = changelog_text()
-    return text.split("## [1.0.0] - Unreleased", 1)[1].split("\n---\n", 1)[0]
+    return text.split(VERSION_1_HEADING, 1)[1].split("\n---\n", 1)[0]
 
 
 def normalized_version_1_section() -> str:
@@ -23,9 +24,10 @@ def normalized_version_1_section() -> str:
 def test_changelog_has_one_release_ready_version_1_section():
     text = changelog_text()
 
-    assert text.count("## [1.0.0] - Unreleased") == 1
+    assert text.count(VERSION_1_HEADING) == 1
+    assert "## [1.0.0] - Unreleased" not in text
     assert "## [0.7.0]" not in text
-    assert "### Fixed" not in text.split("## [1.0.0] - Unreleased", 1)[0]
+    assert "### Fixed" not in text.split(VERSION_1_HEADING, 1)[0]
 
     headings = re.findall(r"^## \[(\d+\.\d+\.\d+)\]", text, re.MULTILINE)
     assert headings == ["1.0.0", "0.6.0", "0.5.0", "0.4.0", "0.3.0", "0.2.0", "0.1.0"]
@@ -35,8 +37,8 @@ def test_version_1_section_explains_the_development_line():
     section = version_1_section()
     project = tomllib.loads(PYPROJECT_PATH.read_text(encoding="utf-8"))["project"]
 
-    assert f"`{project['version']}`" in section
-    assert "has not yet been tagged or published" in section
+    assert project["version"] in section
+    assert "has not yet been tagged or published" not in section
     assert "The former `0.7.0.dev0` development line" in section
     assert "never a separate stable release" in section
 

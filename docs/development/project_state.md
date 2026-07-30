@@ -49,6 +49,7 @@ Completed PROD-007 release tasks:
 * V1-004 Update project version to 1.0.0
 * V1-005 Update project state
 * V1-006 Complete release documentation
+* V1-007 Create release commit
 
 Completed PROD-001 benchmark tasks:
 
@@ -125,14 +126,14 @@ PROD-007 — Version 1.0.0 Release
 Next roadmap task:
 
 ```text
-V1-007 — Create release commit
+V1-008 — Create Git tag v1.0.0
 ```
 
-The source and package metadata are prepared for Version 1.0, but the release
-is not complete. The changelog remains `Unreleased`; no `v1.0.0` tag,
+The exact Version 1.0 release source is prepared and committed. Its changelog is
+dated `2026-07-30`, public package documentation is release-ready, canonical
+project URLs are recorded, and the README is safe to render as the PyPI long
+description. The release is not complete: no `v1.0.0` tag,
 protected-environment approval, PyPI upload, or GitHub Release exists yet.
-The release guide now defines the exact commit, tag, publication, PyPI
-verification, installed-package smoke-test, and release-note boundaries.
 
 ---
 
@@ -673,10 +674,10 @@ Completed Version 1 release tasks:
 * V1-004 Update project version to `1.0.0`
 * V1-005 Update project state
 * V1-006 Complete release documentation
+* V1-007 Create release commit
 
 Remaining Version 1 release tasks:
 
-* V1-007 Create release commit
 * V1-008 Create Git tag `v1.0.0`
 * V1-009 Build and publish distributions
 * V1-010 Verify installation from PyPI
@@ -713,14 +714,15 @@ Completed release-automation tasks:
 The current metadata now:
 
 * identifies the distribution as `python-ai-toolkit`
-* identifies the release-preparation source as `1.0.0`
-* keeps `1.0.0` explicitly unreleased until the authorized tag workflow
+* identifies the stable release source as `1.0.0`
+* dates the Version 1.0 changelog `2026-07-30`
 * requires Python `>=3.11`
 * uses `README.md` as the long description
 * records Burim Koci as the author
 * declares `openai>=1.66.0`, `pydantic>=2.4.2`, and `python-dotenv`
 * discovers all six current `ai*` package directories
-* omits unconfirmed project URLs instead of publishing placeholders
+* records canonical repository, documentation, issue-tracker, and changelog
+  URLs
 * uses fourteen valid PyPI classifiers for stable status, console use, optional
   Django and FastAPI integrations, developer audience, operating-system
   independence, Python 3-only support, the verified Python 3.11–3.14 range,
@@ -778,9 +780,8 @@ development evidence, not the current package state and not a separate stable
 release.
 
 Twine proves that the packaged Markdown is renderable but does not visit link
-destinations. The README's repository-relative documentation links remain
-appropriate for the source checkout; confirmed public project URLs and
-PyPI-page link behavior must be resolved before Version 1.0 publication.
+destinations. Every non-anchor README destination now uses a canonical absolute
+GitHub URL so the long description works from both the repository and PyPI.
 
 `PROD-005 — PyPI Package` is complete. `RELEASE-001` added the initial
 continuous-integration workflow, `RELEASE-002` expanded it into the supported
@@ -829,6 +830,36 @@ Django-only and FastAPI-only wheel installations passed
 
 No release date, tag, deployment approval, upload, PyPI project, or GitHub
 Release was created.
+
+---
+
+## Version 1 Release Commit Status
+
+`V1-007 — Create Release Commit` is complete.
+
+The release source dates the Version 1.0 changelog `2026-07-30`, presents
+`1.0.0` as the first stable release across public package documentation,
+installs users from PyPI, records canonical project URLs, and contains no
+repository-relative README destinations. Maintainer and project-state records
+continue to distinguish this prepared commit from the later tag and
+publication tasks.
+
+Completion verification:
+
+```text
+6 focused release-commit regressions passed
+84 focused release, documentation, state, version, changelog, package, and link checks passed
+474 normal tests passed on Python 3.11, 3.12, 3.13, and 3.14
+Black passed all 135 Python files on every supported interpreter
+Ruff and dependency validation passed on every supported interpreter
+release tag v1.0.0 matched package version 1.0.0
+strict Twine and offline validation passed the 46-entry wheel and 103-entry source archive
+wheel and source-archive core installations passed
+Django-only and FastAPI-only wheel installations passed
+```
+
+No `v1.0.0` tag, deployment approval, PyPI upload, or GitHub Release was
+created.
 
 ---
 
@@ -1066,15 +1097,12 @@ PROD-007 — Version 1.0.0 Release
 
 ### Next Recommended Focus
 
-Begin `V1-007 — Create release commit`.
+Begin `V1-008 — Create Git tag v1.0.0`.
 
-The frozen API, confirmed blocker fixes, consolidated changelog, coordinated
-`1.0.0` metadata, authoritative project state, and final release procedure are
-complete. The next task should choose the actual release date, convert the
-public package documentation from pre-release wording to release-ready wording,
-verify canonical public links and package metadata, run every final source and
-artifact gate, and create the exact reviewed release commit. It must not create
-or push `v1.0.0`, approve a deployment, or publish.
+The exact release commit is prepared and verified. The next task must confirm
+that `main` points to that commit, create annotated tag `v1.0.0` for exactly
+that commit, push only that tag, and observe the release workflow start. It
+must not approve the protected `pypi` deployment or claim publication.
 
 ---
 

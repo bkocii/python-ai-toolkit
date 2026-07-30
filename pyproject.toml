@@ -35,6 +35,12 @@ dependencies = [
     "python-dotenv",
 ]
 
+[project.urls]
+Repository = "https://github.com/bkocii/python-ai-toolkit"
+Documentation = "https://github.com/bkocii/python-ai-toolkit/tree/main/docs"
+Issues = "https://github.com/bkocii/python-ai-toolkit/issues"
+Changelog = "https://github.com/bkocii/python-ai-toolkit/blob/main/CHANGELOG.md"
+
 [project.scripts]
 ai-toolkit = "ai.cli.main:main"
 
