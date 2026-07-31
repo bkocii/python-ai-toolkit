@@ -3391,6 +3391,8 @@ the resulting environment, and runs the complete normal test suite.
 
 ## PROD-007 — Version 1.0.0 Release
 
+Status: Completed
+
 ### Goal
 
 Publish the first stable release.
@@ -3404,11 +3406,11 @@ Publish the first stable release.
 * [x] V1-005 Update project state
 * [x] V1-006 Complete release documentation
 * [x] V1-007 Create release commit
-* [ ] V1-008 Create Git tag `v1.0.0`
-* [ ] V1-009 Build and publish distributions
-* [ ] V1-010 Verify installation from PyPI
-* [ ] V1-011 Run post-release smoke tests
-* [ ] V1-012 Publish release notes
+* [x] V1-008 Create Git tag `v1.0.0`
+* [x] V1-009 Build and publish distributions
+* [x] V1-010 Verify installation from PyPI
+* [x] V1-011 Run post-release smoke tests
+* [x] V1-012 Publish release notes
 
 #### V1-001 — Freeze the Version 1.0 Public API
 
@@ -3746,6 +3748,82 @@ Next task:
 V1-008 — Create Git tag v1.0.0
 ```
 
+#### V1-008 — Create Git Tag v1.0.0
+
+Status: Completed
+
+Annotated tag `v1.0.0` was created for the exact reviewed release commit
+`cb43e4983fc4bf40b9b4c9fa4125ef68748f8b4c` and pushed without pushing any
+unrelated tags.
+
+The tag validation passed, the tag target matched the current release commit,
+and the tag-triggered release workflow started successfully.
+
+#### V1-009 — Build and Publish Distributions
+
+Status: Completed
+
+The tag-triggered release workflow:
+
+* validated the release identity
+* passed the complete Python 3.11 through 3.14 quality matrix
+* built and validated the wheel and source distribution
+* paused at the protected `pypi` environment for explicit approval
+* published `python-ai-toolkit==1.0.0` through PyPI Trusted Publishing
+
+The published release contains:
+
+```text
+python_ai_toolkit-1.0.0-py3-none-any.whl
+python_ai_toolkit-1.0.0.tar.gz
+```
+
+#### V1-010 — Verify Installation from PyPI
+
+Status: Completed
+
+A clean virtual environment installed the exact public
+`python-ai-toolkit==1.0.0` release directly from PyPI.
+
+Verification confirmed:
+
+* package metadata reports version `1.0.0`
+* core imports succeed from isolated `site-packages`
+* `PromptTemplate` renders correctly
+* `ai-toolkit --help` displays the documented commands
+* `pip check` reports no broken requirements
+
+#### V1-011 — Run Post-Release Smoke Tests
+
+Status: Completed
+
+The exact PyPI package passed deterministic installed-package checks in
+separate clean environments:
+
+* core-only installation, with Django and FastAPI absent
+* all 35 core-module imports
+* offline prompt, vector-store, plain-request, and structured-request behavior
+* Django-only optional-extra installation and integration verification
+* FastAPI-only optional-extra installation and integration verification
+* dependency validation in every environment
+
+No provider API key or paid model request was required.
+
+#### V1-012 — Publish Release Notes
+
+Status: Completed
+
+The GitHub Release was published from the existing verified `v1.0.0` tag:
+
+```text
+https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0
+```
+
+The release notes summarize the stable public capabilities, installation
+commands, Version 1 behavior boundaries, compatibility range, and completed
+release verification. No duplicate wheel or source archive was uploaded to the
+GitHub Release.
+
 ### Public API Freeze
 
 Before release, explicitly review:
@@ -3800,9 +3878,9 @@ Live provider smoke tests must be explicit and must not run as normal unit tests
 * [x] Stable public API approved
 * [x] Full quality checks pass
 * [x] Documentation is complete
-* [ ] Package is published
-* [ ] Clean installation succeeds
-* [ ] Version 1.0.0 is tagged and documented
+* [x] Package is published
+* [x] Clean installation succeeds
+* [x] Version 1.0.0 is tagged and documented
 
 ---
 
@@ -3815,7 +3893,7 @@ Live provider smoke tests must be explicit and must not run as normal unit tests
 * [x] Package distributions pass validation
 * [x] CI tests supported Python versions
 * [x] Release automation is operational
-* [ ] Version 1.0.0 is published and smoke-tested
+* [x] Version 1.0.0 is published and smoke-tested
 
 
 ---
@@ -3854,7 +3932,6 @@ They should be reconsidered after Sprint 9 and the Version 1.0 release unless an
 * Web dashboard
 * Automatic model benchmarking
 * AI evaluation framework
-* Repository-wide Black and Ruff cleanup
 * Black and Ruff version constraints for reproducible quality checks
 
 ## Retrieval and RAG

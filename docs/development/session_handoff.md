@@ -4,9 +4,9 @@
 
 **Project:** Python AI Toolkit  
 **Current version:** `1.0.0`  
-**Current milestone:** Sprint 9 — Production Readiness  
-**Active roadmap item:** `PROD-007 — Version 1.0.0 Release`  
-**Next task:** `V1-008 — Create Git tag v1.0.0`
+**Current milestone:** Version 1.0.0 Released
+**Active roadmap item:** None — Sprint 9 and `PROD-007` are complete
+**Next task:** Post-release roadmap review and next-milestone selection
 
 ---
 
@@ -74,7 +74,10 @@ The project has completed:
 - Sprint 7 — Agents & Workflows
 - Sprint 8 — Framework Integrations
 
-Sprint 9 — Production Readiness is active.
+Sprint 9 — Production Readiness is complete.
+
+Version `1.0.0` was tagged, published to PyPI, verified from clean installed
+environments, and documented in the GitHub Release.
 
 ---
 
@@ -218,7 +221,7 @@ Consolidated report:
 docs/development/performance_profiling.md
 ```
 
-The current release task is `V1-008`.
+The Version 1.0 release sequence through `V1-012` is complete.
 
 ---
 
@@ -2512,21 +2515,48 @@ No Git tag, deployment approval, PyPI upload, or GitHub Release was created.
 
 ---
 
-# Exact Next Task — V1-008
+# Version 1.0 Release Completion
 
-Create annotated Git tag `v1.0.0` for the exact reviewed release commit.
+`V1-008` through `V1-012` are complete.
 
-Required work:
+Verified release state:
 
-1. confirm `main` contains the `V1-006` documentation commit followed by the
-   exact `V1-007` release commit
-2. confirm the working tree is clean and local `main` matches `origin/main`
-3. run `python scripts\validate_release_tag.py v1.0.0`
-4. create annotated tag `v1.0.0` pointing to the exact release commit
-5. verify the tag resolves to the same commit as `main`
-6. push only `v1.0.0`, never all local tags
-7. observe that the tag-triggered release workflow starts
-8. do not approve the protected `pypi` deployment or claim publication
+1. annotated tag `v1.0.0` points to exact release commit
+   `cb43e4983fc4bf40b9b4c9fa4125ef68748f8b4c`
+2. the release workflow passed validation and the complete Python 3.11 through
+   3.14 quality matrix
+3. the protected `pypi` deployment was explicitly approved
+4. PyPI serves `python-ai-toolkit==1.0.0` as a wheel and source distribution
+5. a clean core environment installed the exact public version, passed
+   dependency validation, imported the package, rendered a prompt, and
+   displayed CLI help
+6. separate Django-only and FastAPI-only installations passed deterministic
+   offline integration checks
+7. the GitHub Release was published from the existing `v1.0.0` tag
+
+Public release locations:
+
+```text
+https://pypi.org/project/python-ai-toolkit/1.0.0/
+https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0
+```
+
+No new version, tag, or implementation milestone has been selected.
+
+---
+
+# Exact Next Task — Post-Release Roadmap Review
+
+Before changing implementation code:
+
+1. read the current project state, roadmap, architecture, and Future Backlog
+2. confirm Sprint 9 and the Version 1.0 release milestone are complete
+3. review remaining backlog items against Version 1 compatibility guarantees
+4. decide the next milestone scope and version target explicitly
+5. update the roadmap before starting its first implementation task
+
+Do not silently assume a Version 1.1 scope, promote a backlog item, redesign the
+architecture, or change the frozen Version 1 API.
 
 ---
 
@@ -3059,18 +3089,15 @@ For the immediate next task, also provide:
 6. `README.md`
 7. `CHANGELOG.md`
 8. `pyproject.toml`
-9. `docs/installation.md`
-10. `docs/compatibility.md`
-11. `docs/releasing.md`
-12. `docs/api_reference.md`
-13. release- and documentation-focused tests
-14. current workflow files
+9. `docs/api_reference.md`
+10. ADR-0017 and ADR-0018
+11. the complete current Future Backlog when it is stored outside the roadmap
 
 Profiling evidence, generated benchmark artifacts, release artifacts,
 deliverable ZIPs, caches, example media, and future-backlog implementation
-files are not required for `V1-008`. The exact release commit, release guide,
-tag validator, workflow, and current status records are required so the tag can
-be created for the reviewed source without approving or publishing.
+files are not required for the post-release roadmap review. The authoritative
+state, roadmap, architecture, frozen API boundary, and complete backlog are the
+required inputs for selecting the next milestone.
 
 Do not upload the entire repository unless necessary. Provide the authoritative documents and the current files relevant to the next task.
 
@@ -3084,9 +3111,10 @@ Continue the Python AI Toolkit project using the attached session handoff and so
 First:
 1. Read session_handoff.md.
 2. Read project_state.md, roadmap.md, architecture.md, and future_backlog.md.
-3. Verify the repository's current state and confirm that V1-008 is still the correct next task.
-4. Read pyproject.toml, CHANGELOG.md, README.md, docs/installation.md, docs/compatibility.md, and docs/releasing.md.
-5. Create and verify annotated tag v1.0.0 for the exact release commit, push only that tag, and stop before protected PyPI approval.
+3. Verify that Sprint 9 and V1-001 through V1-012 are complete.
+4. Read README.md, CHANGELOG.md, pyproject.toml, docs/api_reference.md, ADR-0017, and ADR-0018.
+5. Review the remaining Future Backlog against the frozen Version 1 compatibility boundary.
+6. Propose the correct next milestone and version target, explain the scope, update the roadmap, and only then begin its first approved task.
 
 Do not redesign the project, skip roadmap order, or assume older file contents.
 Follow the workflow: design → code → tests → documentation → review → git → roadmap update.

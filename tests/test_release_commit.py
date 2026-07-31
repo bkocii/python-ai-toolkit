@@ -64,14 +64,18 @@ def test_public_package_documents_use_stable_release_wording():
         assert "has not yet been tagged or published" not in text, relative_path
 
 
-def test_release_state_advances_to_tag_creation_without_claiming_a_tag():
+def test_release_state_records_completed_tag_publication_and_release_notes():
     project_state = read("docs/development/project_state.md")
     roadmap = read("docs/development/roadmap.md")
     handoff = read("docs/development/session_handoff.md")
 
     assert "* [x] V1-007 Create release commit" in roadmap
-    assert "* [ ] V1-008 Create Git tag `v1.0.0`" in roadmap
-    assert "V1-008 — Create Git tag v1.0.0" in project_state
-    assert "**Next task:** `V1-008 — Create Git tag v1.0.0`" in handoff
-    assert "no `v1.0.0` tag" in project_state
-    assert "No Git tag, deployment approval, or publication occurred." in roadmap
+    assert "* [x] V1-008 Create Git tag `v1.0.0`" in roadmap
+    assert "* [x] V1-012 Publish release notes" in roadmap
+    assert "`PROD-007 — Version 1.0.0 Release` is complete." in project_state
+    assert "**Next task:** Post-release roadmap review" in handoff
+    assert "https://pypi.org/project/python-ai-toolkit/1.0.0/" in project_state
+    assert (
+        "https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0"
+        in project_state
+    )

@@ -10,7 +10,10 @@ application business logic can remain in Python.
 > **Project status:** Version `1.0.0` is the first stable release. Its public
 > API is frozen across the documented Version 1 surface. The built-in provider
 > is currently OpenAI; custom providers can be registered through the provider
-> abstraction.
+> abstraction. The package is available on
+> [PyPI](https://pypi.org/project/python-ai-toolkit/1.0.0/), and the verified
+> release notes are published on
+> [GitHub](https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0).
 
 ## Contents
 
@@ -633,9 +636,16 @@ Completed capability milestones include:
 - agents and workflows
 - Django, FastAPI, and CLI integrations
 - deterministic benchmarks and performance profiling
+- production packaging, supported-version CI, and secure release automation
 
-Sprint 9 focuses on documentation, additional examples, packaging, continuous
-integration, security review, API stability, and the Version 1.0 release.
+Sprint 9 — Production Readiness is complete. Version `1.0.0` was tagged,
+published to PyPI, verified from clean core, Django-only, and FastAPI-only
+installations, and documented in the
+[GitHub Release](https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0).
+
+No post-1.0 implementation milestone is active yet. The next development step
+is to review the roadmap and Future Backlog, then explicitly select the next
+milestone before changing implementation code.
 
 See the authoritative [roadmap](https://github.com/bkocii/python-ai-toolkit/blob/main/docs/development/roadmap.md) instead of
 maintaining a second roadmap in this README.

@@ -13,12 +13,14 @@ Python AI Toolkit
 ## Current Milestone
 
 ```text
-Sprint 9 — Production Readiness
+Version 1.0.0 Released
 ```
 
 ## Current Sprint Status
 
-Sprint 9 is in progress.
+Sprint 9 — Production Readiness is complete.
+
+Version `1.0.0` was released on `2026-07-30`.
 
 Completed Sprint 9 tasks:
 
@@ -28,6 +30,7 @@ Completed Sprint 9 tasks:
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
 * PROD-006 Release Automation
+* PROD-007 Version 1.0.0 Release
 
 Completed PROD-006 release-automation tasks:
 
@@ -50,6 +53,11 @@ Completed PROD-007 release tasks:
 * V1-005 Update project state
 * V1-006 Complete release documentation
 * V1-007 Create release commit
+* V1-008 Create Git tag `v1.0.0`
+* V1-009 Build and publish distributions
+* V1-010 Verify installation from PyPI
+* V1-011 Run post-release smoke tests
+* V1-012 Publish release notes
 
 Completed PROD-001 benchmark tasks:
 
@@ -120,20 +128,22 @@ Completed PROD-005 package tasks:
 Next active task:
 
 ```text
-PROD-007 — Version 1.0.0 Release
+Post-release roadmap review
 ```
 
 Next roadmap task:
 
 ```text
-V1-008 — Create Git tag v1.0.0
+No implementation task is active.
 ```
 
-The exact Version 1.0 release source is prepared and committed. Its changelog is
-dated `2026-07-30`, public package documentation is release-ready, canonical
-project URLs are recorded, and the README is safe to render as the PyPI long
-description. The release is not complete: no `v1.0.0` tag,
-protected-environment approval, PyPI upload, or GitHub Release exists yet.
+The exact Version 1.0 release source was tagged as `v1.0.0` at commit
+`cb43e4983fc4bf40b9b4c9fa4125ef68748f8b4c`, published to PyPI through the
+protected Trusted Publishing workflow, installed and smoke-tested from the
+public package index, and documented in the GitHub Release.
+
+Before changing implementation code, review the completed roadmap and Future
+Backlog, select the next milestone explicitly, and update the roadmap.
 
 ---
 
@@ -650,7 +660,7 @@ Completed:
 Status:
 
 ```text
-In Progress
+Completed
 ```
 
 Completed:
@@ -661,9 +671,6 @@ Completed:
 * PROD-004 Additional Examples
 * PROD-005 PyPI Package
 * PROD-006 Release Automation
-
-Remaining:
-
 * PROD-007 Version 1.0 Release
 
 Completed Version 1 release tasks:
@@ -675,9 +682,6 @@ Completed Version 1 release tasks:
 * V1-005 Update project state
 * V1-006 Complete release documentation
 * V1-007 Create release commit
-
-Remaining Version 1 release tasks:
-
 * V1-008 Create Git tag `v1.0.0`
 * V1-009 Build and publish distributions
 * V1-010 Verify installation from PyPI
@@ -779,6 +783,11 @@ their task-specific roadmap and handoff records. They are historical
 development evidence, not the current package state and not a separate stable
 release.
 
+PyPI now serves the reviewed `1.0.0` wheel and source distribution. A clean
+post-publication installation confirmed the exact public version, dependencies,
+core imports, representative offline behavior, and console entry point before
+the separate Django and FastAPI smoke tests were accepted.
+
 Twine proves that the packaged Markdown is renderable but does not visit link
 destinations. Every non-anchor README destination now uses a canonical absolute
 GitHub URL so the long description works from both the repository and PyPI.
@@ -803,10 +812,10 @@ validation. Documentation verification inventoried 202 fenced blocks, compiled
 
 `V1-006 — Complete Release Documentation` is complete.
 
-The README, installation guide, compatibility guide, API reference, changelog,
-release guide, workflow, roadmap, project state, and handoff now agree that
-package metadata is `1.0.0` while tagging and publication remain pending. The
-changelog is still `Unreleased`.
+At completion of `V1-006`, the README, installation guide, compatibility guide,
+API reference, changelog, release guide, workflow, roadmap, project state, and
+handoff agreed that package metadata was `1.0.0` while tagging and publication
+remained pending. The changelog was still `Unreleased`.
 
 The maintainer guide now maps `V1-007` through `V1-012` to distinct release
 commit, tag, protected publication, PyPI verification, installed-package smoke,
@@ -828,8 +837,8 @@ wheel and source-archive core installations passed
 Django-only and FastAPI-only wheel installations passed
 ```
 
-No release date, tag, deployment approval, upload, PyPI project, or GitHub
-Release was created.
+That documentation task created no release date, tag, deployment approval,
+upload, PyPI project, or GitHub Release.
 
 ---
 
@@ -840,9 +849,9 @@ Release was created.
 The release source dates the Version 1.0 changelog `2026-07-30`, presents
 `1.0.0` as the first stable release across public package documentation,
 installs users from PyPI, records canonical project URLs, and contains no
-repository-relative README destinations. Maintainer and project-state records
-continue to distinguish this prepared commit from the later tag and
-publication tasks.
+repository-relative README destinations. At completion of `V1-007`, maintainer
+and project-state records distinguished this prepared commit from the later tag
+and publication tasks.
 
 Completion verification:
 
@@ -858,8 +867,40 @@ wheel and source-archive core installations passed
 Django-only and FastAPI-only wheel installations passed
 ```
 
-No `v1.0.0` tag, deployment approval, PyPI upload, or GitHub Release was
-created.
+That release-commit task created no `v1.0.0` tag, deployment approval, PyPI
+upload, or GitHub Release.
+
+---
+
+## Version 1.0 Release Status
+
+`PROD-007 — Version 1.0.0 Release` is complete.
+
+Completed release evidence:
+
+* annotated tag `v1.0.0` points to release commit
+  `cb43e4983fc4bf40b9b4c9fa4125ef68748f8b4c`
+* the tag-triggered workflow passed validation and the Python 3.11 through
+  3.14 quality matrix
+* the protected `pypi` environment was explicitly approved
+* PyPI serves `python-ai-toolkit==1.0.0` as both a wheel and source
+  distribution
+* a clean core environment installed the exact release from PyPI, passed
+  `pip check`, imported the public package, rendered a prompt, and displayed
+  CLI help
+* separate Django-only and FastAPI-only installations passed deterministic
+  integration smoke tests
+* the GitHub Release was published from the existing verified tag
+
+Public release locations:
+
+```text
+https://pypi.org/project/python-ai-toolkit/1.0.0/
+https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0
+```
+
+The Version 1.0 release milestone is complete. No new implementation milestone
+has been selected.
 
 ---
 
@@ -1089,20 +1130,17 @@ docs/development/performance_profiling.md
 
 ## Next Milestone Task
 
-The next active roadmap item is:
+There is no active implementation milestone.
 
-```text
-PROD-007 — Version 1.0.0 Release
-```
+Sprint 9 and the complete Version 1.0 release sequence are finished.
 
 ### Next Recommended Focus
 
-Begin `V1-008 — Create Git tag v1.0.0`.
+Review the completed roadmap and the Future Backlog, decide the scope and
+version target for the next milestone, record that decision in the roadmap,
+and only then begin implementation.
 
-The exact release commit is prepared and verified. The next task must confirm
-that `main` points to that commit, create annotated tag `v1.0.0` for exactly
-that commit, push only that tag, and observe the release workflow start. It
-must not approve the protected `pypi` deployment or claim publication.
+Do not silently promote a Future Backlog item or assume a Version 1.1 scope.
 
 ---
 

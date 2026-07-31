@@ -218,6 +218,9 @@ def test_public_documents_are_ready_for_the_stable_release():
     changelog = CHANGELOG_PATH.read_text(encoding="utf-8")
 
     assert "Version `1.0.0` is the first stable release" in readme
+    assert "https://pypi.org/project/python-ai-toolkit/1.0.0/" in readme
+    assert "https://github.com/bkocii/python-ai-toolkit/releases/tag/v1.0.0" in readme
+    assert "Sprint 9 — Production Readiness is complete." in readme
     assert "python -m pip install python-ai-toolkit" in readme
     assert "distributed through PyPI" in installation
     assert "stable package metadata is `1.0.0`" in compatibility
